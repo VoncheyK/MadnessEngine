@@ -32,10 +32,6 @@ class StoryMenuState extends MusicBeatState
 {
 	var scoreText:FlxText;
 
-	#if polymod
-	polymod.Polymod.init({modRoot: "mods", dirs: ['testMod']});
-	#end
-
 	var weekData:WeekStuff = haxe.Json.parse(Assets.getText(Paths.json("weekStuff")));
 
 
