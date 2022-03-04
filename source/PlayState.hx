@@ -1615,84 +1615,7 @@ class PlayState extends MusicBeatState
 		{
 			notes.forEachAlive(function(daNote:Note)
 			{
-				if (daNote.y > FlxG.height)
-				{
-					daNote.active = false;
-					daNote.visible = false;
-				}
-				else
-				{
-					daNote.visible = true;
-					daNote.active = true;
-				}
-
-				daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
-
-				// i am so fucking sorry for this if condition
-				if (daNote.isSustainNote
-					&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
-					&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
-				{
-					var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
-					swagRect.y /= daNote.scale.y;
-					swagRect.height -= swagRect.y;
-
-					daNote.clipRect = swagRect;
-				}
-
-				if (!daNote.mustPress && daNote.wasGoodHit)
-				{
-					if (SONG.song != 'Tutorial')
-						camZooming = true;
-
-					var altAnim:String = "";
-
-					if (SONG.notes[Math.floor(curStep / 16)] != null)
-					{
-						if (SONG.notes[Math.floor(curStep / 16)].altAnim)
-							altAnim = '-alt';
-					}
-
-					switch (Math.abs(daNote.noteData))
-					{
-						case 0:
-							dad.playAnim('singLEFT' + altAnim, true);
-						case 1:
-							dad.playAnim('singDOWN' + altAnim, true);
-						case 2:
-							dad.playAnim('singUP' + altAnim, true);
-						case 3:
-							dad.playAnim('singRIGHT' + altAnim, true);
-					}
-
-					dad.holdTimer = 0;
-
-					if (SONG.needsVoices)
-						vocals.volume = 1;
-
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
-				}
-
-				// WIP interpolation shit? Need to fix the pause issue
-				// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
-
-				if (daNote.y < -daNote.height)
-				{
-					if (daNote.tooLate || !daNote.wasGoodHit)
-					{
-						health -= 0.0475;
-						vocals.volume = 0;
-					}
-
-					daNote.active = false;
-					daNote.visible = false;
-
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
-				}
+				opponentNoteHit(daNote);
 			});
 		}
 
@@ -2203,6 +2126,8 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
+
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
@@ -2218,17 +2143,7 @@ class PlayState extends MusicBeatState
 			else
 				health += 0.004;
 
-			switch (note.noteData)
-			{
-				case 0:
-					boyfriend.playAnim('singLEFT', true);
-				case 1:
-					boyfriend.playAnim('singDOWN', true);
-				case 2:
-					boyfriend.playAnim('singUP', true);
-				case 3:
-					boyfriend.playAnim('singRIGHT', true);
-			}
+			boyfriend.playAnim("sing" + direction[note.noteData], true);
 
 			playerStrums.forEach(function(spr:FlxSprite)
 			{
@@ -2247,6 +2162,82 @@ class PlayState extends MusicBeatState
 				notes.remove(note, true);
 				note.destroy();
 			}
+		}
+	}
+
+	function opponentNoteHit(daNote:Note)
+	{
+		if (daNote.y > FlxG.height)
+		{
+			daNote.active = false;
+			daNote.visible = false;
+		}
+		else
+		{
+			daNote.visible = true;
+			daNote.active = true;
+		}
+
+		daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
+
+		// i am so fucking sorry for this if condition
+		// holy fucking shit
+		if (daNote.isSustainNote
+			&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
+			&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
+		{
+			var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
+			swagRect.y /= daNote.scale.y;
+			swagRect.height -= swagRect.y;
+
+			daNote.clipRect = swagRect;
+		}
+
+		if (!daNote.mustPress && daNote.wasGoodHit)
+		{
+			if (SONG.song != 'Tutorial')
+				camZooming = true;
+
+			var altAnim:String = "";
+
+			if (SONG.notes[Math.floor(curStep / 16)] != null)
+			{
+				if (SONG.notes[Math.floor(curStep / 16)].altAnim)
+					altAnim = '-alt';
+			}
+			
+
+			dad.playAnim("sing" + direction[daNote.noteData] + altAnim, true);
+
+			dad.holdTimer = 0;
+
+			if (SONG.needsVoices)
+				vocals.volume = 1;
+
+			//could add light up strums?
+
+			daNote.kill();
+			notes.remove(daNote, true);
+			daNote.destroy();
+		}
+
+		// WIP interpolation shit? Need to fix the pause issue
+		// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
+
+		if (daNote.y < -daNote.height)
+		{
+			if (daNote.tooLate || !daNote.wasGoodHit)
+			{
+				noteMiss(daNote.noteData);
+				vocals.volume = 0;
+			}
+
+			daNote.active = false;
+			daNote.visible = false;
+
+			daNote.kill();
+			notes.remove(daNote, true);
+			daNote.destroy();
 		}
 	}
 
