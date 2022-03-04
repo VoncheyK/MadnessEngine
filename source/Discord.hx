@@ -5,13 +5,15 @@ import discord_rpc.DiscordRpc;
 
 using StringTools;
 
+//changed stuff :)
+
 class DiscordClient
 {
 	public function new()
 	{
 		trace("Discord Client starting...");
 		DiscordRpc.start({
-			clientID: "814588678700924999",
+			clientID: "949412745164492800",
 			onReady: onReady,
 			onError: onError,
 			onDisconnected: onDisconnected
@@ -38,7 +40,7 @@ class DiscordClient
 		DiscordRpc.presence({
 			details: "In the Menus",
 			state: null,
-			largeImageKey: 'icon',
+			largeImageKey: 'big',
 			largeImageText: "Friday Night Funkin'"
 		});
 	}
@@ -74,7 +76,7 @@ class DiscordClient
 		DiscordRpc.presence({
 			details: details,
 			state: state,
-			largeImageKey: 'icon',
+			largeImageKey: 'big',
 			largeImageText: "Friday Night Funkin'",
 			smallImageKey : smallImageKey,
 			// Obtained times are in milliseconds so they are divided so Discord can use it
