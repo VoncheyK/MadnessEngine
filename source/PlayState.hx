@@ -740,6 +740,8 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
+
+		//scoreTxt is now here cuz idc
 		scoreTxt = new FlxText(FlxG.width / 2 - 248, healthBarBG.y + 30, 0, "", 20);
 		scoreTxt.setFormat(Paths.font("impact.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
