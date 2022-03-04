@@ -44,6 +44,9 @@ import openfl.filters.ShaderFilter;
 
 using StringTools;
 
+/**
+ * test
+ */
 class PlayState extends MusicBeatState
 {
 	public static var curStage:String = '';
