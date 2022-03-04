@@ -34,7 +34,7 @@ class StoryMenuState extends MusicBeatState
 
 	var weekData:WeekStuff = haxe.Json.parse(Assets.getText(Paths.json("weekStuff")));
 
-
+	//!softcode later
 	/*!
 	var weekData:Array<Dynamic> = [
 		['Tutorial'],
@@ -47,7 +47,6 @@ class StoryMenuState extends MusicBeatState
 	];
 	*/
 
-	
 	var curDifficulty:Int = 1;
 
 	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true];
@@ -317,7 +316,7 @@ class StoryMenuState extends MusicBeatState
 	{
 		if (weekUnlocked[curWeek])
 		{
-			if (stopspamming == false)
+			if (!stopspamming)
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 
