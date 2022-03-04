@@ -120,6 +120,9 @@ class PlayState extends MusicBeatState
 	var talking:Bool = true;
 	var songScore:Int = 0;
 	var scoreTxt:FlxText;
+	var timeTxt:FlxText;
+
+	var songLength:Float = 0;
 
 	public static var campaignScore:Int = 0;
 
@@ -722,11 +725,12 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
-		scoreTxt = new FlxText(healthBarBG.x + healthBarBG.width - 190, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		scoreTxt.scrollFactor.set();
-		scoreTxt.borderSize = 2;
-		add(scoreTxt);
+		timeTxt = new FlxText(FlxG.width / 2 - 248, 19, 400, "", 32);
+		timeTxt.setFormat(Paths.font("impact.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeTxt.scrollFactor.set();
+		timeTxt.alpha = 0;
+		timeTxt.borderSize = 2;
+		add(timeTxt);
 
 		iconP1 = new HealthIcon(SONG.player1, true);
 		iconP1.y = healthBar.y - (iconP1.height / 2);
@@ -736,6 +740,12 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
+		scoreTxt = new FlxText(FlxG.width / 2 - 248, healthBarBG.y + 30, 0, "", 20);
+		scoreTxt.setFormat(Paths.font("impact.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.scrollFactor.set();
+		scoreTxt.borderSize = 2;
+		add(scoreTxt);
+
 		strumLineNotes.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -743,6 +753,7 @@ class PlayState extends MusicBeatState
 		iconP1.cameras = [camHUD];
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
+		timeTxt.cameras = [camHUD];
 		doof.cameras = [camHUD];
 
 		// if (SONG.song == 'South')
@@ -1006,6 +1017,7 @@ class PlayState extends MusicBeatState
 	{
 		startingSong = false;
 
+		songLength = FlxG.sound.music.length;
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
@@ -1013,6 +1025,8 @@ class PlayState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
+
+		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
 		#if desktop
 		// Song duration in a float, useful for the time left feature
@@ -1354,7 +1368,17 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		scoreTxt.text = "Score:" + songScore;
+		scoreTxt.text = "Score:" + songScore + " | Combo: " + combo;
+
+		var curTime:Float = Conductor.songPosition;
+		if(curTime < 0) curTime = 0;
+
+		var songCalc:Float = (songLength - curTime);
+
+		var secondsTotal:Int = Math.floor(songCalc / 1000);
+		if(secondsTotal < 0) secondsTotal = 0;
+
+		timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
