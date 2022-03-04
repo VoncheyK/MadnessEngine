@@ -272,6 +272,7 @@ class StoryMenuState extends MusicBeatState
 	{
 		if (weekUnlocked[curWeek])
 		{
+			//epic :)
 			if (!stopspamming)
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));

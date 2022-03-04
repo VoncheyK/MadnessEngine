@@ -2058,6 +2058,12 @@ class PlayState extends MusicBeatState
 		});
 	}
 
+	function tooHigh():Void
+	{
+		
+	}
+	
+
 	function noteMiss(direction:Int = 1):Void
 	{
 		if (!boyfriend.stunned)
