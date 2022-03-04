@@ -309,6 +309,8 @@ class FreeplayState extends MusicBeatState
 	override function beatHit()
 	{
 		//we can do cool stuff with the beat
+
+		//yee
 	}
 }
 
