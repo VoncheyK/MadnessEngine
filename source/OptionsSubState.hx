@@ -5,10 +5,11 @@ import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import Options;
 
 class OptionsSubState extends MusicBeatSubstate
 {
-	var textMenuItems:Array<String> = ['Master Volume', 'Sound Volume', 'Controls'];
+	var textMenuItems:Array<String> = ['Downscroll', 'Ghost Tapping'];
 
 	var selector:FlxSprite;
 	var curSelected:Int = 0;
@@ -37,6 +38,14 @@ class OptionsSubState extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
+
+
+		if (controls.BACK)
+		{
+			FlxG.sound.play(Paths.sound('cancelMenu'));
+			FlxG.switchState(new MainMenuState());
+		}
+
 		if (controls.UP_P)
 			curSelected -= 1;
 
@@ -51,6 +60,7 @@ class OptionsSubState extends MusicBeatSubstate
 
 		grpOptionsTexts.forEach(function(txt:FlxText)
 		{
+
 			txt.color = FlxColor.WHITE;
 
 			if (txt.ID == curSelected)
@@ -61,9 +71,10 @@ class OptionsSubState extends MusicBeatSubstate
 		{
 			switch (textMenuItems[curSelected])
 			{
-				case "Controls":
-					FlxG.state.closeSubState();
-					FlxG.state.openSubState(new ControlsSubState());
+				case "Downscroll":
+					FlxG.save.data.Downscroll = !FlxG.save.data.Downscroll;
+					FlxG.save.flush();
+					trace(FlxG.save.data.Downscroll);
 			}
 		}
 	}
