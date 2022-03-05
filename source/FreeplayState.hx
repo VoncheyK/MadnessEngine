@@ -12,6 +12,7 @@ import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import lime.utils.Assets;
+import Sys.sleep;
 
 using StringTools;
 
@@ -35,6 +36,8 @@ class FreeplayState extends MusicBeatState
 
 	override function create()
 	{
+		Conductor.changeBPM(102);
+
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 
 		for (i in 0...initSonglist.length)
@@ -177,7 +180,7 @@ class FreeplayState extends MusicBeatState
 	}
 
 	override function update(elapsed:Float)
-	{
+	{	
 		super.update(elapsed);
 
 		if (FlxG.sound.music.volume < 0.7)
@@ -228,6 +231,14 @@ class FreeplayState extends MusicBeatState
 			PlayState.storyWeek = songs[curSelected].week;
 			trace('CUR WEEK' + PlayState.storyWeek);
 			LoadingState.loadAndSwitchState(new PlayState());
+		}
+
+		for (i in 0...iconArray.length)
+		{
+			
+			iconArray[i].setGraphicSize(Std.int(FlxMath.lerp(150, iconArray[i].width, 0.50)));
+
+			iconArray[i].updateHitbox();
 		}
 	}
 
@@ -308,6 +319,15 @@ class FreeplayState extends MusicBeatState
 	}
 	override function beatHit()
 	{
+		super.beatHit();
+
+		for (i in 0...iconArray.length)
+		{
+			iconArray[i].setGraphicSize(Std.int(iconArray[i].width + 30));
+
+			iconArray[i].updateHitbox();
+		}
+		
 		//we can do cool stuff with the beat
 
 		//yee
