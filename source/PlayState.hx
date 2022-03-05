@@ -117,7 +117,6 @@ class PlayState extends MusicBeatState
 	// Discord RPC variables
 	var storyDifficultyText:String = "";
 	var iconRPC:String = "";
-	var songLength:Float = 0;
 	var detailsText:String = "";
 	var detailsPausedText:String = "";
 	#end
@@ -545,10 +544,11 @@ class PlayState extends MusicBeatState
 
 		//adding stage!!
 		//from kade too :skull:
+		stage = new Stages(SONG.stage);
+
 		for (i in stage.stageToAdd)
-		{
 			add(i);
-		}
+
 		for (index => array in stage.layInFront)
 		{
 			switch (index)
@@ -661,10 +661,7 @@ class PlayState extends MusicBeatState
 				gf.y += 300;
 		}
 
-		add(gf);
-
-		add(dad);
-		add(boyfriend);
+		stage.update(0);
 
 		var doof:DialogueBox = new DialogueBox(false, dialogue);
 		// doof.x += 70;

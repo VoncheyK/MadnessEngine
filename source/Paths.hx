@@ -1,5 +1,6 @@
 package;
 
+import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
@@ -98,6 +99,24 @@ class Paths
 	inline static public function image(key:String, ?library:String)
 	{
 		return getPath('images/$key.png', IMAGE, library);
+	}
+
+	/**
+	 * Loading the image, credits to Kade Engine for this!
+	 * @param key 
+	 * @param library 
+	 * @return FlxGraphic
+	 */
+	static public function loadImage(key:String, ?library:String):FlxGraphic
+	{
+		var path = image(key, library);
+		if (OpenFlAssets.exists(path, IMAGE)) {
+			var bitmap = OpenFlAssets.getBitmapData(path);
+			return FlxGraphic.fromBitmapData(bitmap);
+		} else {
+			trace('no image found in $path');
+			return null;
+		}
 	}
 
 	inline static public function font(key:String)
