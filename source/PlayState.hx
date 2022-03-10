@@ -1,6 +1,5 @@
 package;
 
-import haxe.iterators.ArrayIterator;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -1656,7 +1655,7 @@ class PlayState extends MusicBeatState
 				FlxG.switchState(new StoryMenuState());
 
 				// if ()
-				StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
+				//StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
 
 				if (SONG.validScore)
 				{
@@ -1664,7 +1663,7 @@ class PlayState extends MusicBeatState
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
 
-				FlxG.save.data.weekUnlocked = StoryMenuState.weekUnlocked;
+				//FlxG.save.data.weekUnlocked = StoryMenuState.weekUnlocked;
 				FlxG.save.flush();
 			}
 			else
@@ -1865,7 +1864,7 @@ class PlayState extends MusicBeatState
 	}
 
 	//better keyshit function
-	private function keyShit()
+	private function keyShit():Void
 	{
 		//HOLDING
 		var holdArray:Array<Bool> = [
@@ -1917,6 +1916,7 @@ class PlayState extends MusicBeatState
 						ignoreList.push(daNote.noteData);
 					}
 			});
+
 			for (shit in notesTKL)
 			{
 				shit.kill();
@@ -1928,20 +1928,18 @@ class PlayState extends MusicBeatState
 
 			if (perfectMode)
 				goodNoteHit(possibleNotes[0]);
-
 			else if (0 < possibleNotes.length) 
 			{
-				var h = 0;
-				for (i in pressArray.length...h) {
-					var m = h++;
+				var j = 0;
+				for (i in pressArray.length...j) {
+					var m = j++;
 					if (pressArray[m] && ignoreList.indexOf(m) == -1)
-					badNoteCheck();
+						badNoteCheck();
 				}
-				for (h in 0...possibleNotes.length)
+				for (coolNote in possibleNotes)
 				{
-					var p = possibleNotes[h];
-					pressArray[p.noteData];
-					goodNoteHit(p);
+					pressArray[coolNote.noteData];
+					goodNoteHit(coolNote);
 				}
 			}
 			else
@@ -2016,6 +2014,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	//TODO figure out a better way to do this shit
 	function badNoteCheck()
 	{
 		// just double pasting this shit cuz fuk u
