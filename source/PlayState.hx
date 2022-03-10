@@ -41,6 +41,7 @@ import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
+import ClientSettings;
 
 using StringTools;
 
@@ -722,7 +723,7 @@ class PlayState extends MusicBeatState
 		add(healthBar);
 
 		timeTxt = new FlxText(FlxG.width / 2 - 200, 20, 400, "", 32);
-		timeTxt.setFormat(Paths.font("impact.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
 		timeTxt.borderSize = 2;
@@ -739,7 +740,7 @@ class PlayState extends MusicBeatState
 
 		//scoreTxt is now here cuz idc
 		scoreTxt = new FlxText(FlxG.width / 2 - 248, healthBarBG.y + 30, 0, "", 20);
-		scoreTxt.setFormat(Paths.font("impact.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
@@ -1015,7 +1016,6 @@ class PlayState extends MusicBeatState
 	{
 		startingSong = false;
 
-		songLength = FlxG.sound.music.length;
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
 
@@ -1024,6 +1024,7 @@ class PlayState extends MusicBeatState
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
+		songLength = FlxG.sound.music.length;
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
 		#if desktop
@@ -1953,7 +1954,7 @@ class PlayState extends MusicBeatState
 		{
 			// figured out a better way to do it!!
 			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
-				spr.animation.play("pressed", true); //try forcing?
+				spr.animation.play("pressed"); //try forcing?
 			if (holdArray[spr.ID])
 				spr.animation.play("static");
 

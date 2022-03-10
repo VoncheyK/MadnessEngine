@@ -6,10 +6,12 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import Options;
+import ClientSettings;
 
 class OptionsSubState extends MusicBeatSubstate
 {
 	var textMenuItems:Array<String> = ['Downscroll', 'Ghost Tapping'];
+	var optionNames:Array<String> = ['downScroll', 'ghostTapping'];
 
 	var selector:FlxSprite;
 	var curSelected:Int = 0;
@@ -69,13 +71,9 @@ class OptionsSubState extends MusicBeatSubstate
 
 		if (controls.ACCEPT)
 		{
-			switch (textMenuItems[curSelected])
-			{
-				case "Downscroll":
-					FlxG.save.data.Downscroll = !FlxG.save.data.Downscroll;
-					FlxG.save.flush();
-					trace(FlxG.save.data.Downscroll);
-			}
+			FlxG.save.data.optionNames[curSelected] = !FlxG.save.data.optionNames[curSelected];
+			FlxG.save.flush();
+			trace(optionNames[curSelected] + " : " + FlxG.save.data.optionNames[curSelected]);
 		}
 	}
 }
