@@ -42,6 +42,7 @@ import lime.utils.Assets;
 import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
+import ClientSettings;
 
 using StringTools;
 
