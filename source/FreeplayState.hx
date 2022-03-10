@@ -38,11 +38,14 @@ class FreeplayState extends MusicBeatState
 	{
 		Conductor.changeBPM(102);
 
+		//uh soft coded songs in freeplay
+		//this should work???
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
 
 		for (i in 0...initSonglist.length)
 		{
-			songs.push(new SongMetadata(initSonglist[i], 1, 'gf'));
+			var data = initSonglist[i].split(":");
+			songs.push(new SongMetadata(data[0], Std.parseInt(data[1]), data[2]));
 		}
 
 		/* 
@@ -64,7 +67,7 @@ class FreeplayState extends MusicBeatState
 		isDebug = true;
 		#end
 
-		if (StoryMenuState.weekUnlocked[2] || isDebug)
+		/*if (StoryMenuState.weekUnlocked[2] || isDebug)
 			addWeek(['Bopeebo', 'Fresh', 'Dadbattle'], 1, ['dad']);
 
 		if (StoryMenuState.weekUnlocked[2] || isDebug)
@@ -80,7 +83,7 @@ class FreeplayState extends MusicBeatState
 			addWeek(['Cocoa', 'Eggnog', 'Winter-Horrorland'], 5, ['parents-christmas', 'parents-christmas', 'monster-christmas']);
 
 		if (StoryMenuState.weekUnlocked[6] || isDebug)
-			addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai', 'spirit']);
+			addWeek(['Senpai', 'Roses', 'Thorns'], 6, ['senpai', 'senpai', 'spirit']);*/
 
 		// LOAD MUSIC
 
