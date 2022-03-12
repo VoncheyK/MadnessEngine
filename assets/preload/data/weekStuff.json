@@ -1,5 +1,6 @@
 {
     "weekSongs": [
+		["Disruption"],
 		["Tutorial"],
 		["Bopeebo", "Fresh", "Dadbattle"],
 		["Spookeez", "South", "Monster"],
@@ -12,6 +13,7 @@
     "weekCharacters": [
 		["dad", "bf", "gf"],
 		["dad", "bf", "gf"],
+		["dad", "bf", "gf"],
 		["spooky", "bf", "gf"],
 		["pico", "bf", "gf"],
 		["mom", "bf", "gf"],
@@ -20,6 +22,7 @@
     ],
 
     "weekNames": [
+		"PAIN NO PAIN",
         "Where it all begins.",
 		"Daddy Dearest",
 		"Spooky Month",
@@ -27,6 +30,17 @@
 		"MOMMY MUST MURDER",
 		"RED SNOW",
 		"hating simulator ft. moawling"
+	],
+
+	"weekImages": [
+		"",
+        "week0",
+		"week1",
+		"week2",
+		"week3",
+		"week4",
+		"week5",
+		"week6"
 	],
 	
 	"weekUnlocked": [true, true, true, true, true, true, true]

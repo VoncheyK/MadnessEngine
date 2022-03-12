@@ -30,7 +30,7 @@ class StoryMenuState extends MusicBeatState
 
 	var curDifficulty:Int = 1;
 
-	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true];
+	public static var weekUnlocked:Array<Bool> = [];
 
 	var txtWeekTitle:FlxText;
 
@@ -105,6 +105,8 @@ class StoryMenuState extends MusicBeatState
 			weekThing.screenCenter(X);
 			weekThing.antialiasing = true;
 			// weekThing.updateHitbox();
+
+			weekUnlocked.push(true);
 
 			// Needs an offset thingie
 			if (!weekUnlocked[i])
