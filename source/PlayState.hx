@@ -1610,14 +1610,14 @@ class PlayState extends MusicBeatState
 			});
 		}
 
-		cpuStrums.forEach(function(spr:FlxSprite)
+		/*cpuStrums.forEach(function(spr:FlxSprite)
 		{
 			if (spr.animation.finished)
 			{
 				spr.animation.play('static');
 				spr.centerOffsets();
 			}
-		});
+		});*/
 
 		if (!inCutscene)
 			keyShit();
@@ -1883,32 +1883,36 @@ class PlayState extends MusicBeatState
 		];
 		//release isnt used so ill remove it
 
-		if (holdArray.indexOf(true) != -1 && generatedMusic)
+		//changed it to check if it contains true
+		if (holdArray.contains(true) && generatedMusic)
 			notes.forEachAlive(function(daNote:Note) {
 				if (daNote.isSustainNote && daNote.canBeHit && daNote.mustPress && holdArray[daNote.noteData])
 					goodNoteHit(daNote);
 			});
-		if (pressArray.indexOf(true) != -1 && generatedMusic)
+		if (pressArray.contains(true) && generatedMusic)
 		{
 			boyfriend.holdTimer = 0;
 
 			//possible notes????
 			var possibleNotes:Array<Note> = [];
-			//ignore list
+			//ignore list????
 			var ignoreList:Array<Int> = [];
 			//notes to kill later????
-			var	notesTKL:Array<Note> = [];
+			var	notesTK:Array<Note> = [];
 
 			notes.forEachAlive(function (daNote:Note) {
 				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
-					if (ignoreList.indexOf(daNote.noteData) != -1)
+					if (ignoreList.contains(daNote.noteData))
 						for (note in possibleNotes)
 						{
-							if (note.noteData == daNote.noteData && 10 > Math.abs(daNote.strumTime - note.strumTime))
-								notesTKL.push(daNote);
+							if (note.noteData == daNote.noteData && 10 > Math.abs(daNote.strumTime - note.strumTime)) {
+								notesTK.push(daNote);
+								break;
+							}
 							else if (note.noteData == daNote.noteData && daNote.strumTime < note.strumTime) {
 								possibleNotes.remove(note);
 								possibleNotes.push(daNote);
+								break;
 							}
 						}
 					else
@@ -1918,7 +1922,7 @@ class PlayState extends MusicBeatState
 					}
 			});
 
-			for (shit in notesTKL)
+			for (shit in notesTK)
 			{
 				shit.kill();
 				notes.remove(shit, true);
@@ -1931,41 +1935,53 @@ class PlayState extends MusicBeatState
 				goodNoteHit(possibleNotes[0]);
 			else if (0 < possibleNotes.length) 
 			{
-				var j = 0;
-				for (i in pressArray.length...j) {
-					var m = j++;
-					if (pressArray[m] && ignoreList.indexOf(m) == -1)
-						badNoteCheck();
-				}
+				//if (!ghost tapping stuff)
+				for (i in 0...pressArray.length)
+					if (pressArray[i] && !ignoreList.contains(i))
+					{
+						noteMiss(i);
+						misses++;
+						health -= 0.04;
+						songScore -= 10;
+					}
 				for (coolNote in possibleNotes)
 				{
-					pressArray[coolNote.noteData];
-					goodNoteHit(coolNote);
+					if (pressArray[coolNote.noteData])
+						goodNoteHit(coolNote);
 				}
 			}
 			else
+			{
 				badNoteCheck();
+				misses++;
+				health -= 0.04;
+				songScore -= 10;
+			}
 		}
-		if (boyfriend.holdTimer > 0.004 * Conductor.stepCrochet && holdArray.indexOf(true) == -1
+		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !holdArray.contains(true)
 		&& boyfriend.animation.curAnim.name.startsWith("sing") && !boyfriend.animation.curAnim.name.endsWith("miss"))
-			boyfriend.playAnim("idle");
+			boyfriend.playAnim("idle");				
+		/*else if (!ghost tapping stuff)
+		    for (i in 0...pressArray.length)
+		        if (pressArray[i])
+		            noteMiss(i);*/
 		
-		playerStrums.forEach(function (spr:FlxSprite)
+		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
 			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
-				spr.animation.play("pressed"); //try forcing?
+				spr.animation.play("pressed");
 			if (holdArray[spr.ID])
 				spr.animation.play("static");
 
-			if (spr.animation.curAnim.name != "confirm" || curStage.startsWith("school"))
-				spr.centerOffsets();
-			else
+			if (spr.animation.curAnim.name != "confirm" || !curStage.startsWith("school"))
 			{
 				spr.centerOffsets();
 				spr.offset.x -= 13;
 				spr.offset.y -= 13;
-			}
+			}				
+			else
+				spr.centerOffsets();
 		});
 	}
 
@@ -1974,20 +1990,17 @@ class PlayState extends MusicBeatState
 		
 	}
 
+	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
+
 	function noteMiss(direction:Int = 1):Void
 	{
 		if (!boyfriend.stunned)
 		{
-			health -= 0.04;
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{
 				gf.playAnim('sad');
 			}
 			combo = 0;
-
-			misses++;
-
-			songScore -= 10;
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
@@ -2001,17 +2014,7 @@ class PlayState extends MusicBeatState
 				boyfriend.stunned = false;
 			});
 
-			switch (direction)
-			{
-				case 0:
-					boyfriend.playAnim('singLEFTmiss', true);
-				case 1:
-					boyfriend.playAnim('singDOWNmiss', true);
-				case 2:
-					boyfriend.playAnim('singUPmiss', true);
-				case 3:
-					boyfriend.playAnim('singRIGHTmiss', true);
-			}
+			boyfriend.playAnim('sing' + this.direction[direction] + 'miss', true);
 		}
 	}
 
@@ -2044,8 +2047,6 @@ class PlayState extends MusicBeatState
 			badNoteCheck();
 		}
 	}
-
-	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
 
 	function goodNoteHit(note:Note):Void
 	{
@@ -2130,7 +2131,7 @@ class PlayState extends MusicBeatState
 			if (SONG.needsVoices)
 				vocals.volume = 1;
 
-			cpuStrums.forEach(function(spr:FlxSprite)
+			/*cpuStrums.forEach(function(spr:FlxSprite)
 			{
 				
 				if (Math.abs(daNote.noteData) == spr.ID)
@@ -2145,7 +2146,7 @@ class PlayState extends MusicBeatState
 					else
 						spr.centerOffsets();					
 				}
-			});
+			});*/
 
 			daNote.kill();
 			notes.remove(daNote, true);
