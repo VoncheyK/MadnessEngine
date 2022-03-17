@@ -381,7 +381,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[0].animation.play(weekData.weekCharacters[curWeek][0]);
 		grpWeekCharacters.members[1].animation.play(weekData.weekCharacters[curWeek][1]);
 		grpWeekCharacters.members[2].animation.play(weekData.weekCharacters[curWeek][2]);
-		txtTracklist.text = "Tracks\n";
+		txtTracklist.text = "Tracks\n\n";
 
 		switch (grpWeekCharacters.members[0].animation.curAnim.name)
 		{
