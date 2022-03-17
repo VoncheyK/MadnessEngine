@@ -1971,10 +1971,10 @@ class PlayState extends MusicBeatState
 			// figured out a better way to do it!!
 			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
 				spr.animation.play("pressed");
-			if (holdArray[spr.ID])
+			if (!holdArray[spr.ID])
 				spr.animation.play("static");
 
-			if (spr.animation.curAnim.name != "confirm" || !curStage.startsWith("school"))
+			if (spr.animation.curAnim.name == "confirm" || curStage.startsWith("school"))
 			{
 				spr.centerOffsets();
 				spr.offset.x -= 13;
@@ -1983,11 +1983,6 @@ class PlayState extends MusicBeatState
 			else
 				spr.centerOffsets();
 		});
-	}
-
-	function tooHigh():Void
-	{
-		
 	}
 
 	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
@@ -2064,7 +2059,7 @@ class PlayState extends MusicBeatState
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
-					spr.animation.play('confirm', true);
+					spr.animation.play('confirm');
 				}
 			});
 
