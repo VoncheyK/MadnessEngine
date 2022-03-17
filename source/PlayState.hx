@@ -1365,9 +1365,9 @@ class PlayState extends MusicBeatState
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider "Combo:" + combo + " (Max " + highestCombo + ")";
+		scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
 		//scoreTxt.text += divider 'Accuracy: ' + daAccuracy + '%';
-		scoreTxt.text += divider "Misses:" + misses;
+		scoreTxt.text += divider + "Misses:" + misses;
 		scoreTxt.text += divider + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)

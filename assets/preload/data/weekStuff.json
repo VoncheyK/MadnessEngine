@@ -7,18 +7,20 @@
 		["Satin-Panties", "High", "Milf"],
 		["Cocoa", "Eggnog", "Winter-Horrorland"],
 		["Senpai", "Roses", "Thorns"],
-		["Disruption"]
+		["Disruption"],
+		["Test"]
     ],
 
     "weekCharacters": [
-		["dad", "bf", "gf"],
+		["", "bf", "gf"],
 		["dad", "bf", "gf"],
 		["spooky", "bf", "gf"],
 		["pico", "bf", "gf"],
 		["mom", "bf", "gf"],
 		["parents-christmas", "bf", "gf"],
 		["senpai", "bf", "gf"],
-		["dad", "bf", "gf"]
+		["dad", "bf", "gf"],
+		["", "bf", "gf"]
     ],
 
     "weekNames": [
@@ -29,7 +31,8 @@
 		"MOMMY MUST MURDER",
 		"RED SNOW",
 		"hating simulator ft. moawling",
-		"PAIN NO PAIN"
+		"PAIN NO PAIN",
+		""
 	],
 
 	"weekImages": [
@@ -40,8 +43,9 @@
 		"week4",
 		"week5",
 		"week6",
+		"noweek",
 		"noweek"
 	],
 	
-	"weekUnlocked": [true, true, true, true, true, true, true]
+	"weekUnlocked": [true, true, true, true, true, true, true, true]
 }
