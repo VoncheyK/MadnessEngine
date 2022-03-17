@@ -2079,6 +2079,7 @@ class PlayState extends MusicBeatState
 
 	function opponentNoteHit(daNote:Note)
 	{
+
 		if (daNote.y > FlxG.height)
 		{
 			daNote.active = false;
