@@ -1346,6 +1346,7 @@ class PlayState extends MusicBeatState
 		super.update(elapsed);
 
 		var fcRank:String;
+		var divider:String = ' | '
 
 		//beta ranks until we have actual accuracy to work with
 
@@ -1364,9 +1365,10 @@ class PlayState extends MusicBeatState
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += " | Combo:" + combo + " (Max " + highestCombo + ")";
-		scoreTxt.text += " | Misses:" + misses;
-		scoreTxt.text += ' | ' + fcRank;
+		scoreTxt.text += divider "Combo:" + combo + " (Max " + highestCombo + ")";
+		//scoreTxt.text += divider 'Accuracy: ' + daAccuracy + '%';
+		scoreTxt.text += divider "Misses:" + misses;
+		scoreTxt.text += divider + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)
 		{
