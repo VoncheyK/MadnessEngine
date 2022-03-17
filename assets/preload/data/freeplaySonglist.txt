@@ -1,4 +1,3 @@
-Disruption:1:bf
 Tutorial:1:gf
 Bopeebo:1:dad
 Fresh:1:dad
@@ -18,3 +17,4 @@ Winter-Horrorland:5:monster-christmas
 Senpai:6:senpai
 Roses:6:senpai
 Thorns:6:spirit
+Disruption:1:bf

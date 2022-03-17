@@ -1,46 +1,46 @@
 {
     "weekSongs": [
-		["Disruption"],
 		["Tutorial"],
 		["Bopeebo", "Fresh", "Dadbattle"],
 		["Spookeez", "South", "Monster"],
 		["Pico", "Philly", "Blammed"],
 		["Satin-Panties", "High", "Milf"],
 		["Cocoa", "Eggnog", "Winter-Horrorland"],
-		["Senpai", "Roses", "Thorns"]
+		["Senpai", "Roses", "Thorns"],
+		["Disruption"]
     ],
 
     "weekCharacters": [
-		["dad", "bf", "gf"],
 		["dad", "bf", "gf"],
 		["dad", "bf", "gf"],
 		["spooky", "bf", "gf"],
 		["pico", "bf", "gf"],
 		["mom", "bf", "gf"],
 		["parents-christmas", "bf", "gf"],
-		["senpai", "bf", "gf"]
+		["senpai", "bf", "gf"],
+		["dad", "bf", "gf"]
     ],
 
     "weekNames": [
-		"PAIN NO PAIN",
-        "Where it all begins.",
+        "Funky Beginnings.",
 		"Daddy Dearest",
 		"Spooky Month",
 		"PICO",
 		"MOMMY MUST MURDER",
 		"RED SNOW",
-		"hating simulator ft. moawling"
+		"hating simulator ft. moawling",
+		"PAIN NO PAIN"
 	],
 
 	"weekImages": [
-		"",
-        "week0",
-		"week1",
+		"week0",
+        "week1",
 		"week2",
 		"week3",
 		"week4",
 		"week5",
-		"week6"
+		"week6",
+		"noweek"
 	],
 	
 	"weekUnlocked": [true, true, true, true, true, true, true]
