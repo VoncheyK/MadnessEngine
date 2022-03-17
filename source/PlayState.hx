@@ -146,6 +146,12 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
+	// Ratings
+	public var sicks:Int = 0;
+	public var goods:Int = 0;
+	public var bads:Int = 0;
+	public var shits:Int = 0;
+
 	override public function create()
 	{
 		if (FlxG.sound.music != null)
@@ -1353,10 +1359,30 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		var fcRank:String;
+		var divider:String = ' | ';
+
+		//beta ranks until we have actual accuracy to work with
+
+		fcRank = "[UNRATED]";
+
+		if (sicks > 0) 
+			fcRank = "[SFC]";
+		if (goods > 0)
+			fcRank = "[GFC]";
+		if (bads > 0 || shits > 0)
+			fcRank = "[FC]";
+		if (misses > 0)
+			fcRank = "[SDCB]";
+		if (misses > 9)
+			fcRank = "[Clear]";
+
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += " | Combo:" + combo + " (Max " + highestCombo + ")";
-		scoreTxt.text += " | Misses:" + misses;
+		scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
+		//scoreTxt.text += divider 'Accuracy: ' + daAccuracy + '%';
+		scoreTxt.text += divider + "Misses:" + misses;
+		scoreTxt.text += divider + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)
 		{
@@ -1738,8 +1764,8 @@ class PlayState extends MusicBeatState
 		var rating:FlxSprite = new FlxSprite();
 		var score:Int = 350;
 
-		var daRating:String = "sick";
-		var daAccuracy:Int = 100;
+		var daRating:String = "";
+		var daAccuracy:Int = 0;
 
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
@@ -1758,6 +1784,13 @@ class PlayState extends MusicBeatState
 			daRating = 'good';
 			score = 200;
 			daAccuracy = 80;
+		}
+		else
+		{
+			daRating = 'sick';
+			score = 300;
+			sicks++;
+			daAccuracy = 100;
 		}
 
 		preAcc += daAccuracy;
@@ -1983,7 +2016,7 @@ class PlayState extends MusicBeatState
 				goodNoteHit(possibleNotes[0]);
 			else if (0 < possibleNotes.length) 
 			{
-				//if (ClientSettings.ghostTapping)
+				if (ClientSettings.ghostTapping)
 				for (i in 0...pressArray.length)
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
