@@ -83,6 +83,11 @@ class PlayState extends MusicBeatState
 	private var combo:Int = 0;
 	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
+	
+	//accuracy stuff
+	public var totalNotesHit:Int = 0;
+	public var preAcc:Int = 0;
+	public var accuracy:Int = 100;
 
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
@@ -1734,22 +1739,28 @@ class PlayState extends MusicBeatState
 		var score:Int = 350;
 
 		var daRating:String = "sick";
+		var daAccuracy:Int = 100;
 
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
 			score = 50;
+			daAccuracy = 30;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.75)
 		{
 			daRating = 'bad';
 			score = 100;
+			daAccuracy = 60;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.2)
 		{
 			daRating = 'good';
 			score = 200;
+			daAccuracy = 80;
 		}
+
+		preAcc += daAccuracy;
 
 		daNote.daRating = daRating;
 
@@ -1758,6 +1769,7 @@ class PlayState extends MusicBeatState
 		var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
    		if (!curStage.startsWith('school'))
    		{
+			//i might remake this lmao -jorge
     		var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('noteSplashes', 'shared');
     		sploosh.frames = tex;
 		    sploosh.animation.addByPrefix('splash 0 0', 'note impact 1 purple', 24, false);
@@ -1976,6 +1988,7 @@ class PlayState extends MusicBeatState
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
 						noteMiss(i);
+						totalNotesHit++;
 						misses++;
 						health -= 0.04;
 						songScore -= 10;
@@ -1992,6 +2005,7 @@ class PlayState extends MusicBeatState
 				misses++;
 				health -= 0.04;
 				songScore -= 10;
+				totalNotesHit++;
 			}
 		}
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !holdArray.contains(true)
@@ -2012,14 +2026,15 @@ class PlayState extends MusicBeatState
 			if (!holdArray[spr.ID])
 				spr.animation.play("static");
 
-			if (spr.animation.curAnim.name == "confirm" || curStage.startsWith("school"))
+			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+				spr.centerOffsets();			
+			else
 			{
 				spr.centerOffsets();
 				spr.offset.x -= 13;
 				spr.offset.y -= 13;
-			}				
-			else
-				spr.centerOffsets();
+			}
+				
 		});
 	}
 
@@ -2032,7 +2047,8 @@ class PlayState extends MusicBeatState
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{
 				gf.playAnim('sad');
-			}
+			}		
+
 			combo = 0;
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
@@ -2071,7 +2087,7 @@ class PlayState extends MusicBeatState
 			noteMiss(3);
 	}
 
-	function noteCheck(keyP:Bool, note:Note):Void
+	/*function noteCheck(keyP:Bool, note:Note):Void
 	{
 		if (keyP)
 			goodNoteHit(note);
@@ -2079,7 +2095,7 @@ class PlayState extends MusicBeatState
 		{
 			badNoteCheck();
 		}
-	}
+	}*/
 
 	function goodNoteHit(note:Note):Void
 	{
@@ -2101,14 +2117,18 @@ class PlayState extends MusicBeatState
 				}
 			});
 
+			accuracy = Std.int(preAcc / totalNotesHit);
+
+			trace(accuracy);
+
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
 			if (!note.isSustainNote)
 			{
+				totalNotesHit++;
 				/*if (note.daRating == "sick")
 					noteSplash(note.x, note.y, note.noteData, false);*/
-				popUpScore(note);
 				combo += 1;
 				popUpScore(note);
 				if (combo > highestCombo)
@@ -2204,6 +2224,7 @@ class PlayState extends MusicBeatState
 				noteMiss(daNote.noteData);
 				misses++;
 				health -= 0.04;
+				totalNotesHit++;
 				songScore -= 10;
 				vocals.volume = 0;
 			}

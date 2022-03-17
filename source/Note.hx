@@ -46,7 +46,7 @@ class Note extends FlxSprite
 		isSustainNote = sustainNote;
 
 		//how did you manage to have offcenter notes bruh
-		x += 120;
+		x += 100;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
 		this.strumTime = strumTime;
