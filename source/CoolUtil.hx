@@ -13,7 +13,7 @@ class CoolUtil
 		return difficultyArray[PlayState.storyDifficulty];
 	}
 
-	public static function grantAchivement(name):String
+	public static function grantAchivement(name):String // wtf does this do??
 	{
 		return difficultyArray[PlayState.storyDifficulty];
 	}
