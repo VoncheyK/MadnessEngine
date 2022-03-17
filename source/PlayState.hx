@@ -2190,9 +2190,8 @@ class PlayState extends MusicBeatState
 				health -= 0.04;
 				songScore -= 10;
 
-				^ uncomment this to enable punishing
-				  missing notes by letting them go by without hitting them
-
+				^ uncomment this to enable punishing by
+				missing notes letting them go by instead of hitting them
 				*/
 				vocals.volume = 0;
 			}
