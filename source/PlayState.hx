@@ -165,23 +165,6 @@ class PlayState extends MusicBeatState
 
 		switch (SONG.song.toLowerCase())
 		{
-			case 'tutorial':
-				dialogue = ["Hey you're pretty cute.", 'Use the arrow keys to keep up \nwith me singing.'];
-			case 'bopeebo':
-				dialogue = [
-					'HEY!',
-					"You think you can just sing\nwith my daughter like that?",
-					"If you want to date her...",
-					"You're going to have to go \nthrough ME first!"
-				];
-			case 'fresh':
-				dialogue = ["Not too shabby boy.", ""];
-			case 'dadbattle':
-				dialogue = [
-					"gah you think you're hot stuff?",
-					"If you can beat me here...",
-					"Only then I will even CONSIDER letting you\ndate my daughter!"
-				];
 			case 'senpai':
 				dialogue = CoolUtil.coolTextFile(Paths.txt('senpai/senpaiDialogue'));
 			case 'roses':
@@ -1351,6 +1334,17 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		//updating values
+		scoreTxt.text = "Score: " + songScore;
+		scoreTxt.text += " | Combo:" + combo;
+		scoreTxt.text += " | Misses:" + misses;
+
+		/*if (ClientSettings.displayAccuracy)
+		{
+			scoreTxt.text += ' | Accuracy: ' + accuracy stuff + '%';
+			scoreTxt.text += ' | Rank: ' + rank stuff;
+		}*/
+
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
 
@@ -2172,9 +2166,6 @@ class PlayState extends MusicBeatState
 	override function stepHit()
 	{
 		super.stepHit();
-
-		//updating values
-		scoreTxt.text = "Score:" + songScore + " | Combo: " + combo + " | Misses: " + misses;
 
 		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
 		{
