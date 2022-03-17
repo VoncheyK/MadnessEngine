@@ -1341,7 +1341,7 @@ class PlayState extends MusicBeatState
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += " | Combo:" + combo + " (Max) " + highestCombo;
+		scoreTxt.text += " | Combo:" + combo + " (Max " + highestCombo + ")";
 		scoreTxt.text += " | Misses:" + misses;
 
 		/*if (ClientSettings.displayAccuracy)
@@ -2186,13 +2186,8 @@ class PlayState extends MusicBeatState
 			{
 				noteMiss(daNote.noteData);
 				misses++;
-				/*
 				health -= 0.04;
 				songScore -= 10;
-
-				^ uncomment this to enable punishing by
-				missing notes letting them go by instead of hitting them
-				*/
 				vocals.volume = 0;
 			}
 
