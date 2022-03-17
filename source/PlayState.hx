@@ -1346,7 +1346,7 @@ class PlayState extends MusicBeatState
 		super.update(elapsed);
 
 		var fcRank:String;
-		var divider:String = ' | '
+		var divider:String = ' | ';
 
 		//beta ranks until we have actual accuracy to work with
 
