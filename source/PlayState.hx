@@ -80,6 +80,7 @@ class PlayState extends MusicBeatState
 	private var gfSpeed:Int = 1;
 	private var health:Float = 1;
 	private var combo:Int = 0;
+	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
 
 	private var healthBarBG:FlxSprite;
@@ -143,6 +144,10 @@ class PlayState extends MusicBeatState
 	{
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
+
+		misses = 0;
+		combo = 0;
+		highestCombo = 0;
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -697,6 +702,8 @@ class PlayState extends MusicBeatState
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
+		/*if(ClientSettings.downScroll)
+			healthBarBG.y = 0.11 * FlxG.height;*/
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
@@ -720,9 +727,7 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-
-		//scoreTxt is now here cuz idc
-		scoreTxt = new FlxText(FlxG.width / 2 - 248, healthBarBG.y + 30, 0, "", 20);
+		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 2;
@@ -1336,7 +1341,7 @@ class PlayState extends MusicBeatState
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += " | Combo:" + combo;
+		scoreTxt.text += " | Combo:" + combo + " (Max) " + highestCombo;
 		scoreTxt.text += " | Misses:" + misses;
 
 		/*if (ClientSettings.displayAccuracy)
@@ -1955,7 +1960,7 @@ class PlayState extends MusicBeatState
 				goodNoteHit(possibleNotes[0]);
 			else if (0 < possibleNotes.length) 
 			{
-				//if (!ghost tapping stuff)
+				//if (ClientSettings.ghostTapping)
 				for (i in 0...pressArray.length)
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
@@ -2088,8 +2093,11 @@ class PlayState extends MusicBeatState
 
 			if (!note.isSustainNote)
 			{
-				popUpScore(note);
 				combo += 1;
+				popUpScore(note);
+				if (combo > highestCombo)
+					highestCombo = combo;
+
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
@@ -2177,6 +2185,15 @@ class PlayState extends MusicBeatState
 			if (daNote.tooLate || !daNote.wasGoodHit)
 			{
 				noteMiss(daNote.noteData);
+				misses++;
+				/*
+				health -= 0.04;
+				songScore -= 10;
+
+				^ uncomment this to enable punishing
+				  missing notes by letting them go by without hitting them
+
+				*/
 				vocals.volume = 0;
 			}
 
