@@ -81,6 +81,7 @@ class PlayState extends MusicBeatState
 	private var gfSpeed:Int = 1;
 	private var health:Float = 1;
 	private var combo:Int = 0;
+	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
 
 	private var healthBarBG:FlxSprite;
@@ -145,15 +146,19 @@ class PlayState extends MusicBeatState
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
+		misses = 0;
+		combo = 0;
+		highestCombo = 0;
+
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
+		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		FlxG.cameras.add(camHUD);
-
-		FlxCamera.defaultCameras = [camGame];
+		FlxG.cameras.setDefaultDrawTarget(camHUD, false);
 
 		persistentUpdate = true;
 		persistentDraw = true;
@@ -166,23 +171,6 @@ class PlayState extends MusicBeatState
 
 		switch (SONG.song.toLowerCase())
 		{
-			case 'tutorial':
-				dialogue = ["Hey you're pretty cute.", 'Use the arrow keys to keep up \nwith me singing.'];
-			case 'bopeebo':
-				dialogue = [
-					'HEY!',
-					"You think you can just sing\nwith my daughter like that?",
-					"If you want to date her...",
-					"You're going to have to go \nthrough ME first!"
-				];
-			case 'fresh':
-				dialogue = ["Not too shabby boy.", ""];
-			case 'dadbattle':
-				dialogue = [
-					"gah you think you're hot stuff?",
-					"If you can beat me here...",
-					"Only then I will even CONSIDER letting you\ndate my daughter!"
-				];
 			case 'senpai':
 				dialogue = CoolUtil.coolTextFile(Paths.txt('senpai/senpaiDialogue'));
 			case 'roses':
@@ -722,6 +710,8 @@ class PlayState extends MusicBeatState
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
+		/*if(ClientSettings.downScroll)
+			healthBarBG.y = 0.11 * FlxG.height;*/
 
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
@@ -745,9 +735,7 @@ class PlayState extends MusicBeatState
 		iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-
-		//scoreTxt is now here cuz idc
-		scoreTxt = new FlxText(FlxG.width / 2 - 248, healthBarBG.y + 30, 0, "", 20);
+		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 2;
@@ -1360,6 +1348,17 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		//updating values
+		scoreTxt.text = "Score: " + songScore;
+		scoreTxt.text += " | Combo:" + combo + " (Max " + highestCombo + ")";
+		scoreTxt.text += " | Misses:" + misses;
+
+		/*if (ClientSettings.displayAccuracy)
+		{
+			scoreTxt.text += ' | Accuracy: ' + accuracy stuff + '%';
+			scoreTxt.text += ' | Rank: ' + rank stuff;
+		}*/
+
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
 
@@ -1669,7 +1668,6 @@ class PlayState extends MusicBeatState
 
 				if (SONG.validScore)
 				{
-					NGio.unlockMedal(60961);
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
 
@@ -1756,6 +1754,33 @@ class PlayState extends MusicBeatState
 		daNote.daRating = daRating;
 
 		songScore += score;
+
+		var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
+   		if (!curStage.startsWith('school'))
+   		{
+    		var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('noteSplashes', 'shared');
+    		sploosh.frames = tex;
+		    sploosh.animation.addByPrefix('splash 0 0', 'note impact 1 purple', 24, false);
+    		sploosh.animation.addByPrefix('splash 0 1', 'note impact 1  blue', 24, false);
+    		sploosh.animation.addByPrefix('splash 0 2', 'note impact 1 green', 24, false);
+    		sploosh.animation.addByPrefix('splash 0 3', 'note impact 1 red', 24, false);
+    		sploosh.animation.addByPrefix('splash 1 0', 'note impact 2 purple', 24, false);
+		    sploosh.animation.addByPrefix('splash 1 1', 'note impact 2 blue', 24, false);
+		    sploosh.animation.addByPrefix('splash 1 2', 'note impact 2 green', 24, false);
+		    sploosh.animation.addByPrefix('splash 1 3', 'note impact 2 red', 24, false);
+    		if (daRating == 'sick')
+    			//reminder: attach this to an option once the Options Menu is done
+    		{
+     			add(sploosh);
+     			sploosh.cameras = [camHUD];
+    			sploosh.animation.play('splash ' + FlxG.random.int(0, 1) + " " + daNote.noteData);
+     			sploosh.alpha = 0.6;
+     			sploosh.offset.x += 90;
+     			sploosh.offset.y += 80;
+     			sploosh.animation.finishCallback = function(name)
+     			sploosh.kill();
+     		}
+     	}
 
 		/* if (combo > 60)
 				daRating = 'sick';
@@ -1946,7 +1971,7 @@ class PlayState extends MusicBeatState
 				goodNoteHit(possibleNotes[0]);
 			else if (0 < possibleNotes.length) 
 			{
-				//if (!ghost tapping stuff)
+				//if (ClientSettings.ghostTapping)
 				for (i in 0...pressArray.length)
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
@@ -1984,10 +2009,10 @@ class PlayState extends MusicBeatState
 			// figured out a better way to do it!!
 			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
 				spr.animation.play("pressed");
-			if (holdArray[spr.ID])
+			if (!holdArray[spr.ID])
 				spr.animation.play("static");
 
-			if (spr.animation.curAnim.name != "confirm" || !curStage.startsWith("school"))
+			if (spr.animation.curAnim.name == "confirm" || curStage.startsWith("school"))
 			{
 				spr.centerOffsets();
 				spr.offset.x -= 13;
@@ -1996,11 +2021,6 @@ class PlayState extends MusicBeatState
 			else
 				spr.centerOffsets();
 		});
-	}
-
-	function tooHigh():Void
-	{
-		
 	}
 
 	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
@@ -2077,7 +2097,7 @@ class PlayState extends MusicBeatState
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
-					spr.animation.play('confirm', true);
+					spr.animation.play('confirm');
 				}
 			});
 
@@ -2090,6 +2110,10 @@ class PlayState extends MusicBeatState
 					noteSplash(note.x, note.y, note.noteData, false);*/
 				popUpScore(note);
 				combo += 1;
+				popUpScore(note);
+				if (combo > highestCombo)
+					highestCombo = combo;
+
 				note.kill();
 				notes.remove(note, true);
 				note.destroy();
@@ -2099,6 +2123,7 @@ class PlayState extends MusicBeatState
 
 	function opponentNoteHit(daNote:Note)
 	{
+
 		if (daNote.y > FlxG.height)
 		{
 			daNote.active = false;
@@ -2177,6 +2202,9 @@ class PlayState extends MusicBeatState
 			if (daNote.tooLate || !daNote.wasGoodHit)
 			{
 				noteMiss(daNote.noteData);
+				misses++;
+				health -= 0.04;
+				songScore -= 10;
 				vocals.volume = 0;
 			}
 
@@ -2203,13 +2231,8 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 
-		//updating values
-		scoreTxt.text = "Score:" + songScore + " | Combo: " + combo + " | Misses: " + misses;
-
-		if (FlxG.sound.music.time > Conductor.songPosition + 20 || FlxG.sound.music.time < Conductor.songPosition - 20)
-		{
-			resyncVocals();
-		}
+		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
+			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
 
 		if (dad.curCharacter == 'spooky' && curStep % 4 == 2)
 		{

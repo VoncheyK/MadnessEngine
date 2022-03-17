@@ -83,7 +83,7 @@ class OptionsSubState extends MusicBeatSubstate
 			{
 				txt.color = FlxColor.YELLOW;
 			}		
-			txt.updateHitbox();
+			
 		});
 	}
 }
