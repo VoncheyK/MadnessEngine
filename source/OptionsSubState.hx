@@ -12,8 +12,18 @@ import ClientSettings;
 
 class OptionsSubState extends MusicBeatSubstate
 {
-	var textMenuItems:Array<String> = ['Downscroll', 'Ghost Tapping'];
-	var optionNames:Array<String> = ['downScroll', 'ghostTapping'];
+	var textMenuItems:Array<String> =  //the option name
+	[
+		'Downscroll',
+		'Middlescroll',
+		'Ghost Tapping'
+	];
+	var optionNames:Array<String> = //the variable name for the option on ClientSettings
+	[
+		'downScroll',
+		'middleScroll',
+		'ghostTapping'
+	];
 
 	var selector:FlxSprite;
 	var curSelected:Int = 0;

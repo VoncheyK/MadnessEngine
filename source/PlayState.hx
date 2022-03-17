@@ -140,6 +140,12 @@ class PlayState extends MusicBeatState
 	var detailsPausedText:String = "";
 	#end
 
+	// Ratings
+	public var sicks:Int = 0;
+	public var goods:Int = 0;
+	public var bads:Int = 0;
+	public var shits:Int = 0;
+
 	override public function create()
 	{
 		if (FlxG.sound.music != null)
@@ -1339,10 +1345,28 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		var fcRank:String;
+
+		//beta ranks until we have actual accuracy to work with
+
+		fcRank = "[UNRATED]";
+
+		if (sicks > 0) 
+			fcRank = "[SFC]";
+		if (goods > 0)
+			fcRank = "[GFC]";
+		if (bads > 0 || shits > 0)
+			fcRank = "[FC]";
+		if (misses > 0)
+			fcRank = "[SDCB]";
+		if (misses > 9)
+			fcRank = "[Clear]";
+
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
 		scoreTxt.text += " | Combo:" + combo + " (Max " + highestCombo + ")";
 		scoreTxt.text += " | Misses:" + misses;
+		scoreTxt.text += ' | ' + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)
 		{
@@ -1724,22 +1748,31 @@ class PlayState extends MusicBeatState
 		var rating:FlxSprite = new FlxSprite();
 		var score:Int = 350;
 
-		var daRating:String = "sick";
+		var daRating:String = "";
 
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
 			score = 50;
+			shits++;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.75)
 		{
 			daRating = 'bad';
 			score = 100;
+			bads++;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.2)
 		{
 			daRating = 'good';
 			score = 200;
+			goods++;
+		}
+		else
+		{
+			daRating = 'sick';
+			score = 300;
+			sicks++;
 		}
 
 		songScore += score;
@@ -1960,7 +1993,7 @@ class PlayState extends MusicBeatState
 				goodNoteHit(possibleNotes[0]);
 			else if (0 < possibleNotes.length) 
 			{
-				//if (ClientSettings.ghostTapping)
+				if (ClientSettings.ghostTapping)
 				for (i in 0...pressArray.length)
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
