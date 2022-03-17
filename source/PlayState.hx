@@ -64,6 +64,7 @@ class PlayState extends MusicBeatState
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
 
+	//private var noteSplashes:FlxTypedGroup<NoteSplash>;
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
@@ -231,6 +232,11 @@ class PlayState extends MusicBeatState
 		// Updating Discord Rich Presence.
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
+
+		/*noteSplashes = new FlxTypedGroup<NoteSplash>();
+		var daSplash = new NoteSplash(100, 100, 0);
+		daSplash.alpha = 0;
+		noteSplashes.add(daSplash);*/
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -678,6 +684,8 @@ class PlayState extends MusicBeatState
 		//if(options downscroll is true) // for future options!!
 		//strumLine.y = 580; //should work
 
+		//add(noteSplashes);
+
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
 
@@ -745,6 +753,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
+		//noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -1710,9 +1719,9 @@ class PlayState extends MusicBeatState
 
 	var endingSong:Bool = false;
 
-	private function popUpScore(strumtime:Float):Void
+	private function popUpScore(daNote:Note):Void
 	{
-		var noteDiff:Float = Math.abs(strumtime - Conductor.songPosition);
+		var noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
 		// boyfriend.playAnim('hey');
 		vocals.volume = 1;
 
@@ -1743,6 +1752,8 @@ class PlayState extends MusicBeatState
 			daRating = 'good';
 			score = 200;
 		}
+
+		daNote.daRating = daRating;
 
 		songScore += score;
 
@@ -1966,6 +1977,8 @@ class PlayState extends MusicBeatState
 		        if (pressArray[i])
 		            noteMiss(i);*/
 		
+		//this shit is broken for some reason
+		//TODO fix later
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
@@ -2073,7 +2086,9 @@ class PlayState extends MusicBeatState
 
 			if (!note.isSustainNote)
 			{
-				popUpScore(note.strumTime);
+				/*if (note.daRating == "sick")
+					noteSplash(note.x, note.y, note.noteData, false);*/
+				popUpScore(note);
 				combo += 1;
 				note.kill();
 				notes.remove(note, true);
@@ -2137,15 +2152,16 @@ class PlayState extends MusicBeatState
 				if (Math.abs(daNote.noteData) == spr.ID)
 				{	
 					spr.animation.play('confirm', true);
-					if(!curStage.startsWith("school"))
-					{
-						spr.centerOffsets();
-						spr.offset.x -= 13;
-						spr.offset.y -= 13;
-					}		
-					else
-						spr.centerOffsets();					
+					noteSplash(daNote.x, daNote.y, daNote.noteData, true);										
 				}
+				if(!curStage.startsWith("school"))
+				{
+					spr.centerOffsets();
+					spr.offset.x -= 13;
+					spr.offset.y -= 13;
+				}		
+				else
+					spr.centerOffsets();
 			});*/
 
 			daNote.kill();
@@ -2172,6 +2188,16 @@ class PlayState extends MusicBeatState
 			daNote.destroy();
 		}
 	}
+
+	/*function noteSplash(noteX:Float, noteY:Float, nData:Int, ?isDad = false)
+	{
+		var recycledNote = noteSplashes.recycle(NoteSplash);
+		if (!isDad)    
+			recycledNote.makeSplash(playerStrums.members[nData].x, playerStrums.members[nData].y, nData);
+		else
+			recycledNote.makeSplash(cpuStrums.members[nData].x, cpuStrums.members[nData].y, nData);
+		noteSplashes.add(recycledNote);
+	}*/
 
 	override function stepHit()
 	{

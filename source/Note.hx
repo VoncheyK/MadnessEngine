@@ -22,6 +22,8 @@ class Note extends FlxSprite
 	public var noteType:Int = 1;
 	public var prevNote:Note;
 
+	public var daRating:String = "shit";
+
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
 
@@ -44,7 +46,7 @@ class Note extends FlxSprite
 		isSustainNote = sustainNote;
 
 		//how did you manage to have offcenter notes bruh
-		x += 100;
+		x += 120;
 		// MAKE SURE ITS DEFINITELY OFF SCREEN?
 		y -= 2000;
 		this.strumTime = strumTime;
