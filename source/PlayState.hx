@@ -736,13 +736,16 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
+		//there variables point to the options attached to the time bar and text, nothing special
 		var showTime:Bool = (ClientSettings.showTimeBar);
+		var showTimeTxt:Bool = (ClientSettings.showTimeTxt);
+
 		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
 		timeTxt.borderSize = 2;
-		timeTxt.visible = showTime;
+		timeTxt.visible = showTimeTxt;
 		if (ClientSettings.downScroll)
 			timeTxt.y = FlxG.height - 44;
 

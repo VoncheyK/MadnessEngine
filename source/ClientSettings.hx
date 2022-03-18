@@ -11,6 +11,7 @@ class ClientSettings
     public static var noteskin:String = "Edited";
     public static var displayAccuracy:Bool = true;
     public static var showTimeBar:Bool = true;
+    public static var showTimeTxt;Bool = true;
 
     public static function saveSettings()
     {
@@ -20,6 +21,7 @@ class ClientSettings
         FlxG.save.data.noteskin = noteskin;
         FlxG.save.data.displayAccuracy = displayAccuracy;
         FlxG.save.data.showTimeBar = showTimeBar;
+        FlxG.save.data.showTimeTxt = showTimeTxt;
     }
 
     public static function loadSettings()
@@ -29,7 +31,8 @@ class ClientSettings
         if(FlxG.save.data.ghostTapping != null) ghostTapping = FlxG.save.data.ghostTapping;
         if(FlxG.save.data.noteskin != null) noteskin = FlxG.save.data.noteskin;
         if(FlxG.save.data.displayAccuracy != null) displayAccuracy = FlxG.save.data.displayAccuracy;
-        if(FlxG.save.data.showTimeBar != null) displayAccuracy = FlxG.save.data.showTimeBar;
+        if(FlxG.save.data.showTimeBar != null) showTimeBar = FlxG.save.data.showTimeBar;
+        if(FlxG.save.data.showTimeTxt != null) showTimeTxt = FlxG.save.data.showTimeTxt;
         
         //this will save your last volume
         if (FlxG.save.data.volume != null) FlxG.sound.volume = FlxG.save.data.volume;
