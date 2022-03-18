@@ -1,5 +1,6 @@
 package;
 
+import js.html.Clients;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -749,7 +750,7 @@ class PlayState extends MusicBeatState
 		if (ClientSettings.downScroll)
 			timeTxt.y = FlxG.height - 44;
 
-		timeBarBG = new AttachedSprite('healthBar');
+		timeBarBG = new AttachedSprite('timeBar');
 		timeBarBG.screenCenter();
 		timeBarBG.x = timeTxt.x;
 		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
@@ -1065,7 +1066,7 @@ class PlayState extends MusicBeatState
 
 		if (!paused)
 			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 1, false);
-		FlxG.sound.music.onComplete = endSong;
+			FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
 		songLength = FlxG.sound.music.length;
@@ -1434,12 +1435,17 @@ class PlayState extends MusicBeatState
 			accRank = "F";
 
 		//updating values
-		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Misses:" + misses;
-		if (ClientSettings.displayAccuracy) {
-			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
-		}
+		if (!ClientSettings.botPlay)
+		{
+			scoreTxt.text = "Score: " + songScore;
+			scoreTxt.text += divider + "Misses:" + misses;
+			if (ClientSettings.displayAccuracy)
+			{
+				scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
+				scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+			}
+			}else{
+				scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
@@ -1826,6 +1832,8 @@ class PlayState extends MusicBeatState
 		var daRating:String = "";
 		var daAccuracy:Int = 0;
 
+	if (!ClientSettings.botPlay)
+	{
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
@@ -1854,6 +1862,9 @@ class PlayState extends MusicBeatState
 			daAccuracy = 100;
 			sicks++;
 		}
+	} else {
+		daRating = 'sick';
+	}
 
 		preAcc += daAccuracy;
 
@@ -2010,6 +2021,7 @@ class PlayState extends MusicBeatState
 	//better keyshit function
 	private function keyShit():Void
 	{
+		if (ClientSettings.botPlay) return;
 		//HOLDING
 		var holdArray:Array<Bool> = [
 			controls.LEFT,
@@ -2118,10 +2130,12 @@ class PlayState extends MusicBeatState
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
-			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
-				spr.animation.play("pressed");
-			if (!holdArray[spr.ID])
-				spr.animation.play("static");
+			if (!ClientSettings.botPlay) {
+				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
+					spr.animation.play("pressed");
+				if (!holdArray[spr.ID])
+					spr.animation.play("static");
+			}
 
 			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
 			{	
@@ -2230,7 +2244,7 @@ class PlayState extends MusicBeatState
 					highestCombo = combo;
 
 				if (note.daRating == "sick")
-					noteSplash(note.x, note.y, note.noteData, false);
+					//noteSplash(note.x, note.y, note.noteData, false);
 
 				note.kill();
 				notes.remove(note, true);
@@ -2241,7 +2255,7 @@ class PlayState extends MusicBeatState
 
 	function botPlayNoteHit(daNote:Note):Void
 	{
-		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5) 
+		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8) 
 			{
 				health += 0.023;
 
@@ -2253,16 +2267,25 @@ class PlayState extends MusicBeatState
 
 				playerStrums.forEach(function(spr:FlxSprite)
 				{
-					if (Math.abs(daNote.noteData) == spr.ID)
+					if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
 					{
 						spr.animation.play('confirm');
+					};
+
+					if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+					{	
+						spr.centerOffsets();
+						spr.offset.x -= 13;
+						spr.offset.y -= 13;	
+					}	
+					else
+					{
+						spr.centerOffsets();
 					}
 				});
-
-				updateAccuracy();
 			}
 
-			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5 && !daNote.isSustainNote) 
+			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote)
 			{
 				combo++;
 				totalNotesHit++;
