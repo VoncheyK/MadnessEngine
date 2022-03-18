@@ -23,8 +23,9 @@ class OptionsMenu extends MusicBeatState
 		'',
 		'',
 		'',
-		'',
 		'WIP',
+		'',
+		'',
 		''
 	];
 	var optionNames:Array<String> = //the variable name for the option on ClientSettings
@@ -34,7 +35,8 @@ class OptionsMenu extends MusicBeatState
 		'ghostTapping',
 		'botPlay',
 		'displayAccuracy',
-		'showTimeBar'
+		'showTimeBar',
+		'showTimeTxt'
 	];
 
 	var grpOptionsTexts:FlxTypedGroup<Alphabet>;
