@@ -56,7 +56,6 @@ class PlayState extends MusicBeatState
 
 	private var vocals:FlxSound;
 
-	//static to be accessed by external classes
 	public static var dad:Character;
 	public static var gf:Character;
 	public static var boyfriend:Boyfriend;
@@ -64,7 +63,7 @@ class PlayState extends MusicBeatState
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
 
-	//private var noteSplashes:FlxTypedGroup<NoteSplash>;
+	private var noteSplashes:FlxTypedGroup<NoteSplash>;
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
@@ -232,10 +231,10 @@ class PlayState extends MusicBeatState
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
 
-		/*noteSplashes = new FlxTypedGroup<NoteSplash>();
+		noteSplashes = new FlxTypedGroup<NoteSplash>();
 		var daSplash = new NoteSplash(100, 100, 0);
 		daSplash.alpha = 0;
-		noteSplashes.add(daSplash);*/
+		noteSplashes.add(daSplash);
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -683,7 +682,7 @@ class PlayState extends MusicBeatState
 		//if(options downscroll is true) // for future options!!
 		//strumLine.y = 580; //should work
 
-		//add(noteSplashes);
+		add(noteSplashes);
 
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
@@ -752,7 +751,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
-		//noteSplashes.cameras = [camHUD];
+		noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -1380,7 +1379,7 @@ class PlayState extends MusicBeatState
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
 		scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
-		//scoreTxt.text += divider 'Accuracy: ' + daAccuracy + '%';
+		scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
 		scoreTxt.text += divider + "Misses:" + misses;
 		scoreTxt.text += divider + fcRank;
 
@@ -1762,7 +1761,7 @@ class PlayState extends MusicBeatState
 		//
 
 		var rating:FlxSprite = new FlxSprite();
-		var score:Int = 350;
+		var score:Int = 0;
 
 		var daRating:String = "";
 		var daAccuracy:Int = 0;
@@ -1772,25 +1771,28 @@ class PlayState extends MusicBeatState
 			daRating = 'shit';
 			score = 50;
 			daAccuracy = 30;
+			shits++;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.75)
 		{
 			daRating = 'bad';
 			score = 100;
 			daAccuracy = 60;
+			bads++;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.2)
 		{
 			daRating = 'good';
 			score = 200;
 			daAccuracy = 80;
+			goods++;
 		}
 		else
 		{
 			daRating = 'sick';
-			score = 300;
-			sicks++;
+			score = 300;			
 			daAccuracy = 100;
+			sicks++;
 		}
 
 		preAcc += daAccuracy;
@@ -1799,7 +1801,7 @@ class PlayState extends MusicBeatState
 
 		songScore += score;
 
-		var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
+		/*var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
    		if (!curStage.startsWith('school'))
    		{
 			//i might remake this lmao -jorge
@@ -1825,7 +1827,7 @@ class PlayState extends MusicBeatState
      			sploosh.animation.finishCallback = function(name)
      			sploosh.kill();
      		}
-     	}
+     	}*/
 
 		/* if (combo > 60)
 				daRating = 'sick';
@@ -2025,6 +2027,7 @@ class PlayState extends MusicBeatState
 						misses++;
 						health -= 0.04;
 						songScore -= 10;
+						updateAccuracy();
 					}
 				for (coolNote in possibleNotes)
 				{
@@ -2039,6 +2042,7 @@ class PlayState extends MusicBeatState
 				health -= 0.04;
 				songScore -= 10;
 				totalNotesHit++;
+				updateAccuracy();
 			}
 		}
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !holdArray.contains(true)
@@ -2150,9 +2154,7 @@ class PlayState extends MusicBeatState
 				}
 			});
 
-			accuracy = Std.int(preAcc / totalNotesHit);
-
-			trace(accuracy);
+			updateAccuracy();
 
 			note.wasGoodHit = true;
 			vocals.volume = 1;
@@ -2160,12 +2162,13 @@ class PlayState extends MusicBeatState
 			if (!note.isSustainNote)
 			{
 				totalNotesHit++;
-				/*if (note.daRating == "sick")
-					noteSplash(note.x, note.y, note.noteData, false);*/
 				combo += 1;
 				popUpScore(note);
 				if (combo > highestCombo)
 					highestCombo = combo;
+
+				if (note.daRating == "sick")
+					noteSplash(note.x, note.y, note.noteData, false);
 
 				note.kill();
 				notes.remove(note, true);
@@ -2230,7 +2233,7 @@ class PlayState extends MusicBeatState
 				if (Math.abs(daNote.noteData) == spr.ID)
 				{	
 					spr.animation.play('confirm', true);
-					noteSplash(daNote.x, daNote.y, daNote.noteData, true);										
+					//noteSplash(daNote.x, daNote.y, daNote.noteData, true);										
 				}
 				if(!curStage.startsWith("school"))
 				{
@@ -2260,6 +2263,7 @@ class PlayState extends MusicBeatState
 				totalNotesHit++;
 				songScore -= 10;
 				vocals.volume = 0;
+				updateAccuracy();
 			}
 
 			daNote.active = false;
@@ -2271,7 +2275,13 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	/*function noteSplash(noteX:Float, noteY:Float, nData:Int, ?isDad = false)
+	//just to call it several times lol
+	function updateAccuracy()
+	{
+		accuracy = Std.int(preAcc / totalNotesHit);
+	}
+
+	function noteSplash(noteX:Float, noteY:Float, nData:Int, ?isDad = false)
 	{
 		var recycledNote = noteSplashes.recycle(NoteSplash);
 		if (!isDad)    
@@ -2279,7 +2289,7 @@ class PlayState extends MusicBeatState
 		else
 			recycledNote.makeSplash(cpuStrums.members[nData].x, cpuStrums.members[nData].y, nData);
 		noteSplashes.add(recycledNote);
-	}*/
+	}
 
 	override function stepHit()
 	{
