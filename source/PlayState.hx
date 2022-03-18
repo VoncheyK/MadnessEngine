@@ -749,7 +749,7 @@ class PlayState extends MusicBeatState
 		if (ClientSettings.downScroll)
 			timeTxt.y = FlxG.height - 44;
 
-		timeBarBG = new AttachedSprite('healthBar');
+		timeBarBG = new AttachedSprite('timeBar');
 		timeBarBG.screenCenter();
 		timeBarBG.x = timeTxt.x;
 		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
