@@ -2230,7 +2230,7 @@ class PlayState extends MusicBeatState
 					highestCombo = combo;
 
 				if (note.daRating == "sick")
-					//noteSplash(note.x, note.y, note.noteData, false);
+					noteSplash(note.x, note.y, note.noteData, false);
 
 				note.kill();
 				notes.remove(note, true);
