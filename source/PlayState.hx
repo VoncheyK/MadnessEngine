@@ -2298,13 +2298,6 @@ class PlayState extends MusicBeatState
 
 				popUpScore(daNote);
 			}
-
-			boyfriend.playAnim("idle", true);
-
-			playerStrums.forEach(function(spr:FlxSprite)
-				{				
-					spr.animation.play('idle');
-				});
 	}
 
 	function opponentNoteHit(daNote:Note)
