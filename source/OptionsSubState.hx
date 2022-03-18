@@ -16,29 +16,41 @@ class OptionsSubState extends MusicBeatSubstate
 	[
 		'Downscroll',
 		'Middlescroll',
-		'Ghost Tapping'
+		'Ghost Tapping',
+		'Show Accuracy'
 	];
 	var optionNames:Array<String> = //the variable name for the option on ClientSettings
 	[
 		'downScroll',
 		'middleScroll',
-		'ghostTapping'
+		'ghostTapping',
+		'displayAccuracy'
 	];
+
+	private var currentDescription:String = "";
+	public static var descriptionText:FlxText;
 
 	var selector:FlxSprite;
 	var curSelected:Int = 0;
-
 	var grpOptionsTexts:FlxTypedGroup<Alphabet>;
 
-	public function new()
+	override function create()
 	{
-		super();
+		super.create();
+
+		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
+		menuBG.color = 0x063970;
+		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
+		menuBG.updateHitbox();
+		menuBG.screenCenter();
+		menuBG.antialiasing = true;
+		add(menuBG);
 
 		grpOptionsTexts = new FlxTypedGroup<Alphabet>();
 		add(grpOptionsTexts);
 
 		selector = new FlxSprite().makeGraphic(5, 5, FlxColor.RED);
-		//add(selector);
+		add(selector);
 
 		for (i in 0...textMenuItems.length)
 		{
@@ -60,18 +72,16 @@ class OptionsSubState extends MusicBeatSubstate
 		if (controls.DOWN_P)
 			changeSelection(1);
 
-		if (controls.BACK)
-		{
+		if (controls.BACK){
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			FlxG.switchState(new MainMenuState());
 		}
 
-		if (controls.ACCEPT)
-		{
+		if (controls.ACCEPT){
 			FlxG.save.data.optionNames[curSelected] = !FlxG.save.data.optionNames[curSelected];
-			FlxG.save.flush();
 			trace(optionNames[curSelected] + " : " + FlxG.save.data.optionNames[curSelected]);
 		}
+		FlxG.save.flush();
 	}
 
 	function changeSelection(change:Int)
@@ -93,7 +103,6 @@ class OptionsSubState extends MusicBeatSubstate
 			{
 				txt.color = FlxColor.YELLOW;
 			}		
-			
 		});
 	}
 }

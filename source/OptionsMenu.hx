@@ -18,8 +18,28 @@ class OptionsMenu extends MusicBeatState
 	var selector:FlxText;
 	var curSelected:Int = 0;
 
+	var textMenuItems:Array<String> =  //the option name
+	[
+		'',
+		'',
+		'',
+		'WIP',
+		''
+	];
+	var optionNames:Array<String> = //the variable name for the option on ClientSettings
+	[
+		'downScroll',
+		'middleScroll',
+		'ghostTapping',
+		'displayAccuracy',
+		'nothing'
+	];
+
+	var grpOptionsTexts:FlxTypedGroup<Alphabet>;
 	var controlsStrings:Array<String> = [];
 
+	private var currentDescription:String = "";
+	public static var descriptionText:FlxText;
 	private var grpControls:FlxTypedGroup<Alphabet>;
 
 	override function create()
@@ -32,6 +52,18 @@ class OptionsMenu extends MusicBeatState
 		menuBG.screenCenter();
 		menuBG.antialiasing = true;
 		add(menuBG);
+
+		grpOptionsTexts = new FlxTypedGroup<Alphabet>();
+		add(grpOptionsTexts);
+
+		currentDescription = "descriptions should be here!";
+
+		descriptionText = new FlxText(FlxG.width - 460, 10, 450, "", 12);
+		descriptionText.setFormat("VCR OSD Mono", 24, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		descriptionText.borderSize = 2;
+		descriptionText.scrollFactor.set();
+		descriptionText.text = currentDescription;
+		add(descriptionText);
 
 		/* 
 			grpControls = new FlxTypedGroup<Alphabet>();
@@ -50,39 +82,44 @@ class OptionsMenu extends MusicBeatState
 			}
 		 */
 
+		for (i in 0...textMenuItems.length)
+		{
+			var optionText:Alphabet = new Alphabet(0, 20 + (i * 90), textMenuItems[i], true, false);
+			optionText.ID = i;
+			optionText.targetY = i;
+			optionText.screenCenter(X);
+			grpOptionsTexts.add(optionText);
+		}
+
 		super.create();
 
-		openSubState(new OptionsSubState());
+		//openSubState(new OptionsSubState());
 	}
 
 	override function update(elapsed:Float)
 	{
-		super.update(elapsed);
+		super.update(elapsed); 
+		/*if (controls.ACCEPT) {
+			changeBinding();
+		}*/
 
-		/* 
-			if (controls.ACCEPT)
-			{
-				changeBinding();
-			}
-
-			if (isSettingControl)
-				waitingInput();
-			else
-			{
-				if (controls.BACK)
-					FlxG.switchState(new MainMenuState());
-				if (controls.UP_P)
-					changeSelection(-1);
-				if (controls.DOWN_P)
-					changeSelection(1);
-			}
-		 */
+		if (isSettingControl)
+			waitingInput();
+		else
+		{
+			if (controls.BACK)
+				FlxG.switchState(new MainMenuState());
+			/*if (controls.UP_P)
+				changeSelection(-1);
+			if (controls.DOWN_P)
+				changeSelection(1);*/
+		}
+		FlxG.save.flush();
 	}
 
 	function waitingInput():Void
 	{
-		if (FlxG.keys.getIsDown().length > 0)
-		{
+		if (FlxG.keys.getIsDown().length > 0) {
 			PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxG.keys.getIsDown()[0].ID, null);
 		}
 		// PlayerSettings.player1.controls.replaceBinding(Control)
@@ -118,13 +155,20 @@ class OptionsMenu extends MusicBeatState
 			bullShit++;
 
 			item.alpha = 0.6;
-			// item.setGraphicSize(Std.int(item.width * 0.8));
-
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
-				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
+
+		grpOptionsTexts.forEach(function(txt:Alphabet)
+		{
+			txt.color = FlxColor.WHITE;
+
+			if (txt.ID == curSelected)
+			{
+				txt.color = FlxColor.YELLOW;
+			}		
+		});
 	}
 }

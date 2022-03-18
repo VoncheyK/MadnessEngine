@@ -1384,29 +1384,24 @@ class PlayState extends MusicBeatState
 			accRank = "S";
 		if (accuracy < 91)
 			accRank = "A";
-		if (accuracy < 81)
+		if (accuracy < 85)
 			accRank = "B";
-		if (accuracy < 71)
+		if (accuracy < 81)
 			accRank = "C";
-		if (accuracy < 61)
+		if (accuracy < 75)
 			accRank = "D";
-		if (accuracy < 51)
+		if (accuracy < 71)
 			accRank = "E";
-		if (accuracy < 41)
+		if (accuracy < 61)
 			accRank = "F";
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		//scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
-		scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
 		scoreTxt.text += divider + "Misses:" + misses;
-		scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
-
-		/*if (ClientSettings.displayAccuracy)
-		{
-			scoreTxt.text += ' | Accuracy: ' + accuracy stuff + '%';
-			scoreTxt.text += ' | Rank: ' + rank stuff;
-		}*/
+		if (ClientSettings.displayAccuracy) {
+			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
+			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+		}
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
