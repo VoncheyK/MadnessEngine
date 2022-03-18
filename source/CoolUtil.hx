@@ -7,27 +7,6 @@ using StringTools;
 class CoolUtil
 {
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
-	public static var difficultyLength = difficultyArray.length;
-
-	public static function difficultyFromNumber(number:Int):String
-	{
-		return difficultyArray[number];
-	}
-
-	public static function dashToSpace(string:String):String
-	{
-		return string.replace("-", " ");
-	}
-
-	public static function spaceToDash(string:String):String
-	{
-		return string.replace(" ", "-");
-	}
-
-	public static function swapSpaceDash(string:String):String
-	{
-		return StringTools.contains(string, '-') ? dashToSpace(string) : spaceToDash(string);
-	}
 
 	public static function difficultyString():String
 	{
