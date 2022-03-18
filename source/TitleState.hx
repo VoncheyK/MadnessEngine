@@ -233,10 +233,11 @@ class TitleState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
 
-		if (FlxG.keys.justPressed.F)
-		{
+		if (FlxG.keys.justPressed.F) {
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
+
+		ClientSettings.loadSettings();
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 

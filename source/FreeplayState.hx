@@ -11,6 +11,10 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
+import flixel.tweens.FlxTween;
+import flixel.tweens.FlxEase;
+import flixel.system.FlxSound;
+import flixel.util.FlxTimer;
 import lime.utils.Assets;
 import Sys.sleep;
 
@@ -34,6 +38,13 @@ class FreeplayState extends MusicBeatState
 
 	private var iconArray:Array<HealthIcon> = [];
 	private var scoreBG:FlxSprite;
+
+	var text:FlxText;
+
+	#if PRELOAD_ALL
+	var leText:String = "Press SPACE to listen to the Song";
+	var size:Int = 16;
+	#end
 
 	override function create()
 	{
@@ -160,6 +171,19 @@ class FreeplayState extends MusicBeatState
 			trace(md);
 		 */
 
+		#if PRELOAD_ALL
+		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 26).makeGraphic(FlxG.width, 26, 0xFF000000);
+		textBG.alpha = 0.6;
+		add(textBG);
+		text = new FlxText(textBG.x, textBG.y + 4, FlxG.width, leText, size);
+		text.setFormat(Paths.font("vcr.ttf"), size, FlxColor.WHITE, CENTER);
+		text.scrollFactor.set();
+		add(text);
+
+		FlxTween.tween(text, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
+		FlxTween.tween(textBG, {y: FlxG.height - 18}, 2, {ease: FlxEase.elasticInOut});
+		#end
+
 		super.create();
 	}
 
@@ -183,6 +207,9 @@ class FreeplayState extends MusicBeatState
 		}
 	}
 
+	var instPlaying:Int = -1;
+	public static var curPlayingTxt:String = "N/A";
+	private static var vocals:FlxSound = null;
 	override function update(elapsed:Float)
 	{	
 		super.update(elapsed);
@@ -200,6 +227,7 @@ class FreeplayState extends MusicBeatState
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
 		var accepted = controls.ACCEPT;
+		var space = FlxG.keys.justPressed.SPACE;
 
 		if (upP)
 		{
@@ -223,7 +251,6 @@ class FreeplayState extends MusicBeatState
 		if (accepted)
 		{
 			var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
-
 			trace(poop);
 
 			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
@@ -233,13 +260,56 @@ class FreeplayState extends MusicBeatState
 			PlayState.storyWeek = songs[curSelected].week;
 			trace('CUR WEEK' + PlayState.storyWeek);
 			LoadingState.loadAndSwitchState(new PlayState());
+
+			#if PRELOAD_ALL
+			destroyFreeplayVocals();
+			#end
 		}
+		#if PRELOAD_ALL
+		if (space)
+		{
+			text.text = leText; //dont ask.
+			if(instPlaying != curSelected)
+			{
+				destroyFreeplayVocals();
+				FlxG.sound.music.volume = 0;
+				var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
+				PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+				if (PlayState.SONG.needsVoices)
+					vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song));
+				else
+					vocals = new FlxSound();
+
+				curPlayingTxt = songs[curSelected].songName.toLowerCase();
+				FlxG.sound.list.add(vocals);
+				FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song), 0.7);
+				vocals.play();
+				vocals.persist = true;
+				vocals.looped = true;
+				vocals.volume = 0.7;
+				instPlaying = curSelected;
+				trace('playing ' + poop);
+				text.text = 'Playing ' + songs[curSelected].songName + '!';
+				new FlxTimer().start(1, function(tmr:FlxTimer)
+				{
+					text.text = leText;
+				});
+			}
+			else
+			{
+				trace("already playing!");
+				text.text = 'This song is already playing!';
+				new FlxTimer().start(0.6, function(tmr:FlxTimer)
+				{
+					text.text = leText;
+				});
+			}
+		}
+		#end
 
 		for (i in 0...iconArray.length)
 		{
-			
 			iconArray[i].setGraphicSize(Std.int(FlxMath.lerp(150, iconArray[i].width, 0.50)));
-
 			iconArray[i].updateHitbox();
 		}
 
@@ -249,6 +319,15 @@ class FreeplayState extends MusicBeatState
 		scoreBG.width = scoreText.width;
 		scoreBG.x = scoreText.x;
 		diffText.x = scoreBG.x + (scoreBG.width / 2) - (diffText.width / 2);
+	}
+
+	public static function destroyFreeplayVocals()
+	{
+		if(vocals != null)
+		{
+			vocals.stop();
+			vocals.destroy();
+		}
 	}
 
 	function changeDiff(change:Int = 0)
@@ -291,10 +370,6 @@ class FreeplayState extends MusicBeatState
 		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
 		// lerpScore = 0;
-		#end
-
-		#if PRELOAD_ALL
-		FlxG.sound.playMusic(Paths.inst(songs[curSelected].songName), 0);
 		#end
 
 		var bullShit:Int = 0;

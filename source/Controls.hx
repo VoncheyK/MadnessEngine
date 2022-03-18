@@ -502,7 +502,7 @@ class Controls extends FlxActionSet
 				inline bindKeys(Control.DOWN, [S, FlxKey.DOWN]);
 				inline bindKeys(Control.LEFT, [A, FlxKey.LEFT]);
 				inline bindKeys(Control.RIGHT, [D, FlxKey.RIGHT]);
-				inline bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				inline bindKeys(Control.ACCEPT, [Z, ENTER]);
 				inline bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
 				inline bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
 				inline bindKeys(Control.RESET, [R]);
@@ -535,7 +535,7 @@ class Controls extends FlxActionSet
 				bindKeys(Control.DOWN, [S, FlxKey.DOWN]);
 				bindKeys(Control.LEFT, [A, FlxKey.LEFT]);
 				bindKeys(Control.RIGHT, [D, FlxKey.RIGHT]);
-				bindKeys(Control.ACCEPT, [Z, SPACE, ENTER]);
+				bindKeys(Control.ACCEPT, [Z, ENTER]);
 				bindKeys(Control.BACK, [BACKSPACE, ESCAPE]);
 				bindKeys(Control.PAUSE, [P, ENTER, ESCAPE]);
 				bindKeys(Control.RESET, [R]);
