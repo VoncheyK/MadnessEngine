@@ -129,6 +129,9 @@ class PlayState extends MusicBeatState
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
+
+	//HUD Text
+	var infoBar:FlxText;
 	var scoreTxt:FlxText;
 	var timeTxt:FlxText;
 
@@ -722,15 +725,14 @@ class PlayState extends MusicBeatState
 
 		FlxG.fixedTimestep = false;
 
-		healthBarBG = new FlxSprite(0, FlxG.height * 0.9).loadGraphic(Paths.image('healthBar'));
+		healthBarBG = new FlxSprite(0, FlxG.height * 0.875).loadGraphic(Paths.image('healthBar'));
+		if (ClientSettings.downScroll)
+			healthBarBG.y = 64;
 		healthBarBG.screenCenter(X);
 		healthBarBG.scrollFactor.set();
 		add(healthBarBG);
-		/*if(ClientSettings.downScroll)
-			healthBarBG.y = 0.11 * FlxG.height;*/
 
-		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
-			'health', 0, 2);
+		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this, 'health', 0, 2);
 		healthBar.scrollFactor.set();
 		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
 		// healthBar
@@ -786,6 +788,26 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
+		/*
+			infoDisplay is for Song Name on the Left Side of the Screen
+			engineDisplay is for the Engine Name
+			engineBar and infoBar are the exact positions of engineDisplay
+		*/
+
+		var infoDisplay:String = CoolUtil.dashToSpace(PlayState.SONG.song) + ' - ' + CoolUtil.difficultyFromNumber(PlayState.storyDifficulty);
+		var engineDisplay:String = "Madness Engine v" + Main.gameVersion;
+		var engineBar:FlxText = new FlxText(0, FlxG.height - 30, 0, engineDisplay, 16);
+		engineBar.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		engineBar.updateHitbox();
+		engineBar.x = FlxG.width - engineBar.width - 5;
+		engineBar.scrollFactor.set();
+		add(engineBar);
+
+		infoBar = new FlxText(5, FlxG.height - 30, 0, infoDisplay, 20);
+		infoBar.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		infoBar.scrollFactor.set();
+		add(infoBar);
+
 		noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -797,6 +819,8 @@ class PlayState extends MusicBeatState
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
 		timeTxt.cameras = [camHUD];
+		engineBar.cameras = [camHUD];
+		infoBar.cameras = [camHUD];
 		doof.cameras = [camHUD];
 
 		// if (SONG.song == 'South')
@@ -1398,7 +1422,7 @@ class PlayState extends MusicBeatState
 
 		var fcRank:String;
 		var accRank:String;
-		var divider:String = ' | ';
+		var divider:String = ' // ';
 
 		//ranks
 
@@ -1435,11 +1459,13 @@ class PlayState extends MusicBeatState
 
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Misses:" + misses;
+		scoreTxt.text += divider + "Misses: " + misses;
 		if (ClientSettings.displayAccuracy) {
-			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+			scoreTxt.text += divider + "Accuracy: " + accuracy + '% ' + fcRank;
+			scoreTxt.text += divider + "Rank: " + accRank;
 		}
+
+		detailsText = scoreTxt.text;
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
