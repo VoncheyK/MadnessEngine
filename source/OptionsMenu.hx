@@ -32,7 +32,7 @@ class OptionsMenu extends MusicBeatState
 		'middleScroll',
 		'ghostTapping',
 		'displayAccuracy',
-		'nothing'
+		'showTimeBar'
 	];
 
 	var grpOptionsTexts:FlxTypedGroup<Alphabet>;

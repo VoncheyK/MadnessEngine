@@ -91,6 +91,12 @@ class PlayState extends MusicBeatState
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
 
+	//time bar
+	var songPercent:Float = 0;
+	public static var goodPos = 42;
+	private var timeBarBG:AttachedSprite;
+	public var timeBar:FlxBar;
+
 	private var generatedMusic:Bool = false;
 	private var startingSong:Bool = false;
 
@@ -730,12 +736,38 @@ class PlayState extends MusicBeatState
 		// healthBar
 		add(healthBar);
 
-		timeTxt = new FlxText(FlxG.width / 2 - 200, 20, 400, "", 32);
+		var showTime:Bool = (ClientSettings.showTimeBar);
+		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
 		timeTxt.borderSize = 2;
+		timeTxt.visible = showTime;
+		if (ClientSettings.downScroll)
+			timeTxt.y = FlxG.height - 44;
+
+		timeBarBG = new AttachedSprite('healthBar');
+		timeBarBG.screenCenter();
+		timeBarBG.x = timeTxt.x;
+		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
+		timeBarBG.scrollFactor.set();
+		timeBarBG.alpha = 0;
+		timeBarBG.visible = showTime;
+		timeBarBG.color = FlxColor.BLACK;
+		timeBarBG.xAdd = -4;
+		timeBarBG.yAdd = -4;
+
+		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
+			'songPercent', 0, 1);
+		timeBar.scrollFactor.set();
+		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.WHITE);
+		timeBar.numDivisions = 800;
+		timeBar.alpha = 0;
+		timeBar.visible = showTime;
+		add(timeBarBG);
+		add(timeBar);
 		add(timeTxt);
+		timeBarBG.sprTracker = timeBar;
 
 		iconP1 = new HealthIcon(SONG.player1, true);
 		iconP1.y = healthBar.y - (iconP1.height / 2);
@@ -756,6 +788,8 @@ class PlayState extends MusicBeatState
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
 		healthBarBG.cameras = [camHUD];
+		timeBar.cameras = [camHUD];
+		timeBarBG.cameras = [camHUD];
 		iconP1.cameras = [camHUD];
 		iconP2.cameras = [camHUD];
 		scoreTxt.cameras = [camHUD];
@@ -1032,6 +1066,7 @@ class PlayState extends MusicBeatState
 		vocals.play();
 
 		songLength = FlxG.sound.music.length;
+		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 
 		#if desktop
@@ -1362,7 +1397,7 @@ class PlayState extends MusicBeatState
 		var accRank:String;
 		var divider:String = ' | ';
 
-		//beta ranks??
+		//ranks
 
 		fcRank = "[UNRATED]";
 		accRank = "F";
@@ -1405,6 +1440,7 @@ class PlayState extends MusicBeatState
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
+		songPercent = (curTime / songLength);
 
 		var songCalc:Float = (songLength - curTime);
 
