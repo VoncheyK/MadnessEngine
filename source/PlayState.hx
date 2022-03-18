@@ -1390,6 +1390,10 @@ class PlayState extends MusicBeatState
 		if (accuracy < 71)
 			accRank = "C";
 		if (accuracy < 61)
+			accRank = "D";
+		if (accuracy < 51)
+			accRank = "E";
+		if (accuracy < 41)
 			accRank = "F";
 
 		//updating values
