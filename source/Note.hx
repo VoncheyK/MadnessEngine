@@ -22,6 +22,8 @@ class Note extends FlxSprite
 	public var noteType:Int = 1;
 	public var prevNote:Note;
 
+	public var daRating:String = "shit";
+
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
 

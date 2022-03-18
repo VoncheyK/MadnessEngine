@@ -64,6 +64,7 @@ class PlayState extends MusicBeatState
 	private var notes:FlxTypedGroup<Note>;
 	private var unspawnNotes:Array<Note> = [];
 
+	//private var noteSplashes:FlxTypedGroup<NoteSplash>;
 	private var strumLine:FlxSprite;
 	private var curSection:Int = 0;
 
@@ -82,6 +83,11 @@ class PlayState extends MusicBeatState
 	private var combo:Int = 0;
 	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
+	
+	//accuracy stuff
+	public var totalNotesHit:Int = 0;
+	public var preAcc:Int = 0;
+	public var accuracy:Int = 100;
 
 	private var healthBarBG:FlxSprite;
 	private var healthBar:FlxBar;
@@ -225,6 +231,11 @@ class PlayState extends MusicBeatState
 		// Updating Discord Rich Presence.
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
+
+		/*noteSplashes = new FlxTypedGroup<NoteSplash>();
+		var daSplash = new NoteSplash(100, 100, 0);
+		daSplash.alpha = 0;
+		noteSplashes.add(daSplash);*/
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -672,6 +683,8 @@ class PlayState extends MusicBeatState
 		//if(options downscroll is true) // for future options!!
 		//strumLine.y = 580; //should work
 
+		//add(noteSplashes);
+
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
 
@@ -739,6 +752,7 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
+		//noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
 		healthBar.cameras = [camHUD];
@@ -1751,37 +1765,44 @@ class PlayState extends MusicBeatState
 		var score:Int = 350;
 
 		var daRating:String = "";
+		var daAccuracy:Int = 0;
 
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
 			score = 50;
-			shits++;
+			daAccuracy = 30;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.75)
 		{
 			daRating = 'bad';
 			score = 100;
-			bads++;
+			daAccuracy = 60;
 		}
 		else if (noteDiff > Conductor.safeZoneOffset * 0.2)
 		{
 			daRating = 'good';
 			score = 200;
-			goods++;
+			daAccuracy = 80;
 		}
 		else
 		{
 			daRating = 'sick';
 			score = 300;
 			sicks++;
+			daAccuracy = 100;
 		}
+
+		preAcc += daAccuracy;
+
+		daNote.daRating = daRating;
 
 		songScore += score;
 
 		var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
    		if (!curStage.startsWith('school'))
    		{
+			//i might remake this lmao -jorge
     		var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('noteSplashes', 'shared');
     		sploosh.frames = tex;
 		    sploosh.animation.addByPrefix('splash 0 0', 'note impact 1 purple', 24, false);
@@ -2000,6 +2021,7 @@ class PlayState extends MusicBeatState
 					if (pressArray[i] && !ignoreList.contains(i))
 					{
 						noteMiss(i);
+						totalNotesHit++;
 						misses++;
 						health -= 0.04;
 						songScore -= 10;
@@ -2016,6 +2038,7 @@ class PlayState extends MusicBeatState
 				misses++;
 				health -= 0.04;
 				songScore -= 10;
+				totalNotesHit++;
 			}
 		}
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !holdArray.contains(true)
@@ -2026,6 +2049,8 @@ class PlayState extends MusicBeatState
 		        if (pressArray[i])
 		            noteMiss(i);*/
 		
+		//this shit is broken for some reason
+		//TODO fix later
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
@@ -2034,14 +2059,15 @@ class PlayState extends MusicBeatState
 			if (!holdArray[spr.ID])
 				spr.animation.play("static");
 
-			if (spr.animation.curAnim.name == "confirm" || curStage.startsWith("school"))
+			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+				spr.centerOffsets();			
+			else
 			{
 				spr.centerOffsets();
 				spr.offset.x -= 13;
 				spr.offset.y -= 13;
-			}				
-			else
-				spr.centerOffsets();
+			}
+				
 		});
 	}
 
@@ -2054,7 +2080,8 @@ class PlayState extends MusicBeatState
 			if (combo > 5 && gf.animOffsets.exists('sad'))
 			{
 				gf.playAnim('sad');
-			}
+			}		
+
 			combo = 0;
 
 			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
@@ -2093,7 +2120,7 @@ class PlayState extends MusicBeatState
 			noteMiss(3);
 	}
 
-	function noteCheck(keyP:Bool, note:Note):Void
+	/*function noteCheck(keyP:Bool, note:Note):Void
 	{
 		if (keyP)
 			goodNoteHit(note);
@@ -2101,7 +2128,7 @@ class PlayState extends MusicBeatState
 		{
 			badNoteCheck();
 		}
-	}
+	}*/
 
 	function goodNoteHit(note:Note):Void
 	{
@@ -2123,11 +2150,18 @@ class PlayState extends MusicBeatState
 				}
 			});
 
+			accuracy = Std.int(preAcc / totalNotesHit);
+
+			trace(accuracy);
+
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
 			if (!note.isSustainNote)
 			{
+				totalNotesHit++;
+				/*if (note.daRating == "sick")
+					noteSplash(note.x, note.y, note.noteData, false);*/
 				combo += 1;
 				popUpScore(note);
 				if (combo > highestCombo)
@@ -2196,15 +2230,16 @@ class PlayState extends MusicBeatState
 				if (Math.abs(daNote.noteData) == spr.ID)
 				{	
 					spr.animation.play('confirm', true);
-					if(!curStage.startsWith("school"))
-					{
-						spr.centerOffsets();
-						spr.offset.x -= 13;
-						spr.offset.y -= 13;
-					}		
-					else
-						spr.centerOffsets();					
+					noteSplash(daNote.x, daNote.y, daNote.noteData, true);										
 				}
+				if(!curStage.startsWith("school"))
+				{
+					spr.centerOffsets();
+					spr.offset.x -= 13;
+					spr.offset.y -= 13;
+				}		
+				else
+					spr.centerOffsets();
 			});*/
 
 			daNote.kill();
@@ -2222,6 +2257,7 @@ class PlayState extends MusicBeatState
 				noteMiss(daNote.noteData);
 				misses++;
 				health -= 0.04;
+				totalNotesHit++;
 				songScore -= 10;
 				vocals.volume = 0;
 			}
@@ -2234,6 +2270,16 @@ class PlayState extends MusicBeatState
 			daNote.destroy();
 		}
 	}
+
+	/*function noteSplash(noteX:Float, noteY:Float, nData:Int, ?isDad = false)
+	{
+		var recycledNote = noteSplashes.recycle(NoteSplash);
+		if (!isDad)    
+			recycledNote.makeSplash(playerStrums.members[nData].x, playerStrums.members[nData].y, nData);
+		else
+			recycledNote.makeSplash(cpuStrums.members[nData].x, cpuStrums.members[nData].y, nData);
+		noteSplashes.add(recycledNote);
+	}*/
 
 	override function stepHit()
 	{
