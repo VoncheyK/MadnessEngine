@@ -11,7 +11,7 @@ class ClientSettings
     public static var noteskin:String = "Edited";
     public static var displayAccuracy:Bool = true;
     public static var showTimeBar:Bool = true;
-    public static var showTimeTxt;Bool = true;
+    public static var showTimeTxt:Bool = true;
 
     public static function saveSettings()
     {
