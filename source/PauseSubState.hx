@@ -107,7 +107,7 @@ class PauseSubState extends MusicBeatSubstate
 				case "Resume":
 					close();
 				case "Restart Song":
-					FlxG.resetState();			
+					FlxG.resetState();
 				case "Toggle Botplay":
 					ClientSettings.botPlay = !ClientSettings.botPlay;
 				case "Exit to menu":
