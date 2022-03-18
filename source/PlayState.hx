@@ -1,5 +1,6 @@
 package;
 
+import js.html.Clients;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -1434,12 +1435,17 @@ class PlayState extends MusicBeatState
 			accRank = "F";
 
 		//updating values
-		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Misses:" + misses;
-		if (ClientSettings.displayAccuracy) {
-			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
-		}
+		if (!ClientSettings.botPlay)
+		{
+			scoreTxt.text = "Score: " + songScore;
+			scoreTxt.text += divider + "Misses:" + misses;
+			if (ClientSettings.displayAccuracy)
+			{
+				scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
+				scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+			}
+			}else{
+				scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
@@ -1826,6 +1832,8 @@ class PlayState extends MusicBeatState
 		var daRating:String = "";
 		var daAccuracy:Int = 0;
 
+	if (!ClientSettings.botPlay)
+	{
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
@@ -1854,6 +1862,9 @@ class PlayState extends MusicBeatState
 			daAccuracy = 100;
 			sicks++;
 		}
+	} else {
+		daRating = 'sick';
+	}
 
 		preAcc += daAccuracy;
 
@@ -2010,6 +2021,7 @@ class PlayState extends MusicBeatState
 	//better keyshit function
 	private function keyShit():Void
 	{
+		if (ClientSettings.botPlay) return;
 		//HOLDING
 		var holdArray:Array<Bool> = [
 			controls.LEFT,
@@ -2118,10 +2130,12 @@ class PlayState extends MusicBeatState
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
-			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
-				spr.animation.play("pressed");
-			if (!holdArray[spr.ID])
-				spr.animation.play("static");
+			if (!ClientSettings.botPlay) {
+				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
+					spr.animation.play("pressed");
+				if (!holdArray[spr.ID])
+					spr.animation.play("static");
+			}
 
 			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
 			{	
@@ -2241,7 +2255,7 @@ class PlayState extends MusicBeatState
 
 	function botPlayNoteHit(daNote:Note):Void
 	{
-		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5) 
+		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8) 
 			{
 				health += 0.023;
 
@@ -2253,16 +2267,24 @@ class PlayState extends MusicBeatState
 
 				playerStrums.forEach(function(spr:FlxSprite)
 				{
-					if (Math.abs(daNote.noteData) == spr.ID)
+					if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
 					{
 						spr.animation.play('confirm');
-					}
-				});
+					};
 
-				updateAccuracy();
+					if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+					{	
+						spr.centerOffsets();
+						spr.offset.x -= 13;
+						spr.offset.y -= 13;	
+					}	
+					else
+					{
+						spr.centerOffsets();
+				});
 			}
 
-			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5 && !daNote.isSustainNote) 
+			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote)
 			{
 				combo++;
 				totalNotesHit++;
@@ -2270,6 +2292,12 @@ class PlayState extends MusicBeatState
 
 				popUpScore(daNote);
 			}
+
+			boyfriend.playAnim("idle", true);
+			playerStrums.forEach(function(spr:FlxSprite)
+			{				
+				spr.animation.play('idle');
+			});
 	}
 
 	function opponentNoteHit(daNote:Note)
