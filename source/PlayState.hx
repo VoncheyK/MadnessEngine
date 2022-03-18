@@ -1359,11 +1359,13 @@ class PlayState extends MusicBeatState
 		super.update(elapsed);
 
 		var fcRank:String;
+		var accRank:String;
 		var divider:String = ' | ';
 
-		//beta ranks until we have actual accuracy to work with
+		//beta ranks??
 
 		fcRank = "[UNRATED]";
+		accRank = "F";
 
 		if (sicks > 0) 
 			fcRank = "[SFC]";
@@ -1376,12 +1378,29 @@ class PlayState extends MusicBeatState
 		if (misses > 9)
 			fcRank = "[Clear]";
 
+		if (accuracy > 99)
+			accRank = "S+";
+		if (accuracy < 100)
+			accRank = "S";
+		if (accuracy < 91)
+			accRank = "A";
+		if (accuracy < 81)
+			accRank = "B";
+		if (accuracy < 71)
+			accRank = "C";
+		if (accuracy < 61)
+			accRank = "D";
+		if (accuracy < 51)
+			accRank = "E";
+		if (accuracy < 41)
+			accRank = "F";
+
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
+		//scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
 		scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
 		scoreTxt.text += divider + "Misses:" + misses;
-		scoreTxt.text += divider + fcRank;
+		scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)
 		{
@@ -2357,7 +2376,7 @@ class PlayState extends MusicBeatState
 			gf.dance();
 		}
 
-		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
+		if (!boyfriend.animation.curAnim.name.startsWith("sing") && (curBeat % 2 == 0 || boyfriend.quickDancer))
 		{
 			boyfriend.playAnim('idle');
 		}
@@ -2397,15 +2416,25 @@ class PlayState extends MusicBeatState
 
                 if (curBeat % 4 == 0)
                 {
+                	var lastLight:FlxSprite = phillyCityLights.members[0];
                     phillyCityLights.forEach(function(light:FlxSprite)
                     {
+                    	// Take note of the previous light
+						if (light.visible == true)
+							lastLight = light;
                         light.visible = false;
                     });
 
-                    curLight = FlxG.random.int(0, phillyCityLights.length - 1);
+                    // To prevent duplicate lights, iterate until you get a matching light
+					while (lastLight == phillyCityLights.members[curLight])
+					{
+						curLight = FlxG.random.int(0, phillyCityLights.length - 1);
+					}
 
                     phillyCityLights.members[curLight].visible = true;
-                    // phillyCityLights.members[curLight].alpha = 1;
+                    phillyCityLights.members[curLight].alpha = 1;
+
+					FlxTween.tween(phillyCityLights.members[curLight], {alpha: 0}, Conductor.stepCrochet * .016);
                 }               
                 if (curBeat % 8 == 4 && FlxG.random.bool(Conductor.bpm > 320 ? 150 : 30) && !trainMoving && trainCooldown > 8)
                 {

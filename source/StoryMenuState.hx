@@ -18,7 +18,9 @@ import lime.net.curl.CURLCode;
 import haxe.Json;
 import lime.app.Application;
 import lime.utils.Assets;
+#if polymod
 import polymod.Polymod;
+#end
 
 using StringTools;
 
