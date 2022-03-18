@@ -124,6 +124,14 @@ class Note extends FlxSprite
 
 		// trace(prevNote);
 
+		/*
+			flipping sustain trails on downscroll
+			so it won't look weird
+		*/
+
+		if (FlxG.save.data.downScroll && sustainNote) 
+			flipY = true;
+
 		if (isSustainNote && prevNote != null)
 		{
 			noteScore * 0.2;
