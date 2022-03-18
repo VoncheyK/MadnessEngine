@@ -2083,12 +2083,14 @@ class PlayState extends MusicBeatState
 				spr.animation.play("static");
 
 			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
-				spr.centerOffsets();			
+			{	
+				spr.centerOffsets();
+				spr.offset.x -= 13;
+				spr.offset.y -= 13;	
+			}	
 			else
 			{
 				spr.centerOffsets();
-				spr.offset.x -= 13;
-				spr.offset.y -= 13;
 			}
 				
 		});
@@ -2187,7 +2189,7 @@ class PlayState extends MusicBeatState
 					highestCombo = combo;
 
 				if (note.daRating == "sick")
-					noteSplash(note.x, note.y, note.noteData, false);
+					//noteSplash(note.x, note.y, note.noteData, false);
 
 				note.kill();
 				notes.remove(note, true);
