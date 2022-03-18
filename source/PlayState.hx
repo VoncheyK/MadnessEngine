@@ -1360,11 +1360,13 @@ class PlayState extends MusicBeatState
 		super.update(elapsed);
 
 		var fcRank:String;
+		var accRank:String;
 		var divider:String = ' | ';
 
-		//beta ranks until we have actual accuracy to work with
+		//beta ranks??
 
 		fcRank = "[UNRATED]";
+		accRank = "F";
 
 		if (sicks > 0) 
 			fcRank = "[SFC]";
@@ -1377,12 +1379,25 @@ class PlayState extends MusicBeatState
 		if (misses > 9)
 			fcRank = "[Clear]";
 
+		if (accuracy > 99)
+			accRank = "S+";
+		if (accuracy < 100)
+			accRank = "S";
+		if (accuracy < 91)
+			accRank = "A";
+		if (accuracy < 81)
+			accRank = "B";
+		if (accuracy < 71)
+			accRank = "C";
+		if (accuracy < 61)
+			accRank = "F";
+
 		//updating values
 		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
-		//scoreTxt.text += divider 'Accuracy: ' + daAccuracy + '%';
+		//scoreTxt.text += divider + "Combo:" + combo + " (Max " + highestCombo + ")";
+		scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
 		scoreTxt.text += divider + "Misses:" + misses;
-		scoreTxt.text += divider + fcRank;
+		scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
 
 		/*if (ClientSettings.displayAccuracy)
 		{
