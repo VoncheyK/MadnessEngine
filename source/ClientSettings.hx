@@ -27,5 +27,9 @@ class ClientSettings
         if(FlxG.save.data.ghostTapping != null) ghostTapping = FlxG.save.data.ghostTapping;
         if(FlxG.save.data.noteskin != null) noteskin = FlxG.save.data.noteskin;
         //if(FlxG.save.data.displayAccuracy != null) noteskin = FlxG.save.data.displayAccuracy;
+        
+        //this will save your last volume
+        if (FlxG.save.data.volume != null) FlxG.sound.volume = FlxG.save.data.volume;
+        if (FlxG.save.data.mute != null) FlxG.sound.muted = FlxG.save.data.mute;
     }
 }
