@@ -12,24 +12,6 @@ import ClientSettings;
 
 class OptionsSubState extends MusicBeatSubstate
 {
-	var textMenuItems:Array<String> =  //the option name
-	[
-		'Downscroll',
-		'Middlescroll',
-		'Ghost Tapping',
-		'Show Accuracy'
-	];
-	var optionNames:Array<String> = //the variable name for the option on ClientSettings
-	[
-		'downScroll',
-		'middleScroll',
-		'ghostTapping',
-		'displayAccuracy'
-	];
-
-	private var currentDescription:String = "";
-	public static var descriptionText:FlxText;
-
 	var selector:FlxSprite;
 	var curSelected:Int = 0;
 	var grpOptionsTexts:FlxTypedGroup<Alphabet>;
@@ -37,14 +19,6 @@ class OptionsSubState extends MusicBeatSubstate
 	override function create()
 	{
 		super.create();
-
-		var menuBG:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuDesat"));
-		menuBG.color = 0x063970;
-		menuBG.setGraphicSize(Std.int(menuBG.width * 1.1));
-		menuBG.updateHitbox();
-		menuBG.screenCenter();
-		menuBG.antialiasing = true;
-		add(menuBG);
 
 		grpOptionsTexts = new FlxTypedGroup<Alphabet>();
 		add(grpOptionsTexts);
@@ -66,34 +40,33 @@ class OptionsSubState extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
-		if (controls.UP_P)
+		/*if (controls.UP_P)
 			changeSelection(-1);
 
 		if (controls.DOWN_P)
-			changeSelection(1);
+			changeSelection(1);*/
 
 		if (controls.BACK){
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			FlxG.switchState(new MainMenuState());
+			FlxG.switchState(new OptionsMenu());
 		}
 
-		if (controls.ACCEPT){
+		/*if (controls.ACCEPT){
 			FlxG.save.data.optionNames[curSelected] = !FlxG.save.data.optionNames[curSelected];
 			trace(optionNames[curSelected] + " : " + FlxG.save.data.optionNames[curSelected]);
-		}
+		}*/
 		FlxG.save.flush();
 	}
 
 	function changeSelection(change:Int)
 	{
+		FlxG.sound.play(Paths.sound('scrollMenu'), 0.4);
 		curSelected += change;
 
 		if (curSelected < 0)
 			curSelected = textMenuItems.length - 1;
 		if (curSelected >= textMenuItems.length)
 			curSelected = 0;
-		
-		FlxG.sound.play(Paths.sound("scrollMenu"));
 
 		grpOptionsTexts.forEach(function(txt:Alphabet)
 		{
