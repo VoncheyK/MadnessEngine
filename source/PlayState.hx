@@ -1452,6 +1452,13 @@ class PlayState extends MusicBeatState
 
 		timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 
+		if (ClientSettings.botPlay)
+		{
+			notes.forEachAlive(function (daNote:Note) {
+				botPlayNoteHit(daNote);
+			});
+		}
+
 		if (FlxG.keys.justPressed.ENTER && startedCountdown && canPause)
 		{
 			persistentUpdate = false;
@@ -2230,6 +2237,39 @@ class PlayState extends MusicBeatState
 				note.destroy();
 			}
 		}
+	}
+
+	function botPlayNoteHit(daNote:Note):Void
+	{
+		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5) 
+			{
+				health += 0.023;
+
+				daNote.kill();
+				notes.remove(daNote, true);
+				daNote.destroy();
+
+				boyfriend.playAnim("sing" + direction[daNote.noteData], true);
+
+				playerStrums.forEach(function(spr:FlxSprite)
+				{
+					if (Math.abs(daNote.noteData) == spr.ID)
+					{
+						spr.animation.play('confirm');
+					}
+				});
+
+				updateAccuracy();
+			}
+
+			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 5 && !daNote.isSustainNote) 
+			{
+				combo++;
+				totalNotesHit++;
+				daNote.daRating = "sick";
+
+				popUpScore(daNote);
+			}
 	}
 
 	function opponentNoteHit(daNote:Note)

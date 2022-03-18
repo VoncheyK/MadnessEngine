@@ -23,6 +23,7 @@ class OptionsMenu extends MusicBeatState
 		'',
 		'',
 		'',
+		'',
 		'WIP',
 		''
 	];
@@ -31,6 +32,7 @@ class OptionsMenu extends MusicBeatState
 		'downScroll',
 		'middleScroll',
 		'ghostTapping',
+		'botPlay',
 		'displayAccuracy',
 		'showTimeBar'
 	];
