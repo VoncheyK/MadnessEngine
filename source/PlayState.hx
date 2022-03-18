@@ -1,9 +1,13 @@
 package;
 
+#if js
 import js.html.Clients;
+#end
+
 #if desktop
 import Discord.DiscordClient;
 #end
+
 import Section.SwagSection;
 import Song.SwagSong;
 import WiggleEffect.WiggleEffectType;
@@ -1435,17 +1439,15 @@ class PlayState extends MusicBeatState
 			accRank = "F";
 
 		//updating values
-		if (!ClientSettings.botPlay)
-		{
-			scoreTxt.text = "Score: " + songScore;
-			scoreTxt.text += divider + "Misses:" + misses;
-			if (ClientSettings.displayAccuracy)
-			{
-				scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-				scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
-			}
-			}else{
-				scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
+		scoreTxt.text = "Score: " + songScore;
+		scoreTxt.text += divider + "Misses:" + misses;
+		if (ClientSettings.displayAccuracy) {
+			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
+			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+		}
+		if (ClientSettings.botPlay) {
+			scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
+		}
 
 		var curTime:Float = Conductor.songPosition;
 		if(curTime < 0) curTime = 0;
@@ -1747,9 +1749,7 @@ class PlayState extends MusicBeatState
 		if (isStoryMode)
 		{
 			campaignScore += songScore;
-
 			storyPlaylist.remove(storyPlaylist[0]);
-
 			if (storyPlaylist.length <= 0)
 			{
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
@@ -1773,7 +1773,6 @@ class PlayState extends MusicBeatState
 			else
 			{
 				var difficulty:String = "";
-
 				if (storyDifficulty == 0)
 					difficulty = '-easy';
 
@@ -1812,7 +1811,6 @@ class PlayState extends MusicBeatState
 	}
 
 	var endingSong:Bool = false;
-
 	private function popUpScore(daNote:Note):Void
 	{
 		var noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
@@ -1832,8 +1830,6 @@ class PlayState extends MusicBeatState
 		var daRating:String = "";
 		var daAccuracy:Int = 0;
 
-	if (!ClientSettings.botPlay)
-	{
 		if (noteDiff > Conductor.safeZoneOffset * 0.9)
 		{
 			daRating = 'shit';
@@ -1862,43 +1858,11 @@ class PlayState extends MusicBeatState
 			daAccuracy = 100;
 			sicks++;
 		}
-	} else {
-		daRating = 'sick';
-	}
+		if (ClientSettings.botPlay) daRating = 'sick';
 
 		preAcc += daAccuracy;
-
 		daNote.daRating = daRating;
-
 		songScore += score;
-
-		/*var sploosh:FlxSprite = new FlxSprite(daNote.x, playerStrums.members[daNote.noteData].y);
-   		if (!curStage.startsWith('school'))
-   		{
-			//i might remake this lmao -jorge
-    		var tex:flixel.graphics.frames.FlxAtlasFrames = Paths.getSparrowAtlas('noteSplashes', 'shared');
-    		sploosh.frames = tex;
-		    sploosh.animation.addByPrefix('splash 0 0', 'note impact 1 purple', 24, false);
-    		sploosh.animation.addByPrefix('splash 0 1', 'note impact 1  blue', 24, false);
-    		sploosh.animation.addByPrefix('splash 0 2', 'note impact 1 green', 24, false);
-    		sploosh.animation.addByPrefix('splash 0 3', 'note impact 1 red', 24, false);
-    		sploosh.animation.addByPrefix('splash 1 0', 'note impact 2 purple', 24, false);
-		    sploosh.animation.addByPrefix('splash 1 1', 'note impact 2 blue', 24, false);
-		    sploosh.animation.addByPrefix('splash 1 2', 'note impact 2 green', 24, false);
-		    sploosh.animation.addByPrefix('splash 1 3', 'note impact 2 red', 24, false);
-    		if (daRating == 'sick')
-    			//reminder: attach this to an option once the Options Menu is done
-    		{
-     			add(sploosh);
-     			sploosh.cameras = [camHUD];
-    			sploosh.animation.play('splash ' + FlxG.random.int(0, 1) + " " + daNote.noteData);
-     			sploosh.alpha = 0.6;
-     			sploosh.offset.x += 90;
-     			sploosh.offset.y += 80;
-     			sploosh.animation.finishCallback = function(name)
-     			sploosh.kill();
-     		}
-     	}*/
 
 		/* if (combo > 60)
 				daRating = 'sick';
@@ -2256,35 +2220,31 @@ class PlayState extends MusicBeatState
 	function botPlayNoteHit(daNote:Note):Void
 	{
 		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8) 
-			{
-				health += 0.023;
-
-				daNote.kill();
-				notes.remove(daNote, true);
-				daNote.destroy();
-
-				boyfriend.playAnim("sing" + direction[daNote.noteData], true);
-
-				playerStrums.forEach(function(spr:FlxSprite)
+		{
+			health += 0.023;
+			daNote.kill();
+			notes.remove(daNote, true);
+			daNote.destroy();
+			boyfriend.playAnim("sing" + direction[daNote.noteData], true);
+			playerStrums.forEach(function(spr:FlxSprite)
+			{			
+				if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
 				{
-					if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
-					{
-						spr.animation.play('confirm');
-					};
-
-					if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
-					{	
-						spr.centerOffsets();
-						spr.offset.x -= 13;
-						spr.offset.y -= 13;	
-					}	
-					else
-					{
-						spr.centerOffsets();
-				});
-			}
-
-			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote)
+					spr.animation.play('confirm');
+				};
+				if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+				{	
+					spr.centerOffsets();
+					spr.offset.x -= 13;
+					spr.offset.y -= 13;	
+				}	
+				else
+				{
+					spr.centerOffsets();
+				}
+			});
+		}
+			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote) 
 			{
 				combo++;
 				totalNotesHit++;
@@ -2292,7 +2252,6 @@ class PlayState extends MusicBeatState
 
 				popUpScore(daNote);
 			}
-
 			boyfriend.playAnim("idle", true);
 			playerStrums.forEach(function(spr:FlxSprite)
 			{				
@@ -2302,7 +2261,6 @@ class PlayState extends MusicBeatState
 
 	function opponentNoteHit(daNote:Note)
 	{
-
 		if (daNote.y > FlxG.height)
 		{
 			daNote.active = false;
