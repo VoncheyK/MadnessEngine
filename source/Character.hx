@@ -9,6 +9,10 @@ using StringTools;
 
 class Character extends FlxSprite
 {
+	// By default, this option set to FALSE will make it so that the character only dances twice per major beat hit
+	// If set to on, they will dance every beat, such as Skid and Pump
+	public var quickDancer:Bool = false;
+
 	public var animOffsets:Map<String, Array<Dynamic>>;
 	public var debugMode:Bool = false;
 
@@ -157,12 +161,15 @@ class Character extends FlxSprite
 				addOffset("singLEFT", 130, -10);
 				addOffset("singDOWN", -50, -130);
 
+				quickDancer = true;
+
 				playAnim('danceRight');
 			case 'mom':
 				tex = Paths.getSparrowAtlas('Mom_Assets');
 				frames = tex;
 
 				animation.addByPrefix('idle', "Mom Idle", 24, false);
+				animation.addByIndices('idlePost', 'Mom Idle', [10, 11, 12, 13], "", 24, true);	
 				animation.addByPrefix('singUP', "Mom Up Pose", 24, false);
 				animation.addByPrefix('singDOWN', "MOM DOWN POSE", 24, false);
 				animation.addByPrefix('singLEFT', 'Mom Left Pose', 24, false);
@@ -337,6 +344,7 @@ class Character extends FlxSprite
 				var tex = Paths.getSparrowAtlas('bfCar');
 				frames = tex;
 				animation.addByPrefix('idle', 'BF idle dance', 24, false);
+				animation.addByIndices('idlePost', 'BF idle dance', [8, 9, 10, 11, 12, 13, 14], "", 24, true);
 				animation.addByPrefix('singUP', 'BF NOTE UP0', 24, false);
 				animation.addByPrefix('singLEFT', 'BF NOTE LEFT0', 24, false);
 				animation.addByPrefix('singRIGHT', 'BF NOTE RIGHT0', 24, false);
@@ -570,6 +578,15 @@ class Character extends FlxSprite
 					playAnim('danceRight');
 		}
 
+		// Post idle animation (think Week 4 and how the player and mom's hair continues to sway after their idle animations are done!)
+		if (animation.curAnim.finished && animation.curAnim.name == 'idle')
+		{
+			// We look for an animation called 'idlePost' to switch to
+			if (animation.getByName('idlePost') != null)
+				// (( WE DON'T USE 'PLAYANIM' BECAUSE WE WANT TO FEED OFF OF THE IDLE OFFSETS! ))
+				animation.play('idlePost', true, false, 0);
+		}
+
 		super.update(elapsed);
 	}
 
@@ -578,7 +595,7 @@ class Character extends FlxSprite
 	/**
 	 * FOR GF DANCING SHIT
 	 */
-	public function dance()
+	public function dance(?forced:Bool = false)
 	{
 		if (!debugMode)
 		{
@@ -590,9 +607,9 @@ class Character extends FlxSprite
 						danced = !danced;
 
 						if (danced)
-							playAnim('danceRight');
+							playAnim('danceRight', forced);
 						else
-							playAnim('danceLeft');
+							playAnim('danceLeft', forced);
 					}
 
 				case 'gf-christmas':
@@ -626,16 +643,13 @@ class Character extends FlxSprite
 						else
 							playAnim('danceLeft');
 					}
-
-				case 'spooky':
-					danced = !danced;
-
-					if (danced)
-						playAnim('danceRight');
-					else
-						playAnim('danceLeft');
 				default:
-					playAnim('idle');
+					// Left/right dancing, think Skid & Pump
+					if (animation.getByName('danceLeft') != null && animation.getByName('danceRight') != null)
+						playAnim((animation.curAnim.name == 'danceRight') ? 'danceLeft' : 'danceRight', forced);
+					// Play normal idle animations for all other characters
+					else
+						playAnim('idle', forced);
 			}
 		}
 	}

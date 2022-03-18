@@ -2301,7 +2301,7 @@ class PlayState extends MusicBeatState
 			gf.dance();
 		}
 
-		if (!boyfriend.animation.curAnim.name.startsWith("sing"))
+		if (!boyfriend.animation.curAnim.name.startsWith("sing") && (curBeat % 2 == 0 || boyfriend.quickDancer))
 		{
 			boyfriend.playAnim('idle');
 		}
@@ -2341,15 +2341,25 @@ class PlayState extends MusicBeatState
 
                 if (curBeat % 4 == 0)
                 {
+                	var lastLight:FlxSprite = phillyCityLights.members[0];
                     phillyCityLights.forEach(function(light:FlxSprite)
                     {
+                    	// Take note of the previous light
+						if (light.visible == true)
+							lastLight = light;
                         light.visible = false;
                     });
 
-                    curLight = FlxG.random.int(0, phillyCityLights.length - 1);
+                    // To prevent duplicate lights, iterate until you get a matching light
+					while (lastLight == phillyCityLights.members[curLight])
+					{
+						curLight = FlxG.random.int(0, phillyCityLights.length - 1);
+					}
 
                     phillyCityLights.members[curLight].visible = true;
-                    // phillyCityLights.members[curLight].alpha = 1;
+                    phillyCityLights.members[curLight].alpha = 1;
+
+					FlxTween.tween(phillyCityLights.members[curLight], {alpha: 0}, Conductor.stepCrochet * .016);
                 }               
                 if (curBeat % 8 == 4 && FlxG.random.bool(Conductor.bpm > 320 ? 150 : 30) && !trainMoving && trainCooldown > 8)
                 {
