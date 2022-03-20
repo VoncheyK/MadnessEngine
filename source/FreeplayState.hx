@@ -50,6 +50,12 @@ class FreeplayState extends MusicBeatState
 	{
 		Conductor.changeBPM(102);
 
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing)
+				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		}
+
 		//uh soft coded songs in freeplay
 		//this should work???
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
