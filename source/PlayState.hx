@@ -87,6 +87,7 @@ class PlayState extends MusicBeatState
 	private var combo:Int = 0;
 	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
+	private var usedBot:Bool = false;
 	
 	//accuracy stuff
 	public var totalNotesHit:Int = 0;
@@ -1449,6 +1450,7 @@ class PlayState extends MusicBeatState
 			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
 		}
 		if (ClientSettings.botPlay) {
+			usedBot = true;
 			scoreTxt.text = "[BOTPLAY]";
 		}
 
@@ -1773,7 +1775,7 @@ class PlayState extends MusicBeatState
 				// if ()
 				//StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
 
-				if (SONG.validScore)
+				if (SONG.validScore && !usedBot)
 				{
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}

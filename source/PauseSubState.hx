@@ -20,6 +20,8 @@ class PauseSubState extends MusicBeatSubstate
 
 	var menuItems:Array<String> = ['Resume', 'Restart Song', 'Toggle Botplay', 'Exit to menu'];
 	var curSelected:Int = 0;
+	static var usedBot:Bool = false;
+	var botText:FlxText;
 
 	var pauseMusic:FlxSound;
 
@@ -52,15 +54,26 @@ class PauseSubState extends MusicBeatSubstate
 		levelDifficulty.updateHitbox();
 		add(levelDifficulty);
 
+		botText = new FlxText(20, 15 + 64, 0, "", 32);
+		botText.text += "Botplay was turned on,\nscore won't be saved until\nbotplay is turned off and\nsong is restarted!";
+		botText.scrollFactor.set();
+		botText.setFormat(Paths.font('vcr.ttf'), 32);
+		botText.visible = false;
+		botText.updateHitbox();
+		add(botText);
+
 		levelDifficulty.alpha = 0;
 		levelInfo.alpha = 0;
+		botText.alpha = 0;
 
 		levelInfo.x = FlxG.width - (levelInfo.width + 20);
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
+		botText.x = FlxG.width - (botText.width + 20);
 
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 		FlxTween.tween(levelInfo, {alpha: 1, y: 20}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
 		FlxTween.tween(levelDifficulty, {alpha: 1, y: levelDifficulty.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.5});
+		FlxTween.tween(botText, {alpha: 1, y: botText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
@@ -96,6 +109,16 @@ class PauseSubState extends MusicBeatSubstate
 		if (downP)
 		{
 			changeSelection(1);
+		}
+
+		if (ClientSettings.botPlay == true)
+		{
+			usedBot = true;
+		}
+
+		if (usedBot) 
+		{
+			botText.visible = true;
 		}
 
 		if (accepted)
