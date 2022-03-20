@@ -1452,15 +1452,10 @@ class PlayState extends MusicBeatState
 
 		if (ClientSettings.botPlay) {
 			usedBot = true;
-<<<<<<< HEAD
-			scoreTxt.text = "[BOTPLAY]";
-		}
-=======
 			detailsText = '[BOTPLAY]';
 
 			/*
 				random botplay text
->>>>>>> 2f981f5190ddf966ad03e3fcdefa9a9c6743b400
 
 				TODO: clean this code up and make it so it doesn't have to update constantly
 				but rather update every time you start a new instance of botplay
