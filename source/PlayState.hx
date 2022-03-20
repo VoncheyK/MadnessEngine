@@ -1536,11 +1536,7 @@ class PlayState extends MusicBeatState
 		var secondsTotal:Int = Math.floor(songCalc / 1000);
 		if(secondsTotal < 0) secondsTotal = 0;
 
-<<<<<<< Updated upstream
 		timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
-=======
-		timeTxt.text = ' (' + FlxStringUtil.formatTime(secondsTotal, false) + ') ' + ' | ' + curSong;
->>>>>>> Stashed changes
 
 		if (ClientSettings.botPlay)
 		{
