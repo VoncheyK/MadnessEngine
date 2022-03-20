@@ -810,12 +810,11 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
-		botplayTxt = new FlxText(healthBarBG.x + healthBarBG.width / 2 - 75, healthBarBG.y + (ClientSettings.downScroll ? 100 : -100), "", 32);
-		if (ClientSettings.downScroll)
+		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+		if(ClientSettings.downScroll)
 			botplayTxt.y = timeBarBG.y - 78;
-		if (ClientSettings.middleScroll)
-		{
-			if (ClientSettings.downScroll)
+		if(ClientSettings.middleScroll) {
+			if(ClientSettings.downScroll)
 				botplayTxt.y = botplayTxt.y - 78;
 			else
 				botplayTxt.y = botplayTxt.y + 78;
@@ -827,10 +826,7 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = ClientSettings.botPlay;
 		botplayTxt.cameras = [camCustom];
 		add(botplayTxt);
-		if (ClientSettings.downScroll) {
-			botplayTxt.y = timeBarBG.y - 200;
-		}
-
+		
 		switch (FlxG.random.int(1, 4))
 		{
 			case 1:
