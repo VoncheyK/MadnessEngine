@@ -1405,6 +1405,7 @@ class PlayState extends MusicBeatState
 		var accRank:String;
 		var divider:String = ' | ';
 
+		//im crying looking at this bro
 		//ranks
 
 		fcRank = "[UNRATED]";
@@ -1985,7 +1986,7 @@ class PlayState extends MusicBeatState
 	//better keyshit function
 	private function keyShit():Void
 	{
-		if (ClientSettings.botPlay) return;
+
 		//HOLDING
 		var holdArray:Array<Bool> = [
 			controls.LEFT,
@@ -2000,6 +2001,13 @@ class PlayState extends MusicBeatState
 			controls.UP_P,
 			controls.RIGHT_P
 		];
+
+		if (ClientSettings.botPlay)
+		{
+			holdArray = [false, false, false, false];
+			pressArray = [false, false, false, false];
+		}
+
 		//release isnt used so ill remove it
 
 		//changed it to check if it contains true
@@ -2012,11 +2020,11 @@ class PlayState extends MusicBeatState
 		{
 			boyfriend.holdTimer = 0;
 
-			//possible notes????
+			//possible notes
 			var possibleNotes:Array<Note> = [];
-			//ignore list????
+			//ignore list
 			var ignoreList:Array<Int> = [];
-			//notes to kill later????
+			//notes to kill
 			var	notesTK:Array<Note> = [];
 
 			notes.forEachAlive(function (daNote:Note) {
@@ -2071,37 +2079,35 @@ class PlayState extends MusicBeatState
 						goodNoteHit(coolNote);
 				}
 			}
-			else
-			{
-				badNoteCheck();
-				misses++;
-				health -= 0.04;
-				songScore -= 10;
-				totalNotesHit++;
-				updateAccuracy();
-			}
 		}
 		if (boyfriend.holdTimer > Conductor.stepCrochet * 0.004 && !holdArray.contains(true)
 		&& boyfriend.animation.curAnim.name.startsWith("sing") && !boyfriend.animation.curAnim.name.endsWith("miss"))
 			boyfriend.playAnim("idle");				
-		/*else if (!ghost tapping stuff)
+		else if (!ClientSettings.ghostTapping)
 		    for (i in 0...pressArray.length)
 		        if (pressArray[i])
-		            noteMiss(i);*/
+				{
+		        	noteMiss(i);
+					misses++;
+					health -= 0.04;
+					songScore -= 10;
+					totalNotesHit++;
+					updateAccuracy();
+				}
 		
 		//this shit is broken for some reason
 		//TODO fix later
+		// figured out a better way to do it!!
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
-			// figured out a better way to do it!!
-			if (!ClientSettings.botPlay) {
+			if (!ClientSettings.botPlay)
+			{
 				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
 					spr.animation.play("pressed");
 				if (!holdArray[spr.ID])
-					spr.animation.play("static");
+					spr.animation.play("static");	
 			}
-
-			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+			if (spr.animation.curAnim.name != "confirm" || !curStage.startsWith("school"))
 			{	
 				spr.centerOffsets();
 				spr.offset.x -= 13;
@@ -2111,7 +2117,6 @@ class PlayState extends MusicBeatState
 			{
 				spr.centerOffsets();
 			}
-				
 		});
 	}
 
@@ -2186,18 +2191,16 @@ class PlayState extends MusicBeatState
 
 			boyfriend.playAnim("sing" + direction[note.noteData], true);
 
-			playerStrums.forEach(function(spr:FlxSprite)
-			{
-				if (Math.abs(note.noteData) == spr.ID)
-				{
-					spr.animation.play('confirm');
-				}
-			});
-
 			updateAccuracy();
 
 			note.wasGoodHit = true;
 			vocals.volume = 1;
+
+			playerStrums.forEach(function(spr:FlxSprite)
+			{
+				if (Math.abs(note.noteData) == spr.ID)
+					spr.animation.play('confirm', true);
+			});		
 
 			if (!note.isSustainNote)
 			{
@@ -2231,7 +2234,7 @@ class PlayState extends MusicBeatState
 				if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
 				{
 					spr.animation.play('confirm');
-				};
+				}
 				if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
 				{	
 					spr.centerOffsets();
@@ -2244,14 +2247,15 @@ class PlayState extends MusicBeatState
 				}
 			});
 		}
-			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote) 
-			{
-				combo++;
-				totalNotesHit++;
-				daNote.daRating = "sick";
 
-				popUpScore(daNote);
-			}
+		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote) 
+		{
+			combo++;
+			totalNotesHit++;
+			daNote.daRating = "sick";
+
+			popUpScore(daNote);
+		}
 	}
 
 	function opponentNoteHit(daNote:Note)
