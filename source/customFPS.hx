@@ -3,6 +3,7 @@ package;
 import haxe.Timer;
 import openfl.events.Event;
 import openfl.text.TextField;
+import openfl.text.TextFormat;
 import flixel.math.FlxMath;
 import openfl.system.System;
 #if gl_stats
