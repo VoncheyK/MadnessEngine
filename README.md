@@ -13,11 +13,15 @@ You need to install this lol
 
 all of them must use *haxelib install* first!!!
 
-flixel
+`flixel
+
 flixel-addons
+
 flixel-ui
+
 hscript
-newgrounds
+
+newgrounds`
 
 # 4th Step.
 
