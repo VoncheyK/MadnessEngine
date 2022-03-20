@@ -13,10 +13,10 @@ You need to install this lol
 
 all of them must use *haxelib install* first!!!
 
-`flixel
-flixel-addons
-flixel-ui
-hscript
+`flixel,
+flixel-addons,
+flixel-ui,
+hscript,
 newgrounds`
 
 # 4th Step.
