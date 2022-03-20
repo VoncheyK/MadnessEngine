@@ -19,13 +19,13 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import lime.app.Application;
-import Achievements;
-import editors.MasterEditorMenu;
 import flixel.input.keyboard.FlxKey;
+
 #if gl_stats
 import openfl.display._internal.stats.Context3DStats;
 import openfl.display._internal.stats.DrawCallContext;
 #end
+
 #if flash
 import openfl.Lib;
 #end
@@ -42,7 +42,7 @@ import openfl.system.System;
 @:fileXml('tags="haxe,release"')
 @:noDebug
 #end
-class FPS extends TextField
+class CustomFPS extends TextField
 {
 	/**
 		The current frame rate, expressed using frames-per-second
@@ -52,7 +52,6 @@ class FPS extends TextField
 	@:noCompletion private var cacheCount:Int;
 	@:noCompletion private var currentTime:Float;
 	@:noCompletion private var times:Array<Float>;
-	var texta:FlxText;
 
 	public function new(x:Float = 10, y:Float = 10, color:Int = 0x000000)
 	{
@@ -64,11 +63,10 @@ class FPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("_sans", 14, color);
+		defaultTextFormat = new TextFormat("VCR OSD Mono", 16, color);
 		autoSize = LEFT;
 		multiline = true;
 		text = "Framerate: ";
-		// text = "Vs Kosan Jodent";
 
 		cacheCount = 0;
 		currentTime = 0;
@@ -97,7 +95,7 @@ class FPS extends TextField
 
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
-		if (currentFPS > ClientPrefs.framerate) currentFPS = ClientPrefs.framerate;
+		if (currentFPS > ClientSettings.framerate) currentFPS = ClientSettings.framerate;
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
@@ -106,14 +104,12 @@ class FPS extends TextField
 			
 			#if openfl
 			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
-			text += "\nMemory Usage: " + memoryMegas + " MB
-					Madness Engine";
+			text += "\nMemory Usage: " + memoryMegas + " MB";
 			#end
-
-			// text = "Vs Kosan Jodent";
+			text += "\nMadness Engine: " + Main.engineVer;
 
 			textColor = 0xFFFFFFFF;
-			if (memoryMegas > 3000 || currentFPS <= ClientPrefs.framerate / 2)
+			if (memoryMegas > 3000 || currentFPS <= ClientSettings.framerate / 2)
 			{
 				textColor = 0xFFFF0000;
 			}
