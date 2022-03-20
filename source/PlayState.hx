@@ -1516,12 +1516,16 @@ class PlayState extends MusicBeatState
 		if (ClientSettings.displayAccuracy) {
 			scoreTxt.text += divider + 'Accuracy: ${accuracy}%';
 			scoreTxt.text += divider + 'Rank: ${accRank} ${fcRank}';
+			#if desktop
 			detailsText = scoreTxt.text;
+			#end
 		}
 
 		if (ClientSettings.botPlay) {
 			usedBot = true;
+			#if desktop
 			detailsText = '[BOTPLAY]';
+			#end
 
 			botplaySine += 180 * elapsed;
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);

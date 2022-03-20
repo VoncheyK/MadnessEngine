@@ -59,11 +59,7 @@ class PauseSubState extends MusicBeatSubstate
 		add(levelDifficulty);
 
 		botText = new FlxText(20, 15 + 64, 0, "", 32);
-<<<<<<< HEAD
-		botText.text += "Botplay was turned on,\nscore won't be saved until\nbotplay is turned off and\nsong is restarted!";
-=======
 		botText.text += "Botplay was turned on,\nScore won't be saved.";
->>>>>>> 2f981f5190ddf966ad03e3fcdefa9a9c6743b400
 		botText.scrollFactor.set();
 		botText.setFormat(Paths.font('vcr.ttf'), 32);
 		botText.visible = false;
