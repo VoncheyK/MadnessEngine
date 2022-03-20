@@ -69,6 +69,14 @@ class Main extends Sprite
 
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
 
+		fpsVar = new CustomFPS(10, 3, 0xFFFFFF);
+		addChild(fpsVar);
+		Lib.current.stage.align = "tl";
+		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
+		if(fpsVar != null) {
+			fpsVar.visible = ClientPrefs.showFPS;
+		}
+
 		#if !mobile
 		addChild(new FPS(10, 3, 0xFFFFFF));
 		#end
