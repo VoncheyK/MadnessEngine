@@ -137,6 +137,10 @@ class PauseSubState extends MusicBeatSubstate
 					FlxG.resetState();
 				case "Toggle Botplay":
 					ClientSettings.botPlay = !ClientSettings.botPlay;
+					PlayState.instance.botplayTxt.visible = ClientSettings.botPlay;
+					PlayState.instance.botplayTxt.alpha = 1;
+					PlayState.instance.botplaySine = 0;
+					PlayState.instance.scoreTxt.visible = false;
 				case "Exit to menu":
 					FlxG.switchState(new MainMenuState());
 			}

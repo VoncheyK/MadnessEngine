@@ -52,6 +52,13 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	/*
+		use this to access this state on other states
+		like this
+		PlayState.instance.*variable*
+	*/
+	public static var instance:PlayState;
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -127,6 +134,7 @@ class PlayState extends MusicBeatState
 	private var iconP1:HealthIcon;
 	private var iconP2:HealthIcon;
 	private var camHUD:FlxCamera;
+	public var camCustom:FlxCamera;
 	private var camGame:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
@@ -151,10 +159,10 @@ class PlayState extends MusicBeatState
 
 	#if desktop
 	// Discord RPC variables
-	var storyDifficultyText:String = "";
-	var iconRPC:String = "";
-	var detailsText:String = "";
-	var detailsPausedText:String = "";
+	public var storyDifficultyText:String = "";
+	public var iconRPC:String = "";
+	public var detailsText:String = "";
+	public var detailsPausedText:String = "";
 	#end
 
 	// Ratings
@@ -163,11 +171,14 @@ class PlayState extends MusicBeatState
 	public var bads:Int = 0;
 	public var shits:Int = 0;
 
-	// Botplay Blink thing
+	// Botplay Text and Blink (Sine)
 	public var botplaySine:Float = 0;
+	public var botplayTxt:FlxText;
 
 	override public function create()
 	{
+		instance = this;
+
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -179,11 +190,15 @@ class PlayState extends MusicBeatState
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
+		camCustom = new FlxCamera();
+		camCustom.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		FlxG.cameras.add(camHUD);
 		FlxG.cameras.setDefaultDrawTarget(camHUD, false);
+		FlxG.cameras.add(camCustom);
+		FlxG.cameras.setDefaultDrawTarget(camCustom, false);
 
 		persistentUpdate = true;
 		persistentDraw = true;
@@ -795,6 +810,39 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
+		botplayTxt = new FlxText(healthBarBG.x + healthBarBG.width / 2 - 75, healthBarBG.y + (ClientSettings.downScroll ? 100 : -100), "", 32);
+		if (ClientSettings.downScroll)
+			botplayTxt.y = timeBarBG.y - 78;
+		if (ClientSettings.middleScroll)
+		{
+			if (ClientSettings.downScroll)
+				botplayTxt.y = botplayTxt.y - 78;
+			else
+				botplayTxt.y = botplayTxt.y + 78;
+		}
+		botplayTxt.setFormat(Paths.font("vcr.ttf"), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayTxt.scrollFactor.set();
+		botplayTxt.size = 32;
+		botplayTxt.borderSize = 2;
+		botplayTxt.visible = ClientSettings.botPlay;
+		botplayTxt.cameras = [camCustom];
+		add(botplayTxt);
+		if (ClientSettings.downScroll) {
+			botplayTxt.y = timeBarBG.y - 200;
+		}
+
+		switch (FlxG.random.int(1, 4))
+		{
+			case 1:
+				botplayTxt.text = "[BOTPLAY]";
+			case 2:
+				botplayTxt.text = "[SKILL ISSUE]";
+			case 3:
+				botplayTxt.text = "[HI MOM]";
+			case 4:
+				botplayTxt.text = "Rank: [BFC]"; //BFC stands for Bot Full Combo
+		}
+
 		noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -1388,12 +1436,33 @@ class PlayState extends MusicBeatState
 	private var paused:Bool = false;
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
+	var alreadyChanged:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
 		#if !debug
 		perfectMode = false;
 		#end
+
+		if (ClientSettings.botPlay && !alreadyChanged)
+		{
+			scoreTxt.visible = false;
+			alreadyChanged = true;
+		} else if (!ClientSettings.botPlay && alreadyChanged) {
+			scoreTxt.visible = true;
+			switch (FlxG.random.int(1, 4))
+			{
+				case 1:
+					botplayTxt.text = "[BOTPLAY]";
+				case 2:
+					botplayTxt.text = "[SKILL ISSUE]";
+				case 3:
+					botplayTxt.text = "[HI MOM]";
+				case 4:
+					botplayTxt.text = "Rank: [BFC]"; //BFC stands for Bot Full Combo
+			}
+			alreadyChanged = false;
+		}
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1454,33 +1523,8 @@ class PlayState extends MusicBeatState
 			usedBot = true;
 			detailsText = '[BOTPLAY]';
 
-			/*
-				random botplay text
-
-				TODO: clean this code up and make it so it doesn't have to update constantly
-				but rather update every time you start a new instance of botplay
-			new FlxTimer().start(1, function(tmr:FlxTimer)
-			{
-				switch (FlxG.random.int(1, 4))
-				{
-					case 1:
-						scoreTxt.text = "[BOTPLAY]";
-					case 2:
-						scoreTxt.text = "[SKILL ISSUE]";
-					case 3:
-						scoreTxt.text = "[HI MOM]";
-					case 4:
-						scoreTxt.text = "Score: 69420 | Misses: 1337 | Accuracy: 135% | Rank: S(kill issue) [BFC]"; //BFC stands for Bot Full Combo
-					}
-			});*/
-			scoreTxt.text = '[BOTPLAY]' //leaving it like this for now until I finish the code -BeastlyGhost
 			botplaySine += 180 * elapsed;
-			scoreTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
-		} else {
-			scoreTxt.text = scoreTxt.text; //bitch???
-			detailsText = scoreTxt.text;
-			//sine shouldn't work if botplay is off
-			scoreTxt.alpha = 1;
+			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
 		var curTime:Float = Conductor.songPosition;
