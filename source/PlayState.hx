@@ -826,7 +826,7 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = ClientSettings.botPlay;
 		botplayTxt.cameras = [camCustom];
 		add(botplayTxt);
-		
+
 		switch (FlxG.random.int(1, 4))
 		{
 			case 1:
