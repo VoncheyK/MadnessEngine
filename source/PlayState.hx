@@ -764,7 +764,7 @@ class PlayState extends MusicBeatState
 		var showTime:Bool = (ClientSettings.showTimeBar);
 		var showTimeTxt:Bool = (ClientSettings.showTimeTxt);
 
-		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
+		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 16);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -787,7 +787,7 @@ class PlayState extends MusicBeatState
 		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
 			'songPercent', 0, 1);
 		timeBar.scrollFactor.set();
-		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.WHITE);
+		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.CYAN);
 		timeBar.numDivisions = 800;
 		timeBar.alpha = 0;
 		timeBar.visible = showTime;
@@ -1536,7 +1536,7 @@ class PlayState extends MusicBeatState
 		var secondsTotal:Int = Math.floor(songCalc / 1000);
 		if(secondsTotal < 0) secondsTotal = 0;
 
-		timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false) + ' | ' + curSong;
+		timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
 
 		if (ClientSettings.botPlay)
 		{

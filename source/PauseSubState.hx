@@ -77,7 +77,7 @@ class PauseSubState extends MusicBeatSubstate
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 		FlxTween.tween(levelInfo, {alpha: 1, y: 20}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
 		FlxTween.tween(levelDifficulty, {alpha: 1, y: levelDifficulty.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.5});
-		FlxTween.tween(botText, {alpha: 1, y: botText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
+		FlxTween.tween(botText, {alpha: 1, y: botText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.8});
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
@@ -115,13 +115,11 @@ class PauseSubState extends MusicBeatSubstate
 			changeSelection(1);
 		}
 
-		if (ClientSettings.botPlay == true)
-		{
+		if (ClientSettings.botPlay) {
 			usedBot = true;
 		}
 
-		if (usedBot) 
-		{
+		if (usedBot) {
 			botText.visible = true;
 		}
 
@@ -142,7 +140,12 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.botplaySine = 0;
 					PlayState.instance.scoreTxt.visible = false;
 				case "Exit to menu":
-					FlxG.switchState(new MainMenuState());
+					ClientSettings.botPlay = false;
+					botText.visible = false;
+					if(PlayState.isStoryMode)
+						FlxG.switchState(new StoryMenuState());
+					else
+						FlxG.switchState(new FreeplayState());
 			}
 		}
 
