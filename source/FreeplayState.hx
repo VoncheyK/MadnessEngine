@@ -127,8 +127,8 @@ class FreeplayState extends MusicBeatState
 			iconArray.push(icon);
 			add(icon);
 
-			songText.offset.x += 250;
-			icon.offset.x += 250;
+			songText.offset.x -= 250;
+			icon.offset.x -= 250;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
 		}
@@ -314,11 +314,11 @@ class FreeplayState extends MusicBeatState
 		}
 		#end
 
-		for (i in 0...iconArray.length)
+		/*for (i in 0...iconArray.length)
 		{
-			iconArray[i].setGraphicSize(Std.int(FlxMath.lerp(150, iconArray[i].width, 0.50)));
+			// iconArray[i].setGraphicSize(Std.int(FlxMath.lerp(150, iconArray[i].width, 0.50)));
 			iconArray[i].updateHitbox();
-		}
+		}*/
 
 		// Adhere the position of all the things (I'm sorry it was just so ugly before I had to fix it Shubs)
 		scoreText.text = "PERSONAL BEST:" + lerpScore;
@@ -407,12 +407,12 @@ class FreeplayState extends MusicBeatState
 	{
 		super.beatHit();
 
-		for (i in 0...iconArray.length)
+		/*for (i in 0...iconArray.length)
 		{
 			iconArray[i].setGraphicSize(Std.int(iconArray[i].width + 30));
 
 			iconArray[i].updateHitbox();
-		}
+		}*/
 		
 		//we can do cool stuff with the beat
 
