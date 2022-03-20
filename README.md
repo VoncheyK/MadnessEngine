@@ -26,6 +26,7 @@ Then download Git https://git-scm.com/downloads works for all OS just follow the
 # 5th step.
 
 Run haxelib git polymod https://github.com/larsiusprime/polymod.git to install Polymod.
+
 Run haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc to install Discord RPC.
 
 # 6th Step. 
