@@ -52,6 +52,13 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
+	/*
+		use this to access this state on other states
+		like this
+		PlayState.instance.*variable*
+	*/
+	public static var instance:PlayState;
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -87,6 +94,7 @@ class PlayState extends MusicBeatState
 	private var combo:Int = 0;
 	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
+	private var usedBot:Bool = false;
 	
 	//accuracy stuff
 	public var totalNotesHit:Int = 0;
@@ -126,6 +134,7 @@ class PlayState extends MusicBeatState
 	private var iconP1:HealthIcon;
 	private var iconP2:HealthIcon;
 	private var camHUD:FlxCamera;
+	public var camCustom:FlxCamera;
 	private var camGame:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
@@ -134,8 +143,8 @@ class PlayState extends MusicBeatState
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
-	var scoreTxt:FlxText;
-	var timeTxt:FlxText;
+	public var scoreTxt:FlxText;
+	public var timeTxt:FlxText;
 
 	var songLength:Float = 0;
 
@@ -150,10 +159,10 @@ class PlayState extends MusicBeatState
 
 	#if desktop
 	// Discord RPC variables
-	var storyDifficultyText:String = "";
-	var iconRPC:String = "";
-	var detailsText:String = "";
-	var detailsPausedText:String = "";
+	public var storyDifficultyText:String = "";
+	public var iconRPC:String = "";
+	public var detailsText:String = "";
+	public var detailsPausedText:String = "";
 	#end
 
 	// Ratings
@@ -162,8 +171,14 @@ class PlayState extends MusicBeatState
 	public var bads:Int = 0;
 	public var shits:Int = 0;
 
+	// Botplay Text and Blink (Sine)
+	public var botplaySine:Float = 0;
+	public var botplayTxt:FlxText;
+
 	override public function create()
 	{
+		instance = this;
+
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
 
@@ -175,11 +190,15 @@ class PlayState extends MusicBeatState
 		camGame = new FlxCamera();
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
+		camCustom = new FlxCamera();
+		camCustom.bgColor.alpha = 0;
 
 		FlxG.cameras.reset(camGame);
 		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		FlxG.cameras.add(camHUD);
 		FlxG.cameras.setDefaultDrawTarget(camHUD, false);
+		FlxG.cameras.add(camCustom);
+		FlxG.cameras.setDefaultDrawTarget(camCustom, false);
 
 		persistentUpdate = true;
 		persistentDraw = true;
@@ -745,7 +764,7 @@ class PlayState extends MusicBeatState
 		var showTime:Bool = (ClientSettings.showTimeBar);
 		var showTimeTxt:Bool = (ClientSettings.showTimeTxt);
 
-		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
+		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 16);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -768,7 +787,7 @@ class PlayState extends MusicBeatState
 		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
 			'songPercent', 0, 1);
 		timeBar.scrollFactor.set();
-		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.WHITE);
+		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.CYAN);
 		timeBar.numDivisions = 800;
 		timeBar.alpha = 0;
 		timeBar.visible = showTime;
@@ -790,6 +809,35 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
+
+		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+		if(ClientSettings.downScroll)
+			botplayTxt.y = timeBarBG.y - 78;
+		if(ClientSettings.middleScroll) {
+			if(ClientSettings.downScroll)
+				botplayTxt.y = botplayTxt.y - 78;
+			else
+				botplayTxt.y = botplayTxt.y + 78;
+		}
+		botplayTxt.setFormat(Paths.font("vcr.ttf"), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		botplayTxt.scrollFactor.set();
+		botplayTxt.size = 32;
+		botplayTxt.borderSize = 2;
+		botplayTxt.visible = ClientSettings.botPlay;
+		botplayTxt.cameras = [camCustom];
+		add(botplayTxt);
+
+		switch (FlxG.random.int(1, 4))
+		{
+			case 1:
+				botplayTxt.text = "[BOTPLAY]";
+			case 2:
+				botplayTxt.text = "[SKILL ISSUE]";
+			case 3:
+				botplayTxt.text = "[HI MOM]";
+			case 4:
+				botplayTxt.text = "Rank: [BFC]"; //BFC stands for Bot Full Combo
+		}
 
 		noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
@@ -1179,6 +1227,8 @@ class PlayState extends MusicBeatState
 		unspawnNotes.sort(sortByShit);
 
 		generatedMusic = true;
+
+		trace(FlxG.sound.list);
 	}
 
 	function sortByShit(Obj1:Note, Obj2:Note):Int
@@ -1384,12 +1434,33 @@ class PlayState extends MusicBeatState
 	private var paused:Bool = false;
 	var startedCountdown:Bool = false;
 	var canPause:Bool = true;
+	var alreadyChanged:Bool = false;
 
 	override public function update(elapsed:Float)
 	{
 		#if !debug
 		perfectMode = false;
 		#end
+
+		if (ClientSettings.botPlay && !alreadyChanged)
+		{
+			scoreTxt.visible = false;
+			alreadyChanged = true;
+		} else if (!ClientSettings.botPlay && alreadyChanged) {
+			scoreTxt.visible = true;
+			switch (FlxG.random.int(1, 4))
+			{
+				case 1:
+					botplayTxt.text = "[BOTPLAY]";
+				case 2:
+					botplayTxt.text = "[SKILL ISSUE]";
+				case 3:
+					botplayTxt.text = "[HI MOM]";
+				case 4:
+					botplayTxt.text = "Rank: [BFC]"; //BFC stands for Bot Full Combo
+			}
+			alreadyChanged = false;
+		}
 
 		if (FlxG.keys.justPressed.NINE)
 		{
@@ -1407,18 +1478,17 @@ class PlayState extends MusicBeatState
 
 		//im crying looking at this bro
 		//ranks
-
 		fcRank = "[UNRATED]";
 		accRank = "F";
 
 		if (sicks > 0) 
-			fcRank = "[SFC]";
+			fcRank = "[SFC]"; //Sick Full Combo
 		if (goods > 0)
-			fcRank = "[GFC]";
+			fcRank = "[GFC]"; //Good Full Combo
 		if (bads > 0 || shits > 0)
-			fcRank = "[FC]";
+			fcRank = "[FC]"; //Full Combo
 		if (misses > 0)
-			fcRank = "[SDCB]";
+			fcRank = "[SDCB]"; //Single Digit Combo Breaks
 		if (misses > 9)
 			fcRank = "[Clear]";
 
@@ -1440,14 +1510,24 @@ class PlayState extends MusicBeatState
 			accRank = "F";
 
 		//updating values
-		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Misses:" + misses;
+		scoreTxt.text = 'Score: ${songScore}';
+		scoreTxt.text += divider + 'Misses: ${misses}';
 		if (ClientSettings.displayAccuracy) {
-			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
+			scoreTxt.text += divider + 'Accuracy: ${accuracy}%';
+			scoreTxt.text += divider + 'Rank: ${accRank} ${fcRank}';
+			#if desktop
+			detailsText = scoreTxt.text;
+			#end
 		}
+
 		if (ClientSettings.botPlay) {
-			scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
+			usedBot = true;
+			#if desktop
+			detailsText = '[BOTPLAY]';
+			#end
+
+			botplaySine += 180 * elapsed;
+			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
 		var curTime:Float = Conductor.songPosition;
@@ -1459,12 +1539,15 @@ class PlayState extends MusicBeatState
 		var secondsTotal:Int = Math.floor(songCalc / 1000);
 		if(secondsTotal < 0) secondsTotal = 0;
 
-		timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+		timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
 
 		if (ClientSettings.botPlay)
 		{
 			notes.forEachAlive(function (daNote:Note) {
-				botPlayNoteHit(daNote);
+				if (daNote.canBeHit && daNote.mustPress)
+				{
+					botPlayNoteHit(daNote);
+				}
 			});
 		}
 
@@ -1740,7 +1823,7 @@ class PlayState extends MusicBeatState
 		canPause = false;
 		FlxG.sound.music.volume = 0;
 		vocals.volume = 0;
-		if (SONG.validScore)
+		if (SONG.validScore && !usedBot)
 		{
 			#if !switch
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty);
@@ -1763,7 +1846,7 @@ class PlayState extends MusicBeatState
 				// if ()
 				//StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
 
-				if (SONG.validScore)
+				if (SONG.validScore && !usedBot)
 				{
 					Highscore.saveWeekScore(storyWeek, campaignScore, storyDifficulty);
 				}
@@ -2220,42 +2303,30 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function botPlayNoteHit(daNote:Note):Void
-	{
-		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8) 
-		{
+	function botPlayNoteHit(note:Note):Void
+	{	
+		if (note.noteData >= 0)
 			health += 0.023;
-			daNote.kill();
-			notes.remove(daNote, true);
-			daNote.destroy();
-			boyfriend.playAnim("sing" + direction[daNote.noteData], true);
-			playerStrums.forEach(function(spr:FlxSprite)
-			{			
-				if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
-				{
-					spr.animation.play('confirm');
-				}
-				if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
-				{	
-					spr.centerOffsets();
-					spr.offset.x -= 13;
-					spr.offset.y -= 13;	
-				}	
-				else
-				{
-					spr.centerOffsets();
-				}
-			});
-		}
+		else
+			health += 0.004;
 
-		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote) 
+		boyfriend.playAnim("sing" + direction[note.noteData], true);
+
+		note.wasGoodHit = true;
+		vocals.volume = 1;
+
+		if (!note.isSustainNote)
 		{
-			combo++;
 			totalNotesHit++;
-			daNote.daRating = "sick";
-
-			popUpScore(daNote);
+			combo += 1;
+			popUpScore(note);
+			if (combo > highestCombo)
+				highestCombo = combo;
 		}
+
+		note.kill();
+		notes.remove(note, true);
+		note.destroy();
 	}
 
 	function opponentNoteHit(daNote:Note)

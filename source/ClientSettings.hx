@@ -9,10 +9,11 @@ class ClientSettings
     public static var middleScroll:Bool = false;
     public static var ghostTapping:Bool = true;
     public static var botPlay:Bool = false;
-    public static var noteskin:String = "Edited";
+    public static var noteskin:String = "Normal";
     public static var displayAccuracy:Bool = true;
     public static var showTimeBar:Bool = true;
     public static var showTimeTxt:Bool = true;
+    public static var showFPS:Bool = true;
 
     public static function saveSettings()
     {
@@ -24,6 +25,7 @@ class ClientSettings
         FlxG.save.data.displayAccuracy = displayAccuracy;
         FlxG.save.data.showTimeBar = showTimeBar;
         FlxG.save.data.showTimeTxt = showTimeTxt;
+        FlxG.save.data.showFPS = showFPS;
     }
 
     public static function loadSettings()
@@ -36,6 +38,7 @@ class ClientSettings
         if(FlxG.save.data.displayAccuracy != null) displayAccuracy = FlxG.save.data.displayAccuracy;
         if(FlxG.save.data.showTimeBar != null) showTimeBar = FlxG.save.data.showTimeBar;
         if(FlxG.save.data.showTimeTxt != null) showTimeTxt = FlxG.save.data.showTimeTxt;
+        if(FlxG.save.data.showFPS != null) showFPS = FlxG.save.data.showFPS;
         
         //this will save your last volume
         if (FlxG.save.data.volume != null) FlxG.sound.volume = FlxG.save.data.volume;
