@@ -106,7 +106,7 @@ class CustomFPS extends TextField
 			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
 			text += "\nMemory Usage: " + memoryMegas + " MB";
 			#end
-			text += "\nMadness Engine: " + Main.engineVer;
+			text += "\nMadness Engine: v" + Main.engineVer;
 
 			textColor = 0xFFFFFFFF;
 			if (memoryMegas > 3000 || currentFPS <= ClientSettings.framerate / 2)
