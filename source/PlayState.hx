@@ -1446,7 +1446,7 @@ class PlayState extends MusicBeatState
 			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
 		}
 		if (ClientSettings.botPlay) {
-			scoreTxt.text = "[Botplay is enabled fucker, turn it off!]";
+			scoreTxt.text = "[Botplay? Seriously?]";
 		}
 
 		var curTime:Float = Conductor.songPosition;
@@ -1463,7 +1463,10 @@ class PlayState extends MusicBeatState
 		if (ClientSettings.botPlay)
 		{
 			notes.forEachAlive(function (daNote:Note) {
-				botPlayNoteHit(daNote);
+				if (daNote.canBeHit && daNote.mustPress)
+				{
+					botPlayNoteHit(daNote);
+				}
 			});
 		}
 
@@ -2217,41 +2220,30 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	function botPlayNoteHit(daNote:Note):Void
-	{
-		if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8) 
-		{
+	function botPlayNoteHit(note:Note):Void
+	{	
+		if (note.noteData >= 0)
 			health += 0.023;
-			daNote.kill();
-			notes.remove(daNote, true);
-			daNote.destroy();
-			boyfriend.playAnim("sing" + direction[daNote.noteData], true);
-			playerStrums.forEach(function(spr:FlxSprite)
-			{			
-				if (Math.abs(daNote.noteData) == spr.ID && spr.animation.curAnim.name != "confirm")
-				{
-					spr.animation.play('confirm');
-				};
-				if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
-				{	
-					spr.centerOffsets();
-					spr.offset.x -= 13;
-					spr.offset.y -= 13;	
-				}	
-				else
-				{
-					spr.centerOffsets();
-				}
-			});
-		}
-			if (daNote.canBeHit && daNote.y <= strumLine.y + SONG.speed * 8 && !daNote.isSustainNote) 
-			{
-				combo++;
-				totalNotesHit++;
-				daNote.daRating = "sick";
+		else
+			health += 0.004;
 
-				popUpScore(daNote);
-			}
+		boyfriend.playAnim("sing" + direction[note.noteData], true);
+
+		note.wasGoodHit = true;
+		vocals.volume = 1;
+
+		if (!note.isSustainNote)
+		{
+			totalNotesHit++;
+			combo += 1;
+			popUpScore(note);
+			if (combo > highestCombo)
+				highestCombo = combo;
+		}
+
+		note.kill();
+		notes.remove(note, true);
+		note.destroy();
 	}
 
 	function opponentNoteHit(daNote:Note)

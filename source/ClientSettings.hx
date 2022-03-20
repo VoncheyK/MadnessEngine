@@ -9,7 +9,7 @@ class ClientSettings
     public static var middleScroll:Bool = false;
     public static var ghostTapping:Bool = true;
     public static var botPlay:Bool = false;
-    public static var noteskin:String = "Edited";
+    public static var noteskin:String = "Normal";
     public static var displayAccuracy:Bool = true;
     public static var showTimeBar:Bool = true;
     public static var showTimeTxt:Bool = true;
