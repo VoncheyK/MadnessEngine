@@ -13,11 +13,15 @@ You need to install this lol
 
 all of them must use *haxelib install* first!!!
 
-`flixel,
-flixel-addons,
-flixel-ui,
-hscript,
-newgrounds`
+`flixel`
+
+`flixel-addons`
+
+`flixel-ui`
+
+`hscript`
+
+`newgrounds`
 
 # 4th Step.
 
@@ -25,9 +29,9 @@ Then download Git https://git-scm.com/downloads works for all OS just follow the
 
 # 5th step.
 
-Run haxelib git polymod https://github.com/larsiusprime/polymod.git to install Polymod.
+`Run haxelib git polymod https://github.com/larsiusprime/polymod.git to install Polymod.`
 
-Run haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc to install Discord RPC.
+`Run haxelib git discord_rpc https://github.com/Aidan63/linc_discord-rpc to install Discord RPC.`
 
 # 6th Step. 
 
