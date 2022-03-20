@@ -87,6 +87,7 @@ class PlayState extends MusicBeatState
 	private var combo:Int = 0;
 	private var highestCombo:Int = 0;
 	private var misses:Int = 0;
+	private var usedBot:Bool = false;
 	
 	//accuracy stuff
 	public var totalNotesHit:Int = 0;
@@ -134,8 +135,8 @@ class PlayState extends MusicBeatState
 
 	var talking:Bool = true;
 	var songScore:Int = 0;
-	var scoreTxt:FlxText;
-	var timeTxt:FlxText;
+	public var scoreTxt:FlxText;
+	public var timeTxt:FlxText;
 
 	var songLength:Float = 0;
 
@@ -1409,18 +1410,17 @@ class PlayState extends MusicBeatState
 		var divider:String = ' | ';
 
 		//ranks
-
 		fcRank = "[UNRATED]";
 		accRank = "F";
 
 		if (sicks > 0) 
-			fcRank = "[SFC]";
+			fcRank = "[SFC]"; //Sick Full Combo
 		if (goods > 0)
-			fcRank = "[GFC]";
+			fcRank = "[GFC]"; //Good Full Combo
 		if (bads > 0 || shits > 0)
-			fcRank = "[FC]";
+			fcRank = "[FC]"; //Full Combo
 		if (misses > 0)
-			fcRank = "[SDCB]";
+			fcRank = "[SDCB]"; //Single Digit Combo Breaks
 		if (misses > 9)
 			fcRank = "[Clear]";
 
@@ -1442,19 +1442,45 @@ class PlayState extends MusicBeatState
 			accRank = "F";
 
 		//updating values
-		scoreTxt.text = "Score: " + songScore;
-		scoreTxt.text += divider + "Misses:" + misses;
+		scoreTxt.text = 'Score: ${songScore}';
+		scoreTxt.text += divider + 'Misses: ${misses}';
 		if (ClientSettings.displayAccuracy) {
-			scoreTxt.text += divider + 'Accuracy: ' + accuracy + '%';
-			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
-		}
-		if (ClientSettings.botPlay) {
-			scoreTxt.text = "[BOTPLAY]";
+			scoreTxt.text += divider + 'Accuracy: ${accuracy}%';
+			scoreTxt.text += divider + 'Rank: ${accRank} ${fcRank}';
+			detailsText = scoreTxt.text;
 		}
 
-		if(ClientSettings.botPlay) {
+		if (ClientSettings.botPlay) {
+			usedBot = true;
+			detailsText = '[BOTPLAY]';
+
+			/*
+				random botplay text
+
+				TODO: clean this code up and make it so it doesn't have to update constantly
+				but rather update every time you start a new instance of botplay
+			new FlxTimer().start(1, function(tmr:FlxTimer)
+			{
+				switch (FlxG.random.int(1, 4))
+				{
+					case 1:
+						scoreTxt.text = "[BOTPLAY]";
+					case 2:
+						scoreTxt.text = "[SKILL ISSUE]";
+					case 3:
+						scoreTxt.text = "[HI MOM]";
+					case 4:
+						scoreTxt.text = "Score: 69420 | Misses: 1337 | Accuracy: 135% | Rank: S(kill issue) [BFC]"; //BFC stands for Bot Full Combo
+					}
+			});*/
+			scoreTxt.text = '[BOTPLAY]' //leaving it like this for now until I finish the code -BeastlyGhost
 			botplaySine += 180 * elapsed;
 			scoreTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
+		} else {
+			scoreTxt.text = scoreTxt.text; //bitch???
+			detailsText = scoreTxt.text;
+			//sine shouldn't work if botplay is off
+			scoreTxt.alpha = 1;
 		}
 
 		var curTime:Float = Conductor.songPosition;
@@ -1750,7 +1776,7 @@ class PlayState extends MusicBeatState
 		canPause = false;
 		FlxG.sound.music.volume = 0;
 		vocals.volume = 0;
-		if (SONG.validScore)
+		if (SONG.validScore && !usedBot)
 		{
 			#if !switch
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty);
