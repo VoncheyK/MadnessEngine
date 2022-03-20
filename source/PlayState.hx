@@ -162,6 +162,9 @@ class PlayState extends MusicBeatState
 	public var bads:Int = 0;
 	public var shits:Int = 0;
 
+	// Botplay Blink thing
+	public var botplaySine:Float = 0;
+
 	override public function create()
 	{
 		if (FlxG.sound.music != null)
@@ -1446,7 +1449,12 @@ class PlayState extends MusicBeatState
 			scoreTxt.text += divider + "Rank:" + accRank + " " + fcRank;
 		}
 		if (ClientSettings.botPlay) {
-			scoreTxt.text = "[Botplay? Seriously?]";
+			scoreTxt.text = "[BOTPLAY]";
+		}
+
+		if(ClientSettings.botPlay) {
+			botplaySine += 180 * elapsed;
+			scoreTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
 		var curTime:Float = Conductor.songPosition;
