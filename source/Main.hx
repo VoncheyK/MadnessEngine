@@ -1,5 +1,6 @@
 package;
 
+import openfl.display.CustomFPS;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
 import flixel.FlxGame;
@@ -17,10 +18,10 @@ class Main extends Sprite
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels depending on your zoom).
 	var initialState:Class<FlxState> = TitleState; // The FlxState the game starts with.
 	var zoom:Float = -1; // If -1, zoom is automatically calculated to fit the window dimensions.
-	var framerate:Int = #if html 60 #else 144 #end; // How many frames per second the game should run at.
+	var framerate:Int = 144; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game on fullscreen or not
-	public static var fpsVar:openfl.display.CustomFPS;
+	public static var fpsVar:CustomFPS;
 	public static var engineVer:String = "0.1";
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
@@ -78,7 +79,7 @@ class Main extends Sprite
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
 
 		#if !mobile
-		fpsVar = new openfl.display.CustomFPS(10, 3, 0xFFFFFF);
+		fpsVar = new CustomFPS(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;

@@ -1227,8 +1227,6 @@ class PlayState extends MusicBeatState
 		unspawnNotes.sort(sortByShit);
 
 		generatedMusic = true;
-
-		trace(FlxG.sound.list);
 	}
 
 	function sortByShit(Obj1:Note, Obj2:Note):Int
@@ -1793,21 +1791,16 @@ class PlayState extends MusicBeatState
 		}
 
 		if (generatedMusic)
-		{
-			notes.forEachAlive(function(daNote:Note)
-			{
-				opponentNoteHit(daNote);
-			});
-		}
+			notes.forEachAlive(function(daNote:Note) { opponentNoteHit(daNote); });
 
-		/*cpuStrums.forEach(function(spr:FlxSprite)
+		cpuStrums.forEach(function(spr:FlxSprite)
 		{
 			if (spr.animation.finished)
 			{
 				spr.animation.play('static');
 				spr.centerOffsets();
 			}
-		});*/
+		});
 
 		if (!inCutscene)
 			keyShit();
@@ -2085,10 +2078,18 @@ class PlayState extends MusicBeatState
 			controls.RIGHT_P
 		];
 
+		var releaseArray:Array<Bool> = [
+			controls.LEFT_R,
+			controls.DOWN_R,
+			controls.UP_R,
+			controls.RIGHT_R
+		];
+
 		if (ClientSettings.botPlay)
 		{
 			holdArray = [false, false, false, false];
 			pressArray = [false, false, false, false];
+			releaseArray = [false, false, false, false];
 		}
 
 		//release isnt used so ill remove it
@@ -2187,19 +2188,21 @@ class PlayState extends MusicBeatState
 			{
 				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
 					spr.animation.play("pressed");
-				if (!holdArray[spr.ID])
-					spr.animation.play("static");	
+				if (releaseArray[spr.ID])
+					spr.animation.play("static");
 			}
-			if (spr.animation.curAnim.name != "confirm" || !curStage.startsWith("school"))
+			else if (ClientSettings.lightUpStrums)
+				if (spr.animation.finished)
+					spr.animation.play('static');
+
+			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
 			{	
 				spr.centerOffsets();
 				spr.offset.x -= 13;
 				spr.offset.y -= 13;	
 			}	
 			else
-			{
 				spr.centerOffsets();
-			}
 		});
 	}
 
@@ -2232,36 +2235,6 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	//TODO figure out a better way to do this shit
-	function badNoteCheck()
-	{
-		// just double pasting this shit cuz fuk u
-		// REDO THIS SYSTEM!
-		var upP = controls.UP_P;
-		var rightP = controls.RIGHT_P;
-		var downP = controls.DOWN_P;
-		var leftP = controls.LEFT_P;
-
-		if (leftP)
-			noteMiss(0);
-		if (downP)
-			noteMiss(1);
-		if (upP)
-			noteMiss(2);
-		if (rightP)
-			noteMiss(3);
-	}
-
-	/*function noteCheck(keyP:Bool, note:Note):Void
-	{
-		if (keyP)
-			goodNoteHit(note);
-		else
-		{
-			badNoteCheck();
-		}
-	}*/
-
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
@@ -2279,11 +2252,12 @@ class PlayState extends MusicBeatState
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
-			playerStrums.forEach(function(spr:FlxSprite)
-			{
-				if (Math.abs(note.noteData) == spr.ID)
-					spr.animation.play('confirm', true);
-			});		
+			if (ClientSettings.lightUpStrums)
+				playerStrums.forEach(function(spr:FlxSprite)
+				{
+					if (Math.abs(note.noteData) == spr.ID)
+						spr.animation.play('confirm', true);
+				});		
 
 			if (!note.isSustainNote)
 			{
@@ -2293,7 +2267,7 @@ class PlayState extends MusicBeatState
 				if (combo > highestCombo)
 					highestCombo = combo;
 
-				if (note.daRating == "sick")
+				//if (note.daRating == "sick")
 					//noteSplash(note.x, note.y, note.noteData, false);
 
 				note.kill();
@@ -2314,6 +2288,13 @@ class PlayState extends MusicBeatState
 
 		note.wasGoodHit = true;
 		vocals.volume = 1;
+
+		if (ClientSettings.lightUpStrums)
+			playerStrums.forEach(function(spr:FlxSprite)
+			{
+				if (Math.abs(note.noteData) == spr.ID)
+					spr.animation.play('confirm', true);
+			});		
 
 		if (!note.isSustainNote)
 		{
@@ -2355,6 +2336,30 @@ class PlayState extends MusicBeatState
 			swagRect.height -= swagRect.y;
 
 			daNote.clipRect = swagRect;
+
+			var strumX:Float = 0;
+            var strumY:Float = 0;
+
+            if (daNote.mustPress)
+            {
+                strumX = playerStrums.members[daNote.noteData].x;
+                strumY = playerStrums.members[daNote.noteData].y;
+            }
+            else
+            {
+                strumX = cpuStrums.members[daNote.noteData].x;
+                strumY = cpuStrums.members[daNote.noteData].y;
+            }
+
+            strumX += daNote.offset.x;
+            strumY += daNote.offset.y;
+
+            var center:Float = strumY + Note.swagWidth / 2;
+
+            if (!daNote.isSustainNote)
+                daNote.x = strumX - 25;
+            else
+                daNote.x = strumX + 27.5;
 		}
 
 		if (!daNote.mustPress && daNote.wasGoodHit)
@@ -2378,7 +2383,7 @@ class PlayState extends MusicBeatState
 			if (SONG.needsVoices)
 				vocals.volume = 1;
 
-			/*cpuStrums.forEach(function(spr:FlxSprite)
+			cpuStrums.forEach(function(spr:FlxSprite)
 			{
 				
 				if (Math.abs(daNote.noteData) == spr.ID)
@@ -2386,7 +2391,7 @@ class PlayState extends MusicBeatState
 					spr.animation.play('confirm', true);
 					//noteSplash(daNote.x, daNote.y, daNote.noteData, true);										
 				}
-				if(!curStage.startsWith("school"))
+				if(spr.animation.curAnim.name == 'confirm' && !curStage.startsWith("school"))
 				{
 					spr.centerOffsets();
 					spr.offset.x -= 13;
@@ -2394,7 +2399,7 @@ class PlayState extends MusicBeatState
 				}		
 				else
 					spr.centerOffsets();
-			});*/
+			});
 
 			daNote.kill();
 			notes.remove(daNote, true);
@@ -2448,6 +2453,7 @@ class PlayState extends MusicBeatState
 
 		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
 			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
+			resyncVocals();
 
 		if (dad.curCharacter == 'spooky' && curStep % 4 == 2)
 		{

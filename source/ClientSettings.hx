@@ -14,6 +14,7 @@ class ClientSettings
     public static var showTimeBar:Bool = true;
     public static var showTimeTxt:Bool = true;
     public static var framerate:Int = 60;
+    public static var lightUpStrums = true; //TODO set false by default lmao
 
     public static function saveSettings()
     {
@@ -26,6 +27,7 @@ class ClientSettings
         FlxG.save.data.showTimeBar = showTimeBar;
         FlxG.save.data.showTimeTxt = showTimeTxt;
         FlxG.save.data.framerate = framerate;
+        FlxG.save.data.lightUpStrums = lightUpStrums;
     }
 
     public static function loadSettings()
@@ -38,7 +40,7 @@ class ClientSettings
         if(FlxG.save.data.displayAccuracy != null) displayAccuracy = FlxG.save.data.displayAccuracy;
         if(FlxG.save.data.showTimeBar != null) showTimeBar = FlxG.save.data.showTimeBar;
         if(FlxG.save.data.showTimeTxt != null) showTimeTxt = FlxG.save.data.showTimeTxt;
-        if(FlxG.save.data.showFPS != null) showFPS = FlxG.save.data.showFPS;
+        if(FlxG.save.data.lightUpStrums != null) lightUpStrums = FlxG.save.data.lightUpStrums;
         
         if(FlxG.save.data.framerate != null) {
 			framerate = FlxG.save.data.framerate;
