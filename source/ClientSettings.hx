@@ -13,7 +13,7 @@ class ClientSettings
     public static var displayAccuracy:Bool = true;
     public static var showTimeBar:Bool = true;
     public static var showTimeTxt:Bool = true;
-    public static var showFPS:Bool = true;
+    public static var framerate:Int = 60;
 
     public static function saveSettings()
     {
@@ -25,7 +25,7 @@ class ClientSettings
         FlxG.save.data.displayAccuracy = displayAccuracy;
         FlxG.save.data.showTimeBar = showTimeBar;
         FlxG.save.data.showTimeTxt = showTimeTxt;
-        FlxG.save.data.showFPS = showFPS;
+        FlxG.save.data.framerate = framerate;
     }
 
     public static function loadSettings()
@@ -39,6 +39,17 @@ class ClientSettings
         if(FlxG.save.data.showTimeBar != null) showTimeBar = FlxG.save.data.showTimeBar;
         if(FlxG.save.data.showTimeTxt != null) showTimeTxt = FlxG.save.data.showTimeTxt;
         if(FlxG.save.data.showFPS != null) showFPS = FlxG.save.data.showFPS;
+        
+        if(FlxG.save.data.framerate != null) {
+			framerate = FlxG.save.data.framerate;
+			if(framerate > FlxG.drawFramerate) {
+				FlxG.updateFramerate = framerate;
+				FlxG.drawFramerate = framerate;
+			} else {
+				FlxG.drawFramerate = framerate;
+				FlxG.updateFramerate = framerate;
+			}
+		}
         
         //this will save your last volume
         if (FlxG.save.data.volume != null) FlxG.sound.volume = FlxG.save.data.volume;
