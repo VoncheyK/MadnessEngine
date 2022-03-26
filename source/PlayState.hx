@@ -59,6 +59,9 @@ class PlayState extends MusicBeatState
 	*/
 	public static var instance:PlayState;
 
+	public static var script:String = '';
+	var interp:hscript.Interp;
+
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -175,6 +178,13 @@ class PlayState extends MusicBeatState
 	public var botplaySine:Float = 0;
 	public var botplayTxt:FlxText;
 
+	public function callInterp(func_name:String, args:Array<Dynamic>){
+        if (!interp.variables.exists(func_name)) {return;}
+        
+        var method = interp.variables.get(func_name);
+        Reflect.callMethod(interp,method,args);
+	}
+
 	override public function create()
 	{
 		instance = this;
@@ -185,6 +195,23 @@ class PlayState extends MusicBeatState
 		misses = 0;
 		combo = 0;
 		highestCombo = 0;
+		if (Assets.exists(Paths.script(SONG.song.toLowerCase() + '/script')))
+		{
+			script = CoolUtil.useless(Paths.script(SONG.song.toLowerCase() + '/script'));
+		}else{
+			script = "trace('No HSCRIPT was found!')";
+		}
+
+		interp = new hscript.Interp();
+		var parser = new hscript.Parser();
+		var program = parser.parseString(script);
+
+		//setup vars :()
+		interp.variables.set("curSong", SONG.song.toLowerCase()); 
+		interp.variables.set("curSpeed", SONG.speed); 
+		interp.variables.set("curBPM", SONG.bpm); 
+
+		interp.execute(program);
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -260,6 +287,8 @@ class PlayState extends MusicBeatState
 		// Updating Discord Rich Presence.
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
+
+		
 
 		noteSplashes = new FlxTypedGroup<NoteSplash>();
 		var daSplash = new NoteSplash(100, 100, 0);
@@ -614,8 +643,10 @@ class PlayState extends MusicBeatState
 
 		gf = new Character(400, 130, gfVersion);
 		gf.scrollFactor.set(0.95, 0.95);
+		interp.variables.set("gf", gfVersion); 
 
 		dad = new Character(100, 100, SONG.player2);
+		interp.variables.set("dad", SONG.player2); 
 
 		var camPos:FlxPoint = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
 
@@ -661,6 +692,7 @@ class PlayState extends MusicBeatState
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
+		interp.variables.set("bf", SONG.player1); 
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
@@ -716,8 +748,11 @@ class PlayState extends MusicBeatState
 
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
+		interp.variables.set("cpuStrums", cpuStrums); 
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
+		interp.variables.set("playerStrums", playerStrums); 
+
 
 		// startCountdown();
 
