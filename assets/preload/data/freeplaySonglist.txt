@@ -18,4 +18,4 @@ Senpai:6:senpai
 Roses:6:senpai
 Thorns:6:spirit
 Disruption:1:bf
-Applecore:1:bf
+Ugh:1:dad
