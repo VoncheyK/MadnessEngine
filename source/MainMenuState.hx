@@ -90,7 +90,7 @@ class MainMenuState extends MusicBeatState
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
-			menuItem.screenCenter(X);
+			// menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 			menuItem.scrollFactor.set();
 			menuItem.antialiasing = true;
@@ -98,7 +98,7 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollow, null, 0.06);
 
-		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "Madness Engine v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "Madness Engine v" + Main.engineVer, 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
@@ -108,6 +108,18 @@ class MainMenuState extends MusicBeatState
 		changeItem();
 
 		super.create();
+
+		for (i in 0...optionShit.length) {
+			FlxTween.tween(menuItems.members[i], {x: 300 + 75 * i - (i >= 1 ? 35 : 0)}, 1, {
+				onComplete: function(_) {
+					if (i == 0) {
+						remove(menuItems);
+						add(menuItems);
+					}
+				},
+				ease: FlxEase.quartInOut
+			});
+		}
 	}
 
 	var selectedSomethin:Bool = false;
@@ -193,7 +205,7 @@ class MainMenuState extends MusicBeatState
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			spr.screenCenter(X);
+			// spr.screenCenter(X);
 		});
 	}
 
@@ -213,7 +225,7 @@ class MainMenuState extends MusicBeatState
 			if (spr.ID == curSelected)
 			{
 				spr.animation.play('selected');
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
+				// camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
 			}
 
 			spr.updateHitbox();

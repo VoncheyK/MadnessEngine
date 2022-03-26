@@ -2184,16 +2184,10 @@ class PlayState extends MusicBeatState
 		// figured out a better way to do it!!
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
-			if (!ClientSettings.botPlay)
-			{
-				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
-					spr.animation.play("pressed");
-				if (releaseArray[spr.ID])
-					spr.animation.play("static");
-			}
-			else if (ClientSettings.lightUpStrums)
-				if (spr.animation.finished)
-					spr.animation.play('static');
+			if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
+				spr.animation.play("pressed");
+			if (releaseArray[spr.ID])
+				spr.animation.play("static");
 
 			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
 			{	
@@ -2252,12 +2246,11 @@ class PlayState extends MusicBeatState
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
-			if (ClientSettings.lightUpStrums)
-				playerStrums.forEach(function(spr:FlxSprite)
-				{
-					if (Math.abs(note.noteData) == spr.ID)
-						spr.animation.play('confirm', true);
-				});		
+			playerStrums.forEach(function(spr:FlxSprite)
+			{
+				if (Math.abs(note.noteData) == spr.ID)
+					spr.animation.play('confirm', true);
+			});		
 
 			if (!note.isSustainNote)
 			{
@@ -2289,12 +2282,12 @@ class PlayState extends MusicBeatState
 		note.wasGoodHit = true;
 		vocals.volume = 1;
 
-		if (ClientSettings.lightUpStrums)
-			playerStrums.forEach(function(spr:FlxSprite)
-			{
-				if (Math.abs(note.noteData) == spr.ID)
-					spr.animation.play('confirm', true);
-			});		
+
+		playerStrums.forEach(function(spr:FlxSprite)
+		{
+			if (Math.abs(note.noteData) == spr.ID)
+				spr.animation.play('confirm', true);
+		});		
 
 		if (!note.isSustainNote)
 		{
@@ -2336,30 +2329,6 @@ class PlayState extends MusicBeatState
 			swagRect.height -= swagRect.y;
 
 			daNote.clipRect = swagRect;
-
-			var strumX:Float = 0;
-            var strumY:Float = 0;
-
-            if (daNote.mustPress)
-            {
-                strumX = playerStrums.members[daNote.noteData].x;
-                strumY = playerStrums.members[daNote.noteData].y;
-            }
-            else
-            {
-                strumX = cpuStrums.members[daNote.noteData].x;
-                strumY = cpuStrums.members[daNote.noteData].y;
-            }
-
-            strumX += daNote.offset.x;
-            strumY += daNote.offset.y;
-
-            var center:Float = strumY + Note.swagWidth / 2;
-
-            if (!daNote.isSustainNote)
-                daNote.x = strumX - 25;
-            else
-                daNote.x = strumX + 27.5;
 		}
 
 		if (!daNote.mustPress && daNote.wasGoodHit)

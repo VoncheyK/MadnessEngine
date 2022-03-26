@@ -55,6 +55,12 @@ class FreeplayState extends MusicBeatState
 		if (FlxG.sound.music.playing)
 			Conductor.changeBPM(102);
 
+		if (FlxG.sound.music != null)
+		{
+			if (!FlxG.sound.music.playing)
+				FlxG.sound.playMusic(Paths.music('freakyMenu'));
+		}
+
 		//uh soft coded songs in freeplay
 		//this should work???
 		var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
@@ -62,7 +68,22 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...initSonglist.length)
 		{
 			var data = initSonglist[i].split(":");
-			songs.push(new SongMetadata(data[0], Std.parseInt(data[1]), data[2]));
+			var meta = new SongMetadata(data[0], Std.parseInt(data[1]), data[2]);
+			var format = StringTools.replace(meta.songName, " ", "-");
+
+			var diffs = [];
+			var diffsThatExist = ["Easy","Normal","Hard"];
+
+			if (diffsThatExist.contains("Easy"))
+				FreeplayState.loadDiff(0,format,meta.songName,diffs);
+			if (diffsThatExist.contains("Normal"))
+				FreeplayState.loadDiff(1,format,meta.songName,diffs);
+			if (diffsThatExist.contains("Hard"))
+				FreeplayState.loadDiff(2,format,meta.songName,diffs);
+
+			songData.set(data[0],diffs);
+
+			songs.push(meta);
 		}
 
 		/* 
@@ -126,7 +147,8 @@ class FreeplayState extends MusicBeatState
 			iconArray.push(icon);
 			add(icon);
 
-			// songText.x += 40;
+			songText.offset.x -= 250;
+			icon.offset.x -= 250;
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
 		}
@@ -230,9 +252,9 @@ class FreeplayState extends MusicBeatState
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 
-		iconArray[curSelected].setGraphicSize(Std.int(FlxMath.lerp(iconArray[curSelected].width, 150, 0.09/(openfl.Lib.current.stage.frameRate/60))));
+		//iconArray[curSelected].setGraphicSize(Std.int(FlxMath.lerp(iconArray[curSelected].width, 150, 0.09/(openfl.Lib.current.stage.frameRate/60))));
 
-		iconArray[curSelected].updateHitbox();
+		//iconArray[curSelected].updateHitbox();
 
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
@@ -311,7 +333,16 @@ class FreeplayState extends MusicBeatState
 					text.text = leText;
 				});
 
-				Conductor.changeBPM(PlayState.SONG.bpm);
+				var song;
+				try
+				{
+					song = songData.get(songs[curSelected].songName)[curDifficulty];
+					if (song != null)
+						Conductor.changeBPM(song.bpm);
+					trace("bpm should be " + song.bpm);
+				}
+				catch(ex)
+				{trace(ex);}
 			}
 			else
 			{
@@ -325,12 +356,6 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 		#end
-
-		for (i in 0...iconArray.length)
-		{
-			iconArray[i].setGraphicSize(Std.int(FlxMath.lerp(150, iconArray[i].width, 0.50)));
-			iconArray[i].updateHitbox();
-		}
 
 		// Adhere the position of all the things (I'm sorry it was just so ugly before I had to fix it Shubs)
 		scoreText.text = "PERSONAL BEST:" + lerpScore;
@@ -396,6 +421,8 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...iconArray.length)
 		{
 			iconArray[i].alpha = 0.6;
+			iconArray[i].scale.x = 1;
+			iconArray[i].scale.y = 1;
 		}
 
 		iconArray[curSelected].alpha = 1;
@@ -415,9 +442,12 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 	}
+
 	override function beatHit()
 	{
 		super.beatHit();
+
+		trace("beat hit");
 
 		//we can do cool stuff with the beat
 		bg.scale.x += 0.04;
@@ -428,6 +458,15 @@ class FreeplayState extends MusicBeatState
 		iconArray[curSelected].updateHitbox();
 
 		FlxG.camera.shake(0.0018, 0.1);
+	}
+
+	public static function loadDiff(diff:Int, format:String, name:String, array:Array<SwagSong>)
+	{
+		try {
+			array.push(Song.loadFromJson(Highscore.formatSong(format, diff), name));
+		} catch(e) {
+			trace(e);
+		}
 	}
 }
 

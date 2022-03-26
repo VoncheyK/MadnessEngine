@@ -22,7 +22,7 @@ class Main extends Sprite
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game on fullscreen or not
 	public static var fpsVar:CustomFPS;
-	public static var engineVer:String = "0.1";
+	public static var engineVer:String = "0.0.1";
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
