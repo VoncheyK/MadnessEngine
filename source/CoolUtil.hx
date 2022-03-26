@@ -18,6 +18,12 @@ class CoolUtil
 		return difficultyArray[PlayState.storyDifficulty];
 	}
 
+	public static function useless(path:String):String {
+		var daText = Assets.getText(path);
+
+		return daText;
+	}
+
 	public static function coolTextFile(path:String):Array<String>
 	{
 		var daList:Array<String> = Assets.getText(path).trim().split('\n');
