@@ -643,10 +643,8 @@ class PlayState extends MusicBeatState
 
 		gf = new Character(400, 130, gfVersion);
 		gf.scrollFactor.set(0.95, 0.95);
-		interp.variables.set("gf", gfVersion); 
 
 		dad = new Character(100, 100, SONG.player2);
-		interp.variables.set("dad", SONG.player2); 
 
 		var camPos:FlxPoint = new FlxPoint(dad.getGraphicMidpoint().x, dad.getGraphicMidpoint().y);
 
@@ -692,7 +690,6 @@ class PlayState extends MusicBeatState
 		}
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
-		interp.variables.set("bf", SONG.player1); 
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
@@ -748,10 +745,8 @@ class PlayState extends MusicBeatState
 
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
-		interp.variables.set("cpuStrums", cpuStrums); 
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
-		interp.variables.set("playerStrums", playerStrums); 
 
 
 		// startCountdown();
@@ -1504,6 +1499,9 @@ class PlayState extends MusicBeatState
 		}
 
 		super.update(elapsed);
+
+		interp.variables.set("curSpeed", SONG.speed); 
+		interp.variables.set("curBPM", SONG.bpm); 
 
 		var fcRank:String;
 		var accRank:String;
