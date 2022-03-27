@@ -195,11 +195,11 @@ class PlayState extends MusicBeatState
 		misses = 0;
 		combo = 0;
 		highestCombo = 0;
-		if (Assets.exists(Paths.script(SONG.song.toLowerCase() + '/script')))
+		if (Assets.exists(Paths.script(SONG.song.toLowerCase())))
 		{
-			script = CoolUtil.useless(Paths.script(SONG.song.toLowerCase() + '/script'));
+			script = CoolUtil.useless(Paths.script(SONG.song.toLowerCase()));
 		}else{
-			script = "trace('No HSCRIPT was found!')";
+			script = "trace('No script was found. Ignoring!')";
 		}
 
 		interp = new hscript.Interp();
@@ -212,6 +212,7 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curBPM", SONG.bpm); 
 
 		interp.execute(program);
+		
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -1500,8 +1501,8 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		interp.variables.set("curSpeed", SONG.speed); 
-		interp.variables.set("curBPM", SONG.bpm); 
+		SONG.speed = interp.variables.get("curSpeed");
+		SONG.bpm = interp.variables.get("curBPM");
 
 		var fcRank:String;
 		var accRank:String;
@@ -2291,7 +2292,7 @@ class PlayState extends MusicBeatState
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
-		{
+		{	
 
 			if (note.noteData >= 0)
 				health += 0.023;
@@ -2328,6 +2329,12 @@ class PlayState extends MusicBeatState
 				notes.remove(note, true);
 				note.destroy();
 			}
+
+			var isSus:Bool = note.isSustainNote;
+			var leData:Int = Math.round(Math.abs(note.noteData));
+
+
+			callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus]);
 		}
 	}
 

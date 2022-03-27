@@ -1,4 +1,0 @@
-trace("Playing '" + curSong + "', BPM: " + curBPM + ", Speed: " + curSpeed);
-trace("STOP POSTING ABOUT UGH")
-
-curSpeed = 10;

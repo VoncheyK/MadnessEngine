@@ -73,7 +73,7 @@ class Paths
 
 	inline static public function script(key:String, ?library:String)
 	{
-		return getPath('data/$key.hscript', TEXT, library);
+		return getPath('scripts/$key.hscript', TEXT, library);
 	}
 
 	static public function sound(key:String, ?library:String)
