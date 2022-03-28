@@ -1,5 +1,7 @@
 package;
 
+import lime.text.harfbuzz.HBScript;
+import hscript.Checker;
 #if js
 import js.html.Clients;
 #end
@@ -47,6 +49,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
+import FunkyHscript;
 
 using StringTools;
 
@@ -195,9 +198,10 @@ class PlayState extends MusicBeatState
 		misses = 0;
 		combo = 0;
 		highestCombo = 0;
-		if (Assets.exists(Paths.script(SONG.song.toLowerCase())))
+
+		if (Assets.exists(Paths.script("script")))
 		{
-			script = CoolUtil.useless(Paths.script(SONG.song.toLowerCase()));
+			script = CoolUtil.useless(Paths.script("script"));
 		}else{
 			script = "trace('No script was found. Ignoring!')";
 		}
@@ -206,12 +210,20 @@ class PlayState extends MusicBeatState
 		var parser = new hscript.Parser();
 		var program = parser.parseString(script);
 
+		
+
 		//setup vars :()
-		interp.variables.set("curSong", SONG.song.toLowerCase()); 
-		interp.variables.set("curSpeed", SONG.speed); 
-		interp.variables.set("curBPM", SONG.bpm); 
+		interp.variables.set("SongName", SONG.song.toLowerCase()); 
+		interp.variables.set("Speed", SONG.speed); 
+		interp.variables.set("BPM", SONG.bpm); 
+
+		interp.variables.set("curStep", curStep); 
+		interp.variables.set("curBeat", curBeat); 
+
 
 		interp.execute(program);
+
+		callInterp("onCreate", []);
 		
 
 		// var gameCam:FlxCamera = FlxG.camera;
@@ -692,6 +704,10 @@ class PlayState extends MusicBeatState
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
+		interp.variables.set("bf", boyfriend);
+		interp.variables.set("dad", dad);
+		interp.variables.set("gf", gf);
+
 		// REPOSITIONING PER STAGE
 		switch (curStage)
 		{
@@ -749,6 +765,9 @@ class PlayState extends MusicBeatState
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
 
+
+		interp.variables.set("playerStrums", playerStrums);
+		interp.variables.set("cpuStrums", cpuStrums);
 
 		// startCountdown();
 
@@ -840,6 +859,8 @@ class PlayState extends MusicBeatState
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
+
+		interp.variables.set("scoreTxt", scoreTxt);
 
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
 		if(ClientSettings.downScroll)
@@ -1201,6 +1222,7 @@ class PlayState extends MusicBeatState
 			for (songNotes in section.sectionNotes)
 			{
 				var daStrumTime:Float = songNotes[0];
+				var noteType:String = songNotes[3];
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
 
 				var gottaHitNote:Bool = section.mustHitSection;
@@ -1216,7 +1238,8 @@ class PlayState extends MusicBeatState
 				else
 					oldNote = null;
 
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false);
+				swagNote.noteType = songNotes[3];
 				swagNote.sustainLength = songNotes[2];
 				swagNote.scrollFactor.set(0, 0);
 
@@ -1501,8 +1524,10 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
-		SONG.speed = interp.variables.get("curSpeed");
-		SONG.bpm = interp.variables.get("curBPM");
+		callInterp("onUpdate", [elapsed]);
+
+		SONG.speed = interp.variables.get("Speed");
+		SONG.bpm = interp.variables.get("BPM");
 
 		var fcRank:String;
 		var accRank:String;
@@ -2289,10 +2314,24 @@ class PlayState extends MusicBeatState
 		}
 	}*/
 
+	function checkNoteType(noteType:Dynamic)
+	{
+		switch(noteType)
+		{
+			case "Death Note":
+				health -= 1000;
+			
+			default:
+				trace("Since it's a normal note, do nothing!");
+		}
+	}
+
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
 		{	
+
+			checkNoteType(note.noteType);
 
 			if (note.noteData >= 0)
 				health += 0.023;
@@ -2331,10 +2370,11 @@ class PlayState extends MusicBeatState
 			}
 
 			var isSus:Bool = note.isSustainNote;
+			var leType:String = note.noteType;
 			var leData:Int = Math.round(Math.abs(note.noteData));
 
 
-			callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus]);
+			callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus, leType]);
 		}
 	}
 
@@ -2481,6 +2521,9 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 
+		callInterp("onStepHit", []);
+		interp.variables.set("curStep", curStep); 
+
 		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
 			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
 
@@ -2496,6 +2539,9 @@ class PlayState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
+
+		callInterp("onBeatHit", []);
+		interp.variables.set("curBeat", curBeat); 
 
 		if (generatedMusic)
 		{
@@ -2705,6 +2751,8 @@ class PlayState extends MusicBeatState
 		PlayState.boyfriend.playAnim('scared', true);
 		PlayState.gf.playAnim('scared', true);
 	}
+	
 
 	var curLight:Int = 0;
+
 }

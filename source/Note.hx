@@ -15,12 +15,15 @@ class Note extends FlxSprite
 {
 	public var strumTime:Float = 0;
 
+	public var noteType:String = "";
+	public var noteType_mustHit:Bool = true;
+
+
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
 	public var canBeHit:Bool = false;
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
-	public var noteType:Int = 1;
 	public var prevNote:Note;
 
 	public var daRating:String = "shit";
@@ -36,7 +39,7 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?noteType = "")
 	{
 		super();
 
@@ -45,6 +48,15 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
+
+		this.noteType = noteType;
+
+		if (noteType == "null")
+		{
+			noteType = "";
+		}
+
+		
 
 		//how did you manage to have offcenter notes bruh
 		x += 100;
