@@ -1,5 +1,7 @@
 package;
 
+import hscript.Parser;
+import hscript.Interp;
 #if js
 import js.html.Clients;
 #end
@@ -60,7 +62,7 @@ class PlayState extends MusicBeatState
 	public static var instance:PlayState;
 
 	public static var script:String = '';
-	var interp:hscript.Interp;
+	var interp:Interp;
 
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -202,14 +204,15 @@ class PlayState extends MusicBeatState
 			script = "trace('No HSCRIPT was found!')";
 		}
 
-		interp = new hscript.Interp();
-		var parser = new hscript.Parser();
+		interp = new Interp();
+		var parser = new Parser();
 		var program = parser.parseString(script);
 
 		//setup vars :()
 		interp.variables.set("curSong", SONG.song.toLowerCase()); 
 		interp.variables.set("curSpeed", SONG.speed); 
 		interp.variables.set("curBPM", SONG.bpm); 
+		interp.
 
 		interp.execute(program);
 
