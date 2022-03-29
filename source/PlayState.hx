@@ -1,6 +1,4 @@
 package;
-
-import lime.text.harfbuzz.HBScript;
 import hscript.Checker;
 #if js
 import js.html.Clients;
@@ -145,6 +143,7 @@ class PlayState extends MusicBeatState
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
+	var hscriptObjects:Array<Dynamic> = [];
 	var wiggleShit:WiggleEffect = new WiggleEffect();
 
 	var talking:Bool = true;
@@ -219,8 +218,7 @@ class PlayState extends MusicBeatState
 
 		interp.variables.set("curStep", curStep); 
 		interp.variables.set("curBeat", curBeat); 
-
-
+		
 		interp.execute(program);
 
 		callInterp("onCreate", []);
