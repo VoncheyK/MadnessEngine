@@ -183,7 +183,7 @@ class PlayState extends MusicBeatState
 	public var botplayTxt:FlxText;
 
 	public function callInterp(func_name:String, args:Array<Dynamic>){
-        if (!interp.variables.exists(func_name)) {return;}
+        if (!interp.variables.exists(func_name)) return;
         
         var method = interp.variables.get(func_name);
         Reflect.callMethod(interp,method,args);
@@ -203,7 +203,7 @@ class PlayState extends MusicBeatState
 		if (Assets.exists(Paths.script("script")))
 		{
 			script = CoolUtil.useless(Paths.script("script"));
-		}else{
+		} else {
 			script = "trace('No script was found. Ignoring!')";
 		}
 
@@ -224,8 +224,7 @@ class PlayState extends MusicBeatState
 
 		interp.execute(program);
 
-		callInterp("onCreate", []);
-		
+		callInterp("onCreate", []);	
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -247,8 +246,8 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
-		Conductor.mapBPMChanges(SONG);
-		Conductor.changeBPM(SONG.bpm);
+		//Conductor.mapBPMChanges(SONG);
+		//Conductor.changeBPM(SONG.bpm);
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -807,7 +806,7 @@ class PlayState extends MusicBeatState
 		healthBar = new FlxBar(healthBarBG.x + 4, healthBarBG.y + 4, RIGHT_TO_LEFT, Std.int(healthBarBG.width - 8), Std.int(healthBarBG.height - 8), this,
 			'health', 0, 2);
 		healthBar.scrollFactor.set();
-		healthBar.createFilledBar(0xFFFF0000, 0xFF66FF33);
+		healthBar.createFilledBar(FlxColor.fromString('#${dad.iconColor}'), FlxColor.fromString('#${boyfriend.iconColor}'));
 		// healthBar
 		add(healthBar);
 

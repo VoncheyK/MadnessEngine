@@ -1,0 +1,4 @@
+function onBeatHit()
+{
+    Speed += 0.5;
+}

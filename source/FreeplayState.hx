@@ -338,7 +338,10 @@ class FreeplayState extends MusicBeatState
 				{
 					song = songData.get(songs[curSelected].songName)[curDifficulty];
 					if (song != null)
+					{
+						Conductor.mapBPMChanges(song);
 						Conductor.changeBPM(song.bpm);
+					}
 					trace("bpm should be " + song.bpm);
 				}
 				catch(ex)
@@ -454,8 +457,8 @@ class FreeplayState extends MusicBeatState
 		bg.scale.y += 0.04;
 		FlxTween.tween(bg, {"scale.x": 1, "scale.y": 1}, 0.1);		
 
-		iconArray[curSelected].setGraphicSize(Std.int(iconArray[curSelected].width + 30));
-		iconArray[curSelected].updateHitbox();
+		//iconArray[curSelected].setGraphicSize(Std.int(iconArray[curSelected].width + 30));
+		//iconArray[curSelected].updateHitbox();
 
 		FlxG.camera.shake(0.0018, 0.1);
 	}
