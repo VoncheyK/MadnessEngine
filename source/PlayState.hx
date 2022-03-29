@@ -812,7 +812,7 @@ class PlayState extends MusicBeatState
 		var showTime:Bool = (ClientSettings.showTimeBar);
 		var showTimeTxt:Bool = (ClientSettings.showTimeTxt);
 
-		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 16);
+		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
