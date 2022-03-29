@@ -35,7 +35,14 @@ import openfl.utils.ByteArray;
 using StringTools;
 
 class ChartingState extends MusicBeatState
-{
+{	
+
+	public static var noteTypeList:Array<Dynamic> =
+	[
+		'',
+		'Death Note'
+	];
+
 	var _file:FileReference;
 
 	var UI_box:FlxUITabMenu;
@@ -324,6 +331,7 @@ class ChartingState extends MusicBeatState
 	}
 
 	var stepperSusLength:FlxUINumericStepper;
+	var noteTypeChooser:FlxUINumericStepper;
 
 	function addNoteUI():Void
 	{
@@ -334,9 +342,15 @@ class ChartingState extends MusicBeatState
 		stepperSusLength.value = 0;
 		stepperSusLength.name = 'note_susLength';
 
+		noteTypeChooser = new FlxUINumericStepper(10, 60, 1, 0, 0, noteTypeList.length);
+		noteTypeChooser.value = 1;
+		noteTypeChooser.name = 'note_type';
+
+
 		var applyLength:FlxButton = new FlxButton(100, 10, 'Apply');
 
 		tab_group_note.add(stepperSusLength);
+		tab_group_note.add(noteTypeChooser);
 		tab_group_note.add(applyLength);
 
 		UI_box.addGroup(tab_group_note);
@@ -430,6 +444,12 @@ class ChartingState extends MusicBeatState
 			else if (wname == 'note_susLength')
 			{
 				curSelectedNote[2] = nums.value;
+				updateGrid();
+			}
+			else if (wname == 'note_type')
+			{
+				curSelectedNote[3] = noteTypeList[Math.round(nums.value)];
+				trace(curSelectedNote[3]);
 				updateGrid();
 			}
 			else if (wname == 'section_bpm')
@@ -767,7 +787,7 @@ class ChartingState extends MusicBeatState
 		{
 			var strum = note[0] + Conductor.stepCrochet * (_song.notes[daSec].lengthInSteps * sectionNum);
 
-			var copiedNote:Array<Dynamic> = [strum, note[1], note[2]];
+			var copiedNote:Array<Dynamic> = [strum, note[1], note[2], note[3]];
 			_song.notes[daSec].sectionNotes.push(copiedNote);
 		}
 
@@ -805,6 +825,9 @@ class ChartingState extends MusicBeatState
 	{
 		if (curSelectedNote != null)
 			stepperSusLength.value = curSelectedNote[2];
+		
+		if (curSelectedNote != null)
+			noteTypeChooser.value = curSelectedNote[3];
 	}
 
 	function updateGrid():Void
@@ -855,8 +878,15 @@ class ChartingState extends MusicBeatState
 			var daNoteInfo = i[1];
 			var daStrumTime = i[0];
 			var daSus = i[2];
+			var daType = i[3];
 
 			var note:Note = new Note(daStrumTime, daNoteInfo % 4);
+
+			if (daType == "null") {
+				daType == noteTypeList[0];
+			}
+
+			note.noteType = daType;
 			note.sustainLength = daSus;
 			note.setGraphicSize(GRID_SIZE, GRID_SIZE);
 			note.updateHitbox();

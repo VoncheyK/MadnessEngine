@@ -5,7 +5,7 @@ import lime.utils.Assets;
 using StringTools;
 
 class CoolUtil
-{
+{	
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"];
 
 	public static function difficultyString():String
@@ -16,6 +16,12 @@ class CoolUtil
 	public static function grantAchivement(name):String // wtf does this do??
 	{
 		return difficultyArray[PlayState.storyDifficulty];
+	}
+
+	public static function useless(path:String):String {
+		var daText = Assets.getText(path);
+
+		return daText;
 	}
 
 	public static function coolTextFile(path:String):Array<String>
