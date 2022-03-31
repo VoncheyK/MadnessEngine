@@ -49,7 +49,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
-import FunkyHscript;
+// import FunkyHscript;
 
 using StringTools;
 
