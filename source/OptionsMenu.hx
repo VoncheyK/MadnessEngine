@@ -25,7 +25,6 @@ class OptionsMenu extends MusicBeatState
 		'',
 		'Nothing to see here lol',
 		'',
-		'',
 		''
 	];
 	var optionNames:Array<String> = //the variable name for the option on ClientSettings
@@ -33,17 +32,21 @@ class OptionsMenu extends MusicBeatState
 		'downScroll',
 		'middleScroll',
 		'ghostTapping',
-		'botPlay',
 		'displayAccuracy',
 		'showTimeBar',
 		'showTimeTxt'
 	];
 
+	var options:Array<Dynamic> = //the variable name for the option on ClientSettings
+	[
+		["Ghost tapping", 'ghostTapping', 'Pressing an arrow wont cause a miss', Bool],
+		["Downscroll", 'downScroll', 'Toggles downscroll', Bool]
+	];
+
 	var grpOptionsTexts:FlxTypedGroup<Alphabet>;
 	var controlsStrings:Array<String> = [];
 
-	private var currentDescription:String = "";
-	public static var descriptionText:FlxText;
+	private var currentDescription:String = "";	public static var descriptionText:FlxText;
 	private var grpControls:FlxTypedGroup<Alphabet>;
 
 	override function create()
@@ -86,9 +89,9 @@ class OptionsMenu extends MusicBeatState
 			}
 		 */
 
-		for (i in 0...textMenuItems.length)
+		for (i in 0...options.length)
 		{
-			var optionText:Alphabet = new Alphabet(0, 20 + (i * 90), textMenuItems[i], true, false);
+			var optionText:Alphabet = new Alphabet(0, 20 + (i * 90), options[i][1], true, false);
 			optionText.ID = i;
 			optionText.targetY = i;
 			optionText.screenCenter(X);
