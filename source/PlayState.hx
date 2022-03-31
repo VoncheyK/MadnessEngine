@@ -209,8 +209,6 @@ class PlayState extends MusicBeatState
 		var parser = new hscript.Parser();
 		var program = parser.parseString(script);
 
-		
-
 		//setup vars :()
 		interp.variables.set("SongName", SONG.song.toLowerCase()); 
 		interp.variables.set("Speed", SONG.speed); 
@@ -218,8 +216,11 @@ class PlayState extends MusicBeatState
 
 		interp.variables.set("curStep", curStep); 
 		interp.variables.set("curBeat", curBeat); 
+
+		interp.variables.set("Math", Math); 
 		
 		interp.execute(program);
+	
 
 		callInterp("onCreate", []);
 		
@@ -908,6 +909,11 @@ class PlayState extends MusicBeatState
 
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
+
+		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic) { 
+			trace("Tweening object!");
+			FlxTween.tween(boyfriend, result, 2);
+		});
 
 		if (isStoryMode)
 		{

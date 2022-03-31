@@ -1,5 +1,5 @@
 package;
-
+import hscript.Checker;
 #if js
 import js.html.Clients;
 #end
@@ -47,6 +47,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
+import FunkyHscript;
 
 using StringTools;
 
@@ -58,6 +59,9 @@ class PlayState extends MusicBeatState
 		PlayState.instance.*variable*
 	*/
 	public static var instance:PlayState;
+
+	public static var script:String = '';
+	var interp:hscript.Interp;
 
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
@@ -139,6 +143,7 @@ class PlayState extends MusicBeatState
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
+	var hscriptObjects:Array<Dynamic> = [];
 	var wiggleShit:WiggleEffect = new WiggleEffect();
 
 	var talking:Bool = true;
@@ -175,6 +180,13 @@ class PlayState extends MusicBeatState
 	public var botplaySine:Float = 0;
 	public var botplayTxt:FlxText;
 
+	public function callInterp(func_name:String, args:Array<Dynamic>){
+        if (!interp.variables.exists(func_name)) {return;}
+        
+        var method = interp.variables.get(func_name);
+        Reflect.callMethod(interp,method,args);
+	}
+
 	override public function create()
 	{
 		instance = this;
@@ -185,6 +197,32 @@ class PlayState extends MusicBeatState
 		misses = 0;
 		combo = 0;
 		highestCombo = 0;
+
+		if (Assets.exists(Paths.script("script")))
+		{
+			script = CoolUtil.useless(Paths.script("script"));
+		}else{
+			script = "trace('No script was found. Ignoring!')";
+		}
+
+		interp = new hscript.Interp();
+		var parser = new hscript.Parser();
+		var program = parser.parseString(script);
+
+		
+
+		//setup vars :()
+		interp.variables.set("SongName", SONG.song.toLowerCase()); 
+		interp.variables.set("Speed", SONG.speed); 
+		interp.variables.set("BPM", SONG.bpm); 
+
+		interp.variables.set("curStep", curStep); 
+		interp.variables.set("curBeat", curBeat); 
+		
+		interp.execute(program);
+
+		callInterp("onCreate", []);
+		
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -260,6 +298,8 @@ class PlayState extends MusicBeatState
 		// Updating Discord Rich Presence.
 		DiscordClient.changePresence(detailsText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
 		#end
+
+		
 
 		noteSplashes = new FlxTypedGroup<NoteSplash>();
 		var daSplash = new NoteSplash(100, 100, 0);
@@ -662,6 +702,10 @@ class PlayState extends MusicBeatState
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
+		interp.variables.set("bf", boyfriend);
+		interp.variables.set("dad", dad);
+		interp.variables.set("gf", gf);
+
 		// REPOSITIONING PER STAGE
 		switch (curStage)
 		{
@@ -719,6 +763,10 @@ class PlayState extends MusicBeatState
 
 		playerStrums = new FlxTypedGroup<FlxSprite>();
 
+
+		interp.variables.set("playerStrums", playerStrums);
+		interp.variables.set("cpuStrums", cpuStrums);
+
 		// startCountdown();
 
 		generateSong(SONG.song);
@@ -764,7 +812,7 @@ class PlayState extends MusicBeatState
 		var showTime:Bool = (ClientSettings.showTimeBar);
 		var showTimeTxt:Bool = (ClientSettings.showTimeTxt);
 
-		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 32);
+		timeTxt = new FlxText(goodPos + (FlxG.width / 2) - 248, 19, 400, "", 16);
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.alpha = 0;
@@ -787,7 +835,7 @@ class PlayState extends MusicBeatState
 		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
 			'songPercent', 0, 1);
 		timeBar.scrollFactor.set();
-		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.WHITE);
+		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.CYAN);
 		timeBar.numDivisions = 800;
 		timeBar.alpha = 0;
 		timeBar.visible = showTime;
@@ -810,12 +858,13 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
-		botplayTxt = new FlxText(healthBarBG.x + healthBarBG.width / 2 - 75, healthBarBG.y + (ClientSettings.downScroll ? 100 : -100), "", 32);
-		if (ClientSettings.downScroll)
+		interp.variables.set("scoreTxt", scoreTxt);
+
+		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
+		if(ClientSettings.downScroll)
 			botplayTxt.y = timeBarBG.y - 78;
-		if (ClientSettings.middleScroll)
-		{
-			if (ClientSettings.downScroll)
+		if(ClientSettings.middleScroll) {
+			if(ClientSettings.downScroll)
 				botplayTxt.y = botplayTxt.y - 78;
 			else
 				botplayTxt.y = botplayTxt.y + 78;
@@ -827,9 +876,6 @@ class PlayState extends MusicBeatState
 		botplayTxt.visible = ClientSettings.botPlay;
 		botplayTxt.cameras = [camCustom];
 		add(botplayTxt);
-		if (ClientSettings.downScroll) {
-			botplayTxt.y = timeBarBG.y - 200;
-		}
 
 		switch (FlxG.random.int(1, 4))
 		{
@@ -1174,6 +1220,7 @@ class PlayState extends MusicBeatState
 			for (songNotes in section.sectionNotes)
 			{
 				var daStrumTime:Float = songNotes[0];
+				var noteType:String = songNotes[3];
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
 
 				var gottaHitNote:Bool = section.mustHitSection;
@@ -1189,7 +1236,8 @@ class PlayState extends MusicBeatState
 				else
 					oldNote = null;
 
-				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
+				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote, false);
+				swagNote.noteType = songNotes[3];
 				swagNote.sustainLength = songNotes[2];
 				swagNote.scrollFactor.set(0, 0);
 
@@ -1474,6 +1522,11 @@ class PlayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		callInterp("onUpdate", [elapsed]);
+
+		SONG.speed = interp.variables.get("Speed");
+		SONG.bpm = interp.variables.get("BPM");
+
 		var fcRank:String;
 		var accRank:String;
 		var divider:String = ' | ';
@@ -1540,7 +1593,7 @@ class PlayState extends MusicBeatState
 		var secondsTotal:Int = Math.floor(songCalc / 1000);
 		if(secondsTotal < 0) secondsTotal = 0;
 
-		timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+		timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
 
 		if (ClientSettings.botPlay)
 		{
@@ -2259,10 +2312,24 @@ class PlayState extends MusicBeatState
 		}
 	}*/
 
+	function checkNoteType(noteType:Dynamic)
+	{
+		switch(noteType)
+		{
+			case "Death Note":
+				health -= 1000;
+			
+			default:
+				trace("Since it's a normal note, do nothing!");
+		}
+	}
+
 	function goodNoteHit(note:Note):Void
 	{
 		if (!note.wasGoodHit)
-		{
+		{	
+
+			checkNoteType(note.noteType);
 
 			if (note.noteData >= 0)
 				health += 0.023;
@@ -2299,6 +2366,13 @@ class PlayState extends MusicBeatState
 				notes.remove(note, true);
 				note.destroy();
 			}
+
+			var isSus:Bool = note.isSustainNote;
+			var leType:String = note.noteType;
+			var leData:Int = Math.round(Math.abs(note.noteData));
+
+
+			callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus, leType]);
 		}
 	}
 
@@ -2445,6 +2519,9 @@ class PlayState extends MusicBeatState
 	{
 		super.stepHit();
 
+		callInterp("onStepHit", []);
+		interp.variables.set("curStep", curStep); 
+
 		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
 			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
 
@@ -2460,6 +2537,9 @@ class PlayState extends MusicBeatState
 	override function beatHit()
 	{
 		super.beatHit();
+
+		callInterp("onBeatHit", []);
+		interp.variables.set("curBeat", curBeat); 
 
 		if (generatedMusic)
 		{
@@ -2669,6 +2749,8 @@ class PlayState extends MusicBeatState
 		PlayState.boyfriend.playAnim('scared', true);
 		PlayState.gf.playAnim('scared', true);
 	}
+	
 
 	var curLight:Int = 0;
+
 }
