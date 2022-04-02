@@ -1,5 +1,6 @@
 package;
 
+import CreditState.CreditsState;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -30,7 +31,8 @@ class MainMenuState extends MusicBeatState
 		'story mode',
 		'freeplay',
 		//#if !switch 'switch', #end
-		'options'
+		'options',
+		'credits'
 	];
 
 	var magenta:FlxSprite;
@@ -193,6 +195,8 @@ class MainMenuState extends MusicBeatState
 										FlxG.switchState(new FreeplayState());
 									case 'options':
 										FlxG.switchState(new OptionsMenu());
+									case 'credits':
+										FlxG.switchState(new CreditsState());
 								}
 							});
 						}

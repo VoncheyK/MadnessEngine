@@ -1,4 +1,10 @@
-function onBeatHit()
-{
-    Speed += 0.5;
+trace("loaded script???");
+function update(elapsed)
+{ 
+    if (bf.y >= 200)
+    {
+        bf.y++;
+    } else if (bf.y <= 0{
+        bf.y--;
+    }
 }
