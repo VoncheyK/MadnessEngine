@@ -2252,12 +2252,10 @@ class PlayState extends MusicBeatState
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
 			// figured out a better way to do it!!
-			if (!ClientSettings.botPlay) {
 				if (pressArray[spr.ID] && spr.animation.curAnim.name != "confirm")
 					spr.animation.play("pressed");
 				if (!holdArray[spr.ID])
 					spr.animation.play("static");
-			}
 
 			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
 			{	
@@ -2411,6 +2409,26 @@ class PlayState extends MusicBeatState
 		note.wasGoodHit = true;
 		vocals.volume = 1;
 
+		playerStrums.forEach(function(spr:FlxSprite)
+		{
+			// figured out a better way to do it!!
+			if (note.noteData == spr.ID)
+			{
+				spr.animation.play("confirm");
+			}
+
+			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
+			{	
+				spr.centerOffsets();
+				spr.offset.x -= 13;
+				spr.offset.y -= 13;	
+			}	
+			else
+			{
+				spr.centerOffsets();
+			}		
+		});
+
 		if (!note.isSustainNote)
 		{
 			totalNotesHit++;
@@ -2423,6 +2441,13 @@ class PlayState extends MusicBeatState
 		note.kill();
 		notes.remove(note, true);
 		note.destroy();
+
+		var isSus:Bool = note.isSustainNote;
+		var leType:String = note.noteType;
+		var leData:Int = Math.round(Math.abs(note.noteData));
+
+
+		callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus, leType]);
 	}
 
 	function opponentNoteHit(daNote:Note)
