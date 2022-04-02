@@ -37,7 +37,7 @@ class CreditsState extends MusicBeatState { // so today i sto- COUGH COUGH, borr
 		['BeastlyGhost', 'noIcon', 'Coder', 'noLink', 'FFFFFF'],
 		['k2notfound', 'k2', 'Coder', 'noLink', '72805F'],
 		['TheRealJake', 'realjake', 'Coder', 'noLink', 'FFFFFF'],
-		['nintendofan44', 'nintendofan44', 'Coder\nthose icons i made for the credits menu\n are not really good', 'noLink', 'E16500']
+		['nintendofan44', 'nintendofan44', 'Coder', 'noLink', 'E16500']
 	];
 
 	var bg:FlxSprite;
