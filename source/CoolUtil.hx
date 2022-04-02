@@ -1,5 +1,7 @@
 package;
 
+import flixel.FlxG;
+import haxe.PosInfos;
 import lime.utils.Assets;
 
 using StringTools;
@@ -11,6 +13,14 @@ class CoolUtil
 	public static function difficultyString():String
 	{
 		return difficultyArray[PlayState.storyDifficulty];
+	}
+
+	inline public static function coolTrace(text:Dynamic, infos:PosInfos) { // so it can be used in callbacks????
+		trace(text, infos);
+	}
+
+	inline public static function bound(value:Float, min:Float, max:Float):Float {
+		return Math.max(min, Math.min(max, value));
 	}
 
 	public static function grantAchivement(name):String // wtf does this do??
@@ -44,5 +54,13 @@ class CoolUtil
 			dumbArray.push(i);
 		}
 		return dumbArray;
+	}
+
+	public static function browserLoad(site:String) {
+		#if linux
+		Sys.command('/usr/bin/xdg-open', [site]);
+		#else
+		FlxG.openURL(site);
+		#end
 	}
 }

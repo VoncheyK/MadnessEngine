@@ -1512,6 +1512,24 @@ class PlayState extends MusicBeatState
 		perfectMode = false;
 		#end
 
+		/*playerStrums.forEach(function(spr:FlxSprite) {
+			spr.angle += (Math.sin(elapsed * 2.5) + 1) * 5;
+		});
+		cpuStrums.forEach(function(spr:FlxSprite) {
+			spr.angle += (Math.sin(elapsed * 2.5) + 1) * 5;
+		});
+
+		for (note in notes) {
+			if (note.mustPress) {
+				if (!note.isSustainNote)
+					note.angle = playerStrums.members[note.noteData].angle;
+			}
+			else {
+				if (!note.isSustainNote)
+					note.angle = cpuStrums.members[note.noteData].angle;
+			}
+		}*/ // used this to test some stuff
+
 		if (ClientSettings.botPlay && !alreadyChanged)
 		{
 			scoreTxt.visible = false;
@@ -1657,10 +1675,12 @@ class PlayState extends MusicBeatState
 		// FlxG.watch.addQuick('VOL', vocals.amplitudeLeft);
 		// FlxG.watch.addQuick('VOLRight', vocals.amplitudeRight);
 
-		iconP1.setGraphicSize(Std.int(FlxMath.lerp(150, iconP1.width, 0.50)));
-		iconP2.setGraphicSize(Std.int(FlxMath.lerp(150, iconP2.width, 0.50)));
-
+		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, CoolUtil.bound(1 - (elapsed * 9), 0, 1));
+		iconP1.scale.set(mult, mult);
 		iconP1.updateHitbox();
+
+		var mult:Float = FlxMath.lerp(1, iconP2.scale.x, CoolUtil.bound(1 - (elapsed * 9), 0, 1));
+		iconP2.scale.set(mult, mult);
 		iconP2.updateHitbox();
 
 		var iconOffset:Int = 26;
@@ -2262,12 +2282,12 @@ class PlayState extends MusicBeatState
 			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
 			{	
 				spr.centerOffsets();
-				spr.offset.x -= 13;
-				spr.offset.y -= 13;	
+				spr.centerOrigin();
 			}	
 			else
 			{
 				spr.centerOffsets();
+				spr.centerOrigin();
 			}
 				
 		});
@@ -2599,8 +2619,8 @@ class PlayState extends MusicBeatState
 			camHUD.zoom += 0.03;
 		}
 
-		iconP1.setGraphicSize(Std.int(iconP1.width + 30));
-		iconP2.setGraphicSize(Std.int(iconP2.width + 30));
+		iconP1.scale.set(1.2, 1.2);
+		iconP2.scale.set(1.2, 1.2);
 
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();
