@@ -23,7 +23,7 @@ class OptionsMenu extends MusicBeatState
 		'',
 		'',
 		'',
-		'WIP',
+		'Nothing to see here lol',
 		'',
 		''
 	];

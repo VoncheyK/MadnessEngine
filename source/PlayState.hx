@@ -47,7 +47,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
-import FunkyHscript;
+// import FunkyHscript;
 
 using StringTools;
 
@@ -2259,7 +2259,7 @@ class PlayState extends MusicBeatState
 					spr.animation.play("static");
 			}
 
-			if (spr.animation.curAnim.name == "confirm")
+			if (spr.animation.curAnim.name == "confirm" && !curStage.startsWith("school"))
 			{	
 				spr.centerOffsets();
 				spr.offset.x -= 13;
