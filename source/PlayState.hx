@@ -1,9 +1,7 @@
 package;
-
-import hscript.Parser;
-import hscript.Interp;
-import lime.text.harfbuzz.HBScript;
 import hscript.Checker;
+import hscript.Interp;
+import hscript.Parser;
 #if js
 import js.html.Clients;
 #end
@@ -51,7 +49,7 @@ import openfl.display.BlendMode;
 import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
-//import FunkyHscript;
+// import FunkyHscript;
 
 using StringTools;
 
@@ -146,6 +144,7 @@ class PlayState extends MusicBeatState
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
+	var hscriptObjects:Array<Dynamic> = [];
 	var wiggleShit:WiggleEffect = new WiggleEffect();
 
 	var talking:Bool = true;
@@ -211,8 +210,6 @@ class PlayState extends MusicBeatState
 		var parser = new Parser();
 		var program = parser.parseString(script);
 
-		
-
 		//setup vars :()
 		interp.variables.set("SongName", SONG.song.toLowerCase()); 
 		interp.variables.set("Speed", SONG.speed); 
@@ -221,10 +218,26 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curStep", curStep); 
 		interp.variables.set("curBeat", curBeat); 
 
+		interp.variables.set("Math", Math); 
 
+		//gonna add these individualy
+
+		interp.variables.set("camGame", camGame); 
+		interp.variables.set("camHud", camHUD); 
+
+		//wtf is this
+		interp.variables.set("camCustom", camCustom); 
+
+		
 		interp.execute(program);
+	
 
-		callInterp("onCreate", []);	
+		callInterp("onCreate", []);
+
+		interp.variables.set("Print", function print(text:String) {
+			trace(text);
+		});
+		
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -704,9 +717,7 @@ class PlayState extends MusicBeatState
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
-		interp.variables.set("bf", boyfriend);
-		interp.variables.set("dad", dad);
-		interp.variables.set("gf", gf);
+
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
@@ -742,6 +753,10 @@ class PlayState extends MusicBeatState
 		add(dad);
 
 		add(boyfriend);
+
+		interp.variables.set("bf", boyfriend);
+		interp.variables.set("dad", dad);
+		interp.variables.set("gf", gf);
 		
 
 		var doof:DialogueBox = new DialogueBox(false, dialogue);
@@ -910,6 +925,10 @@ class PlayState extends MusicBeatState
 
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
+
+		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
+			FlxTween.tween(object, result, time);
+		});
 
 		if (isStoryMode)
 		{
@@ -2294,9 +2313,12 @@ class PlayState extends MusicBeatState
 		{
 			case "Death Note":
 				health -= 1000;
+
+			case "Heal Note":
+				health += 0.5;
 			
 			default:
-				trace("Since it's a normal note, do nothing!");
+				
 		}
 	}
 
@@ -2381,6 +2403,13 @@ class PlayState extends MusicBeatState
 		note.kill();
 		notes.remove(note, true);
 		note.destroy();
+
+		var isSus:Bool = note.isSustainNote;
+		var leType:String = note.noteType;
+		var leData:Int = Math.round(Math.abs(note.noteData));
+
+
+		callInterp('goodNoteHit', [notes.members.indexOf(note), leData, isSus, leType]);
 	}
 
 	function opponentNoteHit(daNote:Note)
