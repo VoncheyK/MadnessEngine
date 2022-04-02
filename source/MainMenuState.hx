@@ -30,7 +30,8 @@ class MainMenuState extends MusicBeatState
 		'story mode',
 		'freeplay',
 		//#if !switch 'switch', #end
-		'options'
+		'options',
+		'freeplay'
 	];
 
 	var magenta:FlxSprite;

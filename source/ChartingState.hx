@@ -40,7 +40,8 @@ class ChartingState extends MusicBeatState
 	public static var noteTypeList:Array<Dynamic> =
 	[
 		'',
-		'Death Note'
+		'Death Note',
+		'Heal Note'
 	];
 
 	var _file:FileReference;

@@ -218,11 +218,24 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curBeat", curBeat); 
 
 		interp.variables.set("Math", Math); 
+
+		//gonna add these individualy
+
+		interp.variables.set("camGame", camGame); 
+		interp.variables.set("camHud", camHUD); 
+
+		//wtf is this
+		interp.variables.set("camCustom", camCustom); 
+
 		
 		interp.execute(program);
 	
 
 		callInterp("onCreate", []);
+
+		interp.variables.set("Print", function print(text:String) {
+			trace(text);
+		});
 		
 
 		// var gameCam:FlxCamera = FlxG.camera;
@@ -703,9 +716,7 @@ class PlayState extends MusicBeatState
 
 		boyfriend = new Boyfriend(770, 450, SONG.player1);
 
-		interp.variables.set("bf", boyfriend);
-		interp.variables.set("dad", dad);
-		interp.variables.set("gf", gf);
+
 
 		// REPOSITIONING PER STAGE
 		switch (curStage)
@@ -741,6 +752,10 @@ class PlayState extends MusicBeatState
 		add(dad);
 
 		add(boyfriend);
+
+		interp.variables.set("bf", boyfriend);
+		interp.variables.set("dad", dad);
+		interp.variables.set("gf", gf);
 		
 
 		var doof:DialogueBox = new DialogueBox(false, dialogue);
@@ -910,9 +925,8 @@ class PlayState extends MusicBeatState
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 
-		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic) { 
-			trace("Tweening object!");
-			FlxTween.tween(boyfriend, result, 2);
+		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
+			FlxTween.tween(object, result, time);
 		});
 
 		if (isStoryMode)
@@ -2245,7 +2259,7 @@ class PlayState extends MusicBeatState
 					spr.animation.play("static");
 			}
 
-			if (spr.animation.curAnim.name == "confirm" || !curStage.startsWith("school"))
+			if (spr.animation.curAnim.name == "confirm")
 			{	
 				spr.centerOffsets();
 				spr.offset.x -= 13;
@@ -2324,9 +2338,12 @@ class PlayState extends MusicBeatState
 		{
 			case "Death Note":
 				health -= 1000;
+
+			case "Heal Note":
+				health += 0.5;
 			
 			default:
-				trace("Since it's a normal note, do nothing!");
+				
 		}
 	}
 
