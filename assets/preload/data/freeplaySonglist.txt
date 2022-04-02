@@ -2,7 +2,7 @@ Tutorial:1:gf
 Bopeebo:1:dad
 Fresh:1:dad
 Dadbattle:1:dad
-Spookez:2:spooky
+Spookeez:2:spooky
 South:2:spooky
 Monster:2:monster
 Pico:3:pico

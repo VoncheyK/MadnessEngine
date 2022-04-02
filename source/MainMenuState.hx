@@ -1,5 +1,6 @@
 package;
 
+import CreditState.CreditsState;
 #if desktop
 import Discord.DiscordClient;
 #end
