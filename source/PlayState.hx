@@ -226,17 +226,14 @@ class PlayState extends MusicBeatState
 		interp.variables.set("camHud", camHUD); 
 
 		//wtf is this
-		interp.variables.set("camCustom", camCustom); 
+		interp.variables.set("camCustom", camCustom);
+		
 
 		
 		interp.execute(program);
 	
 
 		callInterp("onCreate", []);
-
-		interp.variables.set("Print", function print(text:String) {
-			trace(text);
-		});
 		
 
 		// var gameCam:FlxCamera = FlxG.camera;
@@ -927,7 +924,8 @@ class PlayState extends MusicBeatState
 		startingSong = true;
 
 		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
-			FlxTween.tween(object, result, time);
+
+			var newTween = FlxTween.tween(object, result, time);
 		});
 
 		if (isStoryMode)
@@ -2507,6 +2505,12 @@ class PlayState extends MusicBeatState
 			notes.remove(daNote, true);
 			daNote.destroy();
 		}
+
+		var isSus:Bool = daNote.isSustainNote;
+		var leType:String = daNote.noteType;
+		var leData:Int = Math.round(Math.abs(daNote.noteData));
+
+		callInterp('opponentNoteHit', [notes.members.indexOf(daNote), leData, isSus, leType]);
 	}
 
 	//just to call it several times lol
