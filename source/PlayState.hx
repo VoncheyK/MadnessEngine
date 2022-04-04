@@ -218,7 +218,11 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curBeat", curBeat); 
 
 		interp.variables.set("Math", Math); 
-		
+		interp.variables.set("openCoolLink", function(link:String){
+			FlxG.openURL(link);
+		});
+
+
 		interp.execute(program);
 	
 
