@@ -1,4 +1,5 @@
 package;
+
 import hscript.Checker;
 import hscript.Interp;
 import hscript.Parser;
@@ -88,6 +89,9 @@ class PlayState extends MusicBeatState
 
 	private static var prevCamFollow:FlxObject;
 
+	public static var what:Bool = true;
+
+	private var strums:FlxTypedGroup<FlxSprite>;
 	private var cpuStrums:FlxTypedGroup<FlxSprite>;
 	private var playerStrums:FlxTypedGroup<FlxSprite>;
 
@@ -141,6 +145,8 @@ class PlayState extends MusicBeatState
 	private var camHUD:FlxCamera;
 	public var camCustom:FlxCamera;
 	private var camGame:FlxCamera;
+
+	var idleBeat:Int = 2;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -259,8 +265,8 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
-		//Conductor.mapBPMChanges(SONG);
-		//Conductor.changeBPM(SONG.bpm);
+		Conductor.mapBPMChanges(SONG);
+		Conductor.changeBPM(SONG.bpm);
 
 		switch (SONG.song.toLowerCase())
 		{
@@ -770,10 +776,13 @@ class PlayState extends MusicBeatState
 		strumLine = new FlxSprite(0, 50).makeGraphic(FlxG.width, 10);
 		strumLine.scrollFactor.set();
 
-		//if(options downscroll is true) // for future options!!
-		//strumLine.y = 580; //should work
+		if (ClientSettings.downScroll) // for future options!!
+			strumLine.y = FlxG.height - 165;
 
 		add(noteSplashes);
+
+		strums = new FlxTypedGroup<FlxSprite>();
+		add(strums);
 
 		cpuStrums = new FlxTypedGroup<FlxSprite>();
 		add(cpuStrums);
@@ -906,6 +915,7 @@ class PlayState extends MusicBeatState
 				botplayTxt.text = "Rank: [BFC]"; //BFC stands for Bot Full Combo
 		}
 
+		strums.cameras = [camHUD];
 		noteSplashes.cameras = [camHUD];
 		cpuStrums.cameras = [camHUD];
 		notes.cameras = [camHUD];
@@ -1179,10 +1189,12 @@ class PlayState extends MusicBeatState
 	var previousFrameTime:Int = 0;
 	var lastReportedPlayheadPosition:Int = 0;
 	var songTime:Float = 0;
+	var songStarted:Bool = false;
 
 	function startSong():Void
 	{
 		startingSong = false;
+		songStarted = true;
 
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
@@ -1267,6 +1279,7 @@ class PlayState extends MusicBeatState
 				susLength = susLength / Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
 
+				var type = 0;
 				for (susNote in 0...Math.floor(susLength))
 				{
 					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
@@ -1281,6 +1294,11 @@ class PlayState extends MusicBeatState
 					{
 						sustainNote.x += FlxG.width / 2; // general offset
 					}
+
+					sustainNote.parent = swagNote;
+					swagNote.children.push(sustainNote);
+					sustainNote.spot = type;
+					type++;
 				}
 
 				swagNote.mustPress = gottaHitNote;
@@ -1398,16 +1416,19 @@ class PlayState extends MusicBeatState
 
 			babyArrow.ID = i;
 
-			if (player == 1)
+			switch (player)
 			{
-				playerStrums.add(babyArrow);
+				case 0:
+					cpuStrums.add(babyArrow);
+				case 1:
+					playerStrums.add(babyArrow);
 			}
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 100;
 			babyArrow.x += ((FlxG.width / 2) * player);
 
-			cpuStrums.add(babyArrow);
+			strums.add(babyArrow);
 		}
 	}
 
@@ -2414,6 +2435,77 @@ class PlayState extends MusicBeatState
 
 	function opponentNoteHit(daNote:Note)
 	{
+		var holdArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
+		var stepHeight = (0.45 * Conductor.stepCrochet * FlxMath.roundDecimal(PlayState.SONG.speed, 2));
+		if (ClientSettings.downScroll)
+			{
+				if (daNote.mustPress)
+					daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y
+						+
+						0.45 * (Conductor.songPosition - daNote.strumTime) * (FlxMath.roundDecimal(SONG.speed, 2))) - daNote.noteYOffset;
+				else
+					daNote.y = (strums.members[Math.floor(Math.abs(daNote.noteData))].y
+						+
+						0.45 * (Conductor.songPosition - daNote.strumTime) * (FlxMath.roundDecimal(SONG.speed, 2))) - daNote.noteYOffset;
+				if (daNote.isSustainNote)
+				{
+					daNote.y -= daNote.height - stepHeight;
+
+					// If not in botplay, only clip sustain notes when properly hit, botplay gets to clip it everytime
+					if ((ClientSettings.botPlay
+						|| !daNote.mustPress
+						|| daNote.wasGoodHit
+						|| holdArray[Math.floor(Math.abs(daNote.noteData))])
+						&& daNote.y - daNote.offset.y * daNote.scale.y + daNote.height >= (strumLine.y + Note.swagWidth / 2))
+					{
+						// Clip to strumline
+						var swagRect = new FlxRect(0, 0, daNote.frameWidth * 2, daNote.frameHeight * 2);
+						swagRect.height = (strums.members[Math.floor(Math.abs(daNote.noteData))].y
+							+ Note.swagWidth / 2
+							- daNote.y) / daNote.scale.y;
+						swagRect.y = daNote.frameHeight - swagRect.height;
+
+						daNote.clipRect = swagRect;
+					}
+				}
+
+				if (daNote.isParent)
+				{
+					for (i in 0...daNote.children.length)
+					{
+						var slide = daNote.children[i];
+						slide.y = daNote.y - slide.height;
+					}
+				}
+			}
+			else
+			{
+				if (daNote.mustPress)
+					daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y
+						- 0.45 * (Conductor.songPosition - daNote.strumTime) * (FlxMath.roundDecimal(SONG.speed, 2))) + daNote.noteYOffset;
+				else
+					daNote.y = (strums.members[Math.floor(Math.abs(daNote.noteData))].y
+						- 0.45 * (Conductor.songPosition - daNote.strumTime) * (FlxMath.roundDecimal(SONG.speed,2))) + daNote.noteYOffset;
+				if (daNote.isSustainNote)
+				{
+					if ((ClientSettings.botPlay
+						|| !daNote.mustPress
+						|| daNote.wasGoodHit
+						|| holdArray[Math.floor(Math.abs(daNote.noteData))])
+						&& daNote.y + daNote.offset.y * daNote.scale.y <= (strumLine.y + Note.swagWidth / 2))
+					{
+						// Clip to strumline
+						var swagRect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
+						swagRect.y = (strums.members[Math.floor(Math.abs(daNote.noteData))].y
+							+ Note.swagWidth / 2
+							- daNote.y) / daNote.scale.y;
+						swagRect.height -= swagRect.y;
+
+						daNote.clipRect = swagRect;
+					}
+				}
+			}
+		
 		if (daNote.y > FlxG.height)
 		{
 			daNote.active = false;
@@ -2487,26 +2579,117 @@ class PlayState extends MusicBeatState
 		// WIP interpolation shit? Need to fix the pause issue
 		// daNote.y = (strumLine.y - (songTime - daNote.strumTime) * (0.45 * PlayState.SONG.speed));
 
-		if (daNote.y < -daNote.height)
+		if (daNote.isSustainNote && daNote.wasGoodHit && Conductor.songPosition >= daNote.strumTime)
 		{
-			if (daNote.tooLate || !daNote.wasGoodHit)
-			{
-				noteMiss(daNote.noteData);
-				misses++;
-				health -= 0.04;
-				totalNotesHit++;
-				songScore -= 10;
-				vocals.volume = 0;
-				updateAccuracy();
-			}
-
-			daNote.active = false;
-			daNote.visible = false;
-
 			daNote.kill();
 			notes.remove(daNote, true);
 			daNote.destroy();
 		}
+		else if ((daNote.mustPress && daNote.tooLate && !ClientSettings.downScroll || daNote.mustPress && daNote.tooLate
+			&& ClientSettings.downScroll)
+			&& daNote.mustPress)
+		{
+			if (daNote.isSustainNote && daNote.wasGoodHit)
+			{
+				daNote.kill();
+				notes.remove(daNote, true);
+			}
+			else
+			{
+				if (daNote.isSustainNote)
+				{
+					// im tired and lazy this sucks I know i'm dumb
+					vocals.volume = 0;
+					if (what && !daNote.isSustainNote)
+					{
+						noteMiss(daNote.noteData);
+					}
+					if (daNote.isParent)
+					{
+						health -= 0.2; // give a health punishment for failing a LN
+						trace("hold fell over at the start");
+						for (i in daNote.children)
+						{
+							i.alpha = 0.3;
+							i.sustainIsActive = false;
+						}
+					}
+					else
+					{
+						if (!daNote.wasGoodHit
+							&& daNote.isSustainNote
+							&& daNote.sustainIsActive
+							&& daNote.spot != daNote.parent.children.length)
+						{
+							health -= 0.2; // give a health punishment for failing a LN
+							trace("hold fell over at " + daNote.spot);
+							for (i in daNote.parent.children)
+							{
+								i.alpha = 0.3;
+								i.sustainIsActive = false;
+							}
+							if (daNote.parent.wasGoodHit)
+								misses++;
+							updateAccuracy();
+						}
+						else
+						{
+							health -= 0.15;
+						}
+					}					
+				}
+				else
+				{
+					vocals.volume = 0;
+					if (what && !daNote.isSustainNote)
+					{
+						if (ClientSettings.botPlay)
+						{
+							daNote.daRating = "bad";
+							botPlayNoteHit(daNote);
+						}
+						else
+							noteMiss(daNote.noteData);
+					}
+
+					if (daNote.isParent)
+					{
+						health -= 0.15; // give a health punishment for failing a LN
+						trace("hold fell over at the start");
+						for (i in daNote.children)
+						{
+							i.alpha = 0.3;
+							i.sustainIsActive = false;
+							trace(i.alpha);
+						}
+					}
+					else
+					{
+						if (!daNote.wasGoodHit
+							&& daNote.isSustainNote
+							&& daNote.sustainIsActive
+							&& daNote.spot != daNote.parent.children.length)
+						{
+							health -= 0.25; // give a health punishment for failing a LN
+							trace("hold fell over at " + daNote.spot);
+							for (i in daNote.parent.children)
+							{
+								i.alpha = 0.3;
+								i.sustainIsActive = false;
+								trace(i.alpha);
+							}
+							if (daNote.parent.wasGoodHit)
+								misses++;
+							updateAccuracy();
+						}
+					}
+				}
+			}
+
+				daNote.visible = false;
+				daNote.kill();
+				notes.remove(daNote, true);
+			}
 	}
 
 	//just to call it several times lol
@@ -2554,7 +2737,7 @@ class PlayState extends MusicBeatState
 
 		if (generatedMusic)
 		{
-			notes.sort(FlxSort.byY, FlxSort.DESCENDING);
+			notes.sort(FlxSort.byY, (ClientSettings.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING));
 		}
 
 		if (SONG.notes[Math.floor(curStep / 16)] != null)
@@ -2567,8 +2750,14 @@ class PlayState extends MusicBeatState
 			// else
 			// Conductor.changeBPM(SONG.bpm);
 
-			// Dad doesnt interupt his own notes
-			if (SONG.notes[Math.floor(curStep / 16)].mustHitSection)
+			if (curBeat % idleBeat == 0)
+			{
+				if (!dad.animation.curAnim.name.startsWith('sing'))
+					dad.dance();
+				if (!boyfriend.animation.curAnim.name.startsWith('sing'))
+					boyfriend.dance();
+			}
+			else if ((dad.curCharacter == 'spooky' || dad.curCharacter == 'gf') && !dad.animation.curAnim.name.startsWith('sing'))
 				dad.dance();
 		}
 		// FlxG.log.add('change bpm' + SONG.notes[Std.int(curStep / 16)].changeBPM);

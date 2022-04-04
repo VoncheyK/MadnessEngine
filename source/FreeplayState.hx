@@ -4,7 +4,6 @@ import Song.SwagSong;
 #if desktop
 import Discord.DiscordClient;
 #end
-import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
@@ -242,6 +241,9 @@ class FreeplayState extends MusicBeatState
 	{	
 		super.update(elapsed);
 
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
+
 		if (FlxG.sound.music.volume < 0.7)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -251,10 +253,6 @@ class FreeplayState extends MusicBeatState
 
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
-
-		//iconArray[curSelected].setGraphicSize(Std.int(FlxMath.lerp(iconArray[curSelected].width, 150, 0.09/(openfl.Lib.current.stage.frameRate/60))));
-
-		//iconArray[curSelected].updateHitbox();
 
 		var upP = controls.UP_P;
 		var downP = controls.DOWN_P;
@@ -339,7 +337,6 @@ class FreeplayState extends MusicBeatState
 					song = songData.get(songs[curSelected].songName)[curDifficulty];
 					if (song != null)
 					{
-						Conductor.mapBPMChanges(song);
 						Conductor.changeBPM(song.bpm);
 					}
 					trace("bpm should be " + song.bpm);
@@ -450,15 +447,10 @@ class FreeplayState extends MusicBeatState
 	{
 		super.beatHit();
 
-		trace("beat hit");
-
 		//we can do cool stuff with the beat
 		bg.scale.x += 0.04;
 		bg.scale.y += 0.04;
 		FlxTween.tween(bg, {"scale.x": 1, "scale.y": 1}, 0.1);		
-
-		//iconArray[curSelected].setGraphicSize(Std.int(iconArray[curSelected].width + 30));
-		//iconArray[curSelected].updateHitbox();
 
 		FlxG.camera.shake(0.0018, 0.1);
 	}
