@@ -33,6 +33,16 @@ class Note extends FlxSprite
 
 	public var noteScore:Float = 1;
 
+	
+
+	public var isParent:Bool = false;
+	public var parent:Note = null;
+	public var noteYOffset:Int = 0;
+	public var spot:Int = 0;
+	public var sustainIsActive:Bool = true;
+	
+	public var children:Array<Note> = [];
+
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
@@ -141,12 +151,14 @@ class Note extends FlxSprite
 			flipping sustain trails on downscroll
 			so it won't look weird
 		*/
-
-		if (FlxG.save.data.downScroll && sustainNote) 
+		if (ClientSettings.downScroll && sustainNote) 
 			flipY = true;
+
+		var stepHeight = ((0.45 * Conductor.stepCrochet)) * FlxMath.roundDecimal(PlayState.SONG.speed, 2);
 
 		if (isSustainNote && prevNote != null)
 		{
+			noteYOffset = Math.round(-stepHeight + swagWidth * 0.5);
 			noteScore * 0.2;
 			alpha = 0.6;
 
@@ -196,17 +208,28 @@ class Note extends FlxSprite
 	{
 		super.update(elapsed);
 
+		if (!sustainIsActive)
+			alpha = 0.3;
+
 		if (mustPress)
 		{
-			// The * 0.5 is so that it's easier to hit them too late, instead of too early
-			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
-				canBeHit = true;
-			else
-				canBeHit = false;
+			if (isSustainNote)
+			{
+				if (strumTime - Conductor.songPosition <= (Conductor.safeZoneOffset * 0.5) && strumTime - Conductor.songPosition >= -Conductor.safeZoneOffset)
+					canBeHit = true;
+				else
+					canBeHit = false;
+			}
+			else 
+			{
+				if (strumTime - Conductor.songPosition <= Conductor.safeZoneOffset && strumTime - Conductor.songPosition >= -Conductor.safeZoneOffset)
+					canBeHit = true;
+				else
+					canBeHit = false;
+			}
 
-			if (strumTime < Conductor.songPosition - (Conductor.safeZoneOffset) && !wasGoodHit)
-				tooLate = true;
+			/*if (strumTime < Conductor.songPosition - (Conductor.safeZoneOffset) && !wasGoodHit)
+				tooLate = true;*/
 		}
 		else
 		{

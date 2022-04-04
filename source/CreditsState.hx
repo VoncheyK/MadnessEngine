@@ -14,12 +14,29 @@ class CreditsState extends MusicBeatState
 {
 	var credit1:FlxText;
 
+	var credits:Array<Dynamic> = [
+		"Vonchy -  Main Programmer",
+		"Jorge - Programmer",
+		"BeastlyGhost - Programmer",
+		"k2knotfound - Programmer",
+		"Ziad - Programmer"
+	];
+
 override function create()
 	{
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuBGMagenta'));
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.screenCenter();
 		add(bg);
+
+		for (index => credit in credits) {
+			credit1 = new FlxText(100, 150 + (50 * index), FlxG.width, credit, 32);
+			credit1.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+			credit1.screenCenter(X);
+			add(credit1);
+		}
+
+		/*
 		credit1 = new FlxText(100, 150, FlxG.width, "Vonchy - Lead Coder", 32);
 	    credit1.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 	    credit1.screenCenter(X);
@@ -40,8 +57,9 @@ override function create()
 	    credit1.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 	    credit1.screenCenter(X);
 	    add(credit1);
-        credit1 = new FlxText(100, 100, FlxG.width, "Madness Engine dev", 42);
-	    credit1.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		*/
+        credit1 = new FlxText(100, 75, FlxG.width, "Madness Engine dev", 54);
+	    credit1.setFormat(Paths.font("vcr.ttf"), 48, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 	    credit1.screenCenter(X);
 	    add(credit1);
 

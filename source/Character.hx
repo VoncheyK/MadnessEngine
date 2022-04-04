@@ -21,6 +21,7 @@ class Character extends FlxSprite
 
 	public var holdTimer:Float = 0;
 
+	public var iconColor:String = "FF000000";
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
@@ -503,6 +504,17 @@ class Character extends FlxSprite
 				addOffset("singDOWN-alt", -30, -27);
 
 				playAnim('idle');
+		}
+
+		//iconcolor shit
+		var colorSheet:Array<String> = CoolUtil.coolTextFile(Paths.txt('iconColor'));			
+		for (data in colorSheet)
+		{	//each line
+			var colorData:Array<String> = data.split(':');
+			
+			//checks if the name matches the character
+			if(colorData[0] == curCharacter)
+				iconColor = colorData[1];
 		}
 
 		dance();

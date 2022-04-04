@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileCircle;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -107,7 +108,7 @@ class TitleState extends MusicBeatState
 	{
 		if (!initialized)
 		{
-			var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileDiamond);
+			var diamond:FlxGraphic = FlxGraphic.fromClass(GraphicTransTileCircle);
 			diamond.persist = true;
 			diamond.destroyOnNoUse = false;
 
@@ -128,11 +129,10 @@ class TitleState extends MusicBeatState
 			// FlxG.sound.list.add(music);
 			// music.play();
 			FlxG.sound.playMusic(Paths.music('freakyMenu'), 0);
+			Conductor.changeBPM(102);
 
-			FlxG.sound.music.fadeIn(4, 0, 0.7);
+			FlxG.sound.music.fadeIn(4, 0, 0.7);		
 		}
-
-		Conductor.changeBPM(102);
 		persistentUpdate = true;
 
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuBGOrange"));
@@ -146,7 +146,6 @@ class TitleState extends MusicBeatState
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
 		logoBl.antialiasing = true;
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
 		logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
@@ -209,6 +208,8 @@ class TitleState extends MusicBeatState
 			initialized = true;
 
 		// credGroup.add(credTextShit);
+
+		ClientSettings.loadSettings();
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -231,14 +232,16 @@ class TitleState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music != null)
+		{	
 			Conductor.songPosition = FlxG.sound.music.time;
-		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
+			FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
+		}
 
 		if (FlxG.keys.justPressed.F) {
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 
-		ClientSettings.loadSettings();
+		//ClientSettings.loadSettings();
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
@@ -327,13 +330,13 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
-		logoBl.animation.play('bump');
+		logoBl.animation.play('bump', true);
 		danceLeft = !danceLeft;
 
 		if (danceLeft)
-			gfDance.animation.play('danceRight');
+			gfDance.animation.play('danceRight', true);
 		else
-			gfDance.animation.play('danceLeft');
+			gfDance.animation.play('danceLeft', true);
 
 		FlxG.log.add(curBeat);
 
