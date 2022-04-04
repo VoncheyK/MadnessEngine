@@ -232,17 +232,14 @@ class PlayState extends MusicBeatState
 		interp.variables.set("camHud", camHUD); 
 
 		//wtf is this
-		interp.variables.set("camCustom", camCustom); 
+		interp.variables.set("camCustom", camCustom);
+		
 
 		
 		interp.execute(program);
 	
 
 		callInterp("onCreate", []);
-
-		interp.variables.set("Print", function print(text:String) {
-			trace(text);
-		});
 		
 
 		// var gameCam:FlxCamera = FlxG.camera;
@@ -937,7 +934,8 @@ class PlayState extends MusicBeatState
 		startingSong = true;
 
 		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
-			FlxTween.tween(object, result, time);
+
+			var newTween = FlxTween.tween(object, result, time);
 		});
 
 		if (isStoryMode)
@@ -2585,111 +2583,13 @@ class PlayState extends MusicBeatState
 			notes.remove(daNote, true);
 			daNote.destroy();
 		}
-		else if ((daNote.mustPress && daNote.tooLate && !ClientSettings.downScroll || daNote.mustPress && daNote.tooLate
-			&& ClientSettings.downScroll)
-			&& daNote.mustPress)
-		{
-			if (daNote.isSustainNote && daNote.wasGoodHit)
-			{
-				daNote.kill();
-				notes.remove(daNote, true);
-			}
-			else
-			{
-				if (daNote.isSustainNote)
-				{
-					// im tired and lazy this sucks I know i'm dumb
-					vocals.volume = 0;
-					if (what && !daNote.isSustainNote)
-					{
-						noteMiss(daNote.noteData);
-					}
-					if (daNote.isParent)
-					{
-						health -= 0.2; // give a health punishment for failing a LN
-						trace("hold fell over at the start");
-						for (i in daNote.children)
-						{
-							i.alpha = 0.3;
-							i.sustainIsActive = false;
-						}
-					}
-					else
-					{
-						if (!daNote.wasGoodHit
-							&& daNote.isSustainNote
-							&& daNote.sustainIsActive
-							&& daNote.spot != daNote.parent.children.length)
-						{
-							health -= 0.2; // give a health punishment for failing a LN
-							trace("hold fell over at " + daNote.spot);
-							for (i in daNote.parent.children)
-							{
-								i.alpha = 0.3;
-								i.sustainIsActive = false;
-							}
-							if (daNote.parent.wasGoodHit)
-								misses++;
-							updateAccuracy();
-						}
-						else
-						{
-							health -= 0.15;
-						}
-					}					
-				}
-				else
-				{
-					vocals.volume = 0;
-					if (what && !daNote.isSustainNote)
-					{
-						if (ClientSettings.botPlay)
-						{
-							daNote.daRating = "bad";
-							botPlayNoteHit(daNote);
-						}
-						else
-							noteMiss(daNote.noteData);
-					}
 
-					if (daNote.isParent)
-					{
-						health -= 0.15; // give a health punishment for failing a LN
-						trace("hold fell over at the start");
-						for (i in daNote.children)
-						{
-							i.alpha = 0.3;
-							i.sustainIsActive = false;
-							trace(i.alpha);
-						}
-					}
-					else
-					{
-						if (!daNote.wasGoodHit
-							&& daNote.isSustainNote
-							&& daNote.sustainIsActive
-							&& daNote.spot != daNote.parent.children.length)
-						{
-							health -= 0.25; // give a health punishment for failing a LN
-							trace("hold fell over at " + daNote.spot);
-							for (i in daNote.parent.children)
-							{
-								i.alpha = 0.3;
-								i.sustainIsActive = false;
-								trace(i.alpha);
-							}
-							if (daNote.parent.wasGoodHit)
-								misses++;
-							updateAccuracy();
-						}
-					}
-				}
-			}
+		//this is so unecessary
+		var isSus:Bool = daNote.isSustainNote;
+		var leType:String = daNote.noteType;
+		var leData:Int = Math.round(Math.abs(daNote.noteData));
 
-				daNote.visible = false;
-				daNote.kill();
-				notes.remove(daNote, true);
-			}
+		callInterp('opponentNoteHit', [notes.members.indexOf(daNote), leData, isSus, leType]);
 	}
 
 	//just to call it several times lol
