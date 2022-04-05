@@ -31,6 +31,16 @@ class Note extends FlxSprite
 
 	private var earlyHitMult:Float = 0.5;
 
+	
+
+	public var isParent:Bool = false;
+	public var parent:Note = null;
+	public var noteYOffset:Int = 0;
+	public var spot:Int = 0;
+	public var sustainIsActive:Bool = true;
+	
+	public var children:Array<Note> = [];
+
 	public static var swagWidth:Float = 160 * 0.7;
 	public static var PURP_NOTE:Int = 0;
 	public static var GREEN_NOTE:Int = 2;
@@ -323,6 +333,9 @@ class Note extends FlxSprite
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
+
+		if (!sustainIsActive)
+			alpha = 0.3;
 
 		if (mustPress)
 		{

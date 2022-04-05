@@ -4,7 +4,6 @@ import Song.SwagSong;
 #if desktop
 import Discord.DiscordClient;
 #end
-import flash.text.TextField;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.display.FlxGridOverlay;
@@ -243,6 +242,9 @@ class FreeplayState extends MusicBeatState
 
 		super.update(elapsed);
 
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
+
 		if (FlxG.sound.music.volume < 0.7)
 		{
 			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
@@ -337,7 +339,6 @@ class FreeplayState extends MusicBeatState
 					song = songData.get(songs[curSelected].songName)[curDifficulty];
 					if (song != null)
 					{
-						Conductor.mapBPMChanges(song);
 						Conductor.changeBPM(song.bpm);
 					}
 					trace("bpm should be " + song.bpm);

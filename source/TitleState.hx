@@ -130,7 +130,6 @@ class TitleState extends MusicBeatState
 		logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
 		logoBl.antialiasing = true;
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.animation.play('bump');
 		logoBl.updateHitbox();
 		logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
@@ -193,6 +192,8 @@ class TitleState extends MusicBeatState
 			initialized = true;
 
 		// credGroup.add(credTextShit);
+
+		ClientSettings.loadSettings();
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -215,14 +216,16 @@ class TitleState extends MusicBeatState
 	override function update(elapsed:Float)
 	{
 		if (FlxG.sound.music != null)
+		{	
 			Conductor.songPosition = FlxG.sound.music.time;
-		// FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
+			FlxG.watch.addQuick('amp', FlxG.sound.music.amplitude);
+		}
 
 		if (FlxG.keys.justPressed.F) {
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 
-		ClientSettings.loadSettings();
+		//ClientSettings.loadSettings();
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
@@ -311,13 +314,13 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
-		logoBl.animation.play('bump');
+		logoBl.animation.play('bump', true);
 		danceLeft = !danceLeft;
 
 		if (danceLeft)
-			gfDance.animation.play('danceRight');
+			gfDance.animation.play('danceRight', true);
 		else
-			gfDance.animation.play('danceLeft');
+			gfDance.animation.play('danceLeft', true);
 
 		FlxG.log.add(curBeat);
 
