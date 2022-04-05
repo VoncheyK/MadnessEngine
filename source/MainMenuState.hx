@@ -36,19 +36,11 @@ class MainMenuState extends MusicBeatState
 	var magenta:FlxSprite;
 	var interp:Interp;
 	var camFollow:FlxObject;
-	var interp:Interp;
 	var tween:FlxTween;
 
 	public function callInterp(func_name:String, args:Array<Dynamic>){
         if (!interp.variables.exists(func_name)) return;
 
-        var method = interp.variables.get(func_name);
-        Reflect.callMethod(interp,method,args);
-	}
-
-	public function callInterp(func_name:String, args:Array<Dynamic>){
-        if (!interp.variables.exists(func_name)) return;
-        
         var method = interp.variables.get(func_name);
         Reflect.callMethod(interp,method,args);
 	}
