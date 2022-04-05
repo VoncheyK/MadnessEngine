@@ -934,9 +934,8 @@ class PlayState extends MusicBeatState
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 
-		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float, ease:String) { 
-
-			var newTween = FlxTween.tween(object, result, time, ease);
+		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
+			var newTween = FlxTween.tween(object, result, time);
 		});
 
 		if (isStoryMode)
