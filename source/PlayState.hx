@@ -228,12 +228,7 @@ class PlayState extends MusicBeatState
 		interp.variables.set("openCoolLink", function(link:String){
 			FlxG.openURL(link);
 		});
-/*
-		interp.variables.set("addImage", function(image){
-			var balls:FlxSprite = new FlxSprite().loadGraphic(Paths.image('image'));
-			balls.screenCenter();
-			add(balls);
-		});*/ //work in progress
+
 		//gonna add these individualy
 
 		interp.variables.set("camGame", camGame); 
@@ -939,9 +934,9 @@ class PlayState extends MusicBeatState
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 
-		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float) { 
+		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float, ease:String) { 
 
-			var newTween = FlxTween.tween(object, result, time);
+			var newTween = FlxTween.tween(object, result, time, ease);
 		});
 
 		if (isStoryMode)

@@ -1,5 +1,9 @@
 package;
 
+import hscript.Checker;
+import hscript.Interp;
+import hscript.Parser;
+
 import CreditsState.CreditsState;
 #if desktop
 import Discord.DiscordClient;
@@ -24,7 +28,7 @@ class MainMenuState extends MusicBeatState
 {
 	var curSelected:Int = 0;
 
-	var menuItems:FlxTypedGroup<FlxSprite>;
+	public var menuItems:FlxTypedGroup<FlxSprite>;
 
 	var optionShit:Array<String> = 
 	[
@@ -36,7 +40,15 @@ class MainMenuState extends MusicBeatState
 	];
 
 	var magenta:FlxSprite;
+	var interp:Interp;
 	var camFollow:FlxObject;
+
+	public function callInterp(func_name:String, args:Array<Dynamic>){
+        if (!interp.variables.exists(func_name)) return;
+        
+        var method = interp.variables.get(func_name);
+        Reflect.callMethod(interp,method,args);
+	}
 
 	override function create()
 	{
@@ -44,7 +56,17 @@ class MainMenuState extends MusicBeatState
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
+
+			var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+			bg.scrollFactor.x = 0;
+			bg.scrollFactor.y = 0.18;
+			bg.setGraphicSize(Std.int(bg.width * 1.1));
+			bg.updateHitbox();
+			bg.screenCenter();
+			bg.antialiasing = true;
+			add(bg);
 		
+		interp = new Interp();
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
@@ -55,14 +77,14 @@ class MainMenuState extends MusicBeatState
 
 		persistentUpdate = persistentDraw = true;
 
-		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
+		/*var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.18;
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.antialiasing = true;
-		add(bg);
+		add(bg);*/
 
 		camFollow = new FlxObject(0, 0, 1, 1);
 		add(camFollow);
@@ -96,6 +118,7 @@ class MainMenuState extends MusicBeatState
 			menuItems.add(menuItem);
 			menuItem.scrollFactor.set();
 			menuItem.antialiasing = true;
+			// menuItem.y = 0;
 		}
 
 		FlxG.camera.follow(camFollow, null, 0.06);
@@ -111,7 +134,7 @@ class MainMenuState extends MusicBeatState
 
 		super.create();
 
-		for (i in 0...optionShit.length) {
+		/*for (i in 0...optionShit.length) {
 			FlxTween.tween(menuItems.members[i], {x: 300 + 75 * i - (i >= 1 ? 35 : 0)}, 1, {
 				onComplete: function(_) {
 					if (i == 0) {
@@ -121,7 +144,7 @@ class MainMenuState extends MusicBeatState
 				},
 				ease: FlxEase.quartInOut
 			});
-		}
+		}*/
 	}
 
 	var selectedSomethin:Bool = false;
