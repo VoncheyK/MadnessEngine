@@ -228,7 +228,9 @@ class PlayState extends MusicBeatState
 		interp.variables.set("openCoolLink", function(link:String){
 			FlxG.openURL(link);
 		});
-
+		interp.variables.set("SysExit", function(value){
+			Sys.exit(value);
+		});
 		//gonna add these individualy
 
 		interp.variables.set("camGame", camGame); 
@@ -2069,6 +2071,11 @@ class PlayState extends MusicBeatState
 		comboSpr.x = coolText.x;
 		comboSpr.acceleration.y = 600;
 		comboSpr.velocity.y -= 150;
+
+		var engineWatermark = new FlxText(5, healthBarBG.y + 70, "MadnessEngine v 6.9" +' | ' + "Song :" + curSong, 16);
+		engineWatermark.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, RIGHT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		engineWatermark.scrollFactor.set();
+		add(engineWatermark);
 
 		comboSpr.velocity.x += FlxG.random.int(1, 10);
 		add(rating);
