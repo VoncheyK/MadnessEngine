@@ -57,4 +57,8 @@ class HealthIcon extends FlxSprite
 		if (sprTracker != null)
 			setPosition(sprTracker.x + sprTracker.width + 10, sprTracker.y - 30);
 	}
+
+	public function getCharacter():String {
+		return char;
+	}
 }

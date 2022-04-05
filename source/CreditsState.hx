@@ -129,8 +129,8 @@ class CreditsState extends MusicBeatState { // so today i sto- COUGH COUGH, borr
 				var shiftMult:Int = 1;
 				if (FlxG.keys.pressed.SHIFT) shiftMult = 3;
 
-				var upP = controls.UP_P;
-				var downP = controls.DOWN_P;
+				var upP = controls.NOTE_UP_P;
+				var downP = controls.NOTE_DOWN_P;
 
 				if (upP) {
 					changeSelection(-1 * shiftMult);
@@ -141,13 +141,13 @@ class CreditsState extends MusicBeatState { // so today i sto- COUGH COUGH, borr
 					holdTime = 0;
 				}
 
-				if (controls.DOWN || controls.UP) {
+				if (controls.NOTE_DOWN_P || controls.NOTE_UP_P) {
 					var checkLastHold:Int = Math.floor((holdTime - 0.5) * 10);
 					holdTime += elapsed;
 					var checkNewHold:Int = Math.floor((holdTime - 0.5) * 10);
 
 					if (holdTime > 0.5 && checkNewHold - checkLastHold > 0) {
-						changeSelection((checkNewHold - checkLastHold) * (controls.UP ? -shiftMult : shiftMult));
+						changeSelection((checkNewHold - checkLastHold) * (controls.NOTE_UP_P ? -shiftMult : shiftMult));
 					}
 				}
 			}
@@ -164,7 +164,7 @@ class CreditsState extends MusicBeatState { // so today i sto- COUGH COUGH, borr
 					colorTween.cancel();
 				}
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				FlxG.switchState(new MainMenuState());
+				MusicBeatState.switchState(new MainMenuState());
 				quitting = true;
 			}
 		}

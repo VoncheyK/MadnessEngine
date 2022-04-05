@@ -115,10 +115,10 @@ class OptionsMenu extends MusicBeatState
 		else
 		{
 			if (controls.BACK)
-				FlxG.switchState(new MainMenuState());
-			/*if (controls.UP_P)
+				MusicBeatState.switchState(new MainMenuState());
+			/*if (controls.NOTE_UP_P)
 				changeSelection(-1);
-			if (controls.DOWN_P)
+			if (controls.NOTE_DOWN_P)
 				changeSelection(1);*/
 		}
 		FlxG.save.flush();
@@ -127,7 +127,7 @@ class OptionsMenu extends MusicBeatState
 	function waitingInput():Void
 	{
 		if (FlxG.keys.getIsDown().length > 0) {
-			PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxG.keys.getIsDown()[0].ID, null);
+			PlayerSettings.player1.controls.replaceBinding(Control.NOTE_LEFT, Keys, FlxG.keys.getIsDown()[0].ID, null);
 		}
 		// PlayerSettings.player1.controls.replaceBinding(Control)
 	}

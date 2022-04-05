@@ -1,5 +1,6 @@
 package;
 
+import sys.io.File;
 import Section.SwagSection;
 import haxe.Json;
 import haxe.format.JsonParser;
@@ -11,10 +12,13 @@ typedef SwagSong =
 {
 	var song:String;
 	var notes:Array<SwagSection>;
-	var bpm:Int;
+	var bpm:Float;
 	var needsVoices:Bool;
 	var speed:Float;
 	var stage:String;
+
+	var arrowSkin:String;
+	var splashSkin:String;
 
 	var player1:String;
 	var player2:String;
@@ -25,7 +29,7 @@ class Song
 {
 	public var song:String;
 	public var notes:Array<SwagSection>;
-	public var bpm:Int;
+	public var bpm:Float;
 	public var needsVoices:Bool = true;
 	public var speed:Float = 1;
 	public var stage:String = "stage";
@@ -40,9 +44,31 @@ class Song
 		this.bpm = bpm;
 	}
 
+	private static function onLoadJson(songJson:SwagSong) // Convert old charts to newest format
+	{
+		// can be used later prob?
+	}
+
 	public static function loadFromJson(jsonInput:String, ?folder:String):SwagSong
 	{
-		var rawJson = Assets.getText(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase())).trim();
+		var rawJson = null;
+		
+		var formattedFolder:String = Paths.formatToSongPath(folder);
+		var formattedSong:String = Paths.formatToSongPath(jsonInput);
+		#if MODS_ALLOWED
+		var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
+		if(FileSystem.exists(moddyFile)) {
+			rawJson = File.getContent(moddyFile).trim();
+		}
+		#end
+
+		if(rawJson == null) {
+			#if sys
+			rawJson = File.getContent(Paths.json(formattedFolder + '/' + formattedSong)).trim();
+			#else
+			rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();
+			#end
+		}
 
 		while (!rawJson.endsWith("}"))
 		{
@@ -66,7 +92,9 @@ class Song
 				daSong = songData.song;
 				daBpm = songData.bpm; */
 
-		return parseJSONshit(rawJson);
+		var songJson:SwagSong = parseJSONshit(rawJson);
+		onLoadJson(songJson);
+		return songJson;
 	}
 
 	public static function parseJSONshit(rawJson:String):SwagSong

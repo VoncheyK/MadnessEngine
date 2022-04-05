@@ -83,6 +83,7 @@ class Main extends Sprite {
 
 	private function setupGame():Void
 	{
+		ClientSettings.loadDefaultKeys();
 		// fuck you, persistent caching stays ON during sex
 		FlxGraphic.defaultPersist = true;
 		// the reason for this is we're going to be handling our own cache smartly

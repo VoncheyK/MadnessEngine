@@ -2,13 +2,33 @@ package;
 
 import flixel.FlxG;
 import haxe.PosInfos;
-import lime.utils.Assets;
+import openfl.utils.Assets;
+import lime.utils.Assets as LimeAssets;
+import lime.utils.AssetLibrary;
+import lime.utils.AssetManifest;
 
 using StringTools;
 
 class CoolUtil
 {	
 	public static var difficultyArray:Array<String> = ['EASY', "NORMAL", "HARD"]; //fix shit :(
+	public static var defaultDifficulty:String = 'NORMAL';
+
+	public static function getDifficultyFilePath(num:Null<Int> = null)
+	{
+		if(num == null) num = PlayState.storyDifficulty;
+
+		var fileSuffix:String = difficultyArray[num];
+		if(fileSuffix != defaultDifficulty)
+		{
+			fileSuffix = '-' + fileSuffix;
+		}
+		else
+		{
+			fileSuffix = '';
+		}
+		return Paths.formatToSongPath(fileSuffix);
+	}
 
 	public static function difficultyString():String
 	{
@@ -56,7 +76,40 @@ class CoolUtil
 		return dumbArray;
 	}
 
-	public static function browserLoad(site:String) {
+	public static function dominantColor(sprite:flixel.FlxSprite):Int{
+		var countByColor:Map<Int, Int> = [];
+		for(col in 0...sprite.frameWidth){
+			for(row in 0...sprite.frameHeight){
+			  var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
+			  if(colorOfThisPixel != 0){
+				  if(countByColor.exists(colorOfThisPixel)){
+				    countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
+				  }else if(countByColor[colorOfThisPixel] != 13520687 - (2*13520687)){
+					 countByColor[colorOfThisPixel] = 1;
+				  }
+			  }
+			}
+		 }
+		var maxCount = 0;
+		var maxKey:Int = 0;//after the loop this will store the max color
+		countByColor[flixel.util.FlxColor.BLACK] = 0;
+			for(key in countByColor.keys()){
+			if(countByColor[key] >= maxCount){
+				maxCount = countByColor[key];
+				maxKey = key;
+			}
+		}
+		return maxKey;
+	}
+
+	// uhhhh does this even work at all? i'm starting to doubt
+	public static function precacheSound(sound:String, ?library:String = null):Void { // psych engine
+		if (!Assets.cache.hasSound(Paths.sound(sound, library))) {
+			FlxG.sound.cache(Paths.sound(sound, library));
+		}
+	}
+
+	public static function browserLoad(site:String) { // psych engine
 		#if linux
 		Sys.command('/usr/bin/xdg-open', [site]);
 		#else

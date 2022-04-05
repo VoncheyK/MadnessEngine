@@ -237,7 +237,10 @@ class FreeplayState extends MusicBeatState
 	private static var vocals:FlxSound = null;
 
 	override function update(elapsed:Float)
-	{	
+	{
+		if (FlxG.sound.music != null)
+			Conductor.songPosition = FlxG.sound.music.time;
+
 		super.update(elapsed);
 
 		if (FlxG.sound.music.volume < 0.7)
@@ -250,12 +253,8 @@ class FreeplayState extends MusicBeatState
 		if (Math.abs(lerpScore - intendedScore) <= 10)
 			lerpScore = intendedScore;
 
-		//iconArray[curSelected].setGraphicSize(Std.int(FlxMath.lerp(iconArray[curSelected].width, 150, 0.09/(openfl.Lib.current.stage.frameRate/60))));
-
-		//iconArray[curSelected].updateHitbox();
-
-		var upP = controls.UP_P;
-		var downP = controls.DOWN_P;
+		var upP = controls.NOTE_UP_P;
+		var downP = controls.NOTE_DOWN_P;
 		var accepted = controls.ACCEPT;
 		var space = FlxG.keys.justPressed.SPACE;
 
@@ -268,22 +267,23 @@ class FreeplayState extends MusicBeatState
 			changeSelection(1);
 		}
 
-		if (controls.LEFT_P)
+		if (controls.NOTE_LEFT_P)
 			changeDiff(-1);
-		if (controls.RIGHT_P)
+		if (controls.NOTE_RIGHT_P)
 			changeDiff(1);
 
 		if (controls.BACK)
 		{
-			FlxG.switchState(new MainMenuState());
+			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (accepted)
 		{
-			var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
+			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
+			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			trace(poop);
 
-			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
+			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
 
@@ -448,15 +448,10 @@ class FreeplayState extends MusicBeatState
 	{
 		super.beatHit();
 
-		trace("beat hit");
-
 		//we can do cool stuff with the beat
 		bg.scale.x += 0.04;
 		bg.scale.y += 0.04;
-		FlxTween.tween(bg, {"scale.x": 1, "scale.y": 1}, 0.1);		
-
-		//iconArray[curSelected].setGraphicSize(Std.int(iconArray[curSelected].width + 30));
-		//iconArray[curSelected].updateHitbox();
+		FlxTween.tween(bg, {"scale.x": 1, "scale.y": 1}, 0.1);
 
 		FlxG.camera.shake(0.0018, 0.1);
 	}

@@ -40,15 +40,15 @@ class OptionsSubState extends MusicBeatSubstate
 	{
 		super.update(elapsed);
 
-		/*if (controls.UP_P)
+		/*if (controls.NOTE_UP_P)
 			changeSelection(-1);
 
-		if (controls.DOWN_P)
+		if (controls.NOTE_DOWN_P)
 			changeSelection(1);*/
 
 		if (controls.BACK){
 			FlxG.sound.play(Paths.sound('cancelMenu'));
-			FlxG.switchState(new OptionsMenu());
+			MusicBeatState.switchState(new OptionsMenu());
 		}
 
 		/*if (controls.ACCEPT){

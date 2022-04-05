@@ -6,6 +6,8 @@ import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
 
+using StringTools;
+
 class Paths
 {
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
@@ -49,6 +51,10 @@ class Paths
 	inline static function getPreloadPath(file:String)
 	{
 		return 'assets/$file';
+	}
+
+	inline static public function formatToSongPath(path:String) {
+		return path.toLowerCase().replace(' ', '-');
 	}
 
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)

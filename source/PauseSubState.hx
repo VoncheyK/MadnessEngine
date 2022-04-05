@@ -58,6 +58,13 @@ class PauseSubState extends MusicBeatSubstate
 		levelDifficulty.updateHitbox();
 		add(levelDifficulty);
 
+		var blueballedTxt:FlxText = new FlxText(20, 15 + 64, 0, "", 32);
+		blueballedTxt.text = "Blueballed: " + PlayState.deathCounter;
+		blueballedTxt.scrollFactor.set();
+		blueballedTxt.setFormat(Paths.font('vcr.ttf'), 32);
+		blueballedTxt.updateHitbox();
+		add(blueballedTxt);
+
 		botText = new FlxText(20, 15 + 64, 0, "", 32);
 		botText.text += "Botplay was turned on, Score won't be saved.";
 		botText.scrollFactor.set();
@@ -102,8 +109,8 @@ class PauseSubState extends MusicBeatSubstate
 
 		super.update(elapsed);
 
-		var upP = controls.UP_P;
-		var downP = controls.DOWN_P;
+		var upP = controls.NOTE_UP_P;
+		var downP = controls.NOTE_DOWN_P;
 		var accepted = controls.ACCEPT;
 
 		if (upP)
@@ -141,11 +148,12 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.scoreTxt.visible = false;
 				case "Exit to menu":
 					ClientSettings.botPlay = false;
+					PlayState.deathCounter = 0;
 					botText.visible = false;
 					if(PlayState.isStoryMode)
-						FlxG.switchState(new StoryMenuState());
+						MusicBeatState.switchState(new StoryMenuState());
 					else
-						FlxG.switchState(new FreeplayState());
+						MusicBeatState.switchState(new FreeplayState());
 			}
 		}
 
