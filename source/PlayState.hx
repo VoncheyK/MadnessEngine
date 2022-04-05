@@ -232,7 +232,7 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		instance = this;
-		ClientSettings.downScroll = true;
+		//ClientSettings.downScroll = true;
 
 		if (FlxG.sound.music != null)
 			FlxG.sound.music.stop();
