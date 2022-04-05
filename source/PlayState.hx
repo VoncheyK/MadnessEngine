@@ -228,9 +228,12 @@ class PlayState extends MusicBeatState
 		interp.variables.set("openCoolLink", function(link:String){
 			FlxG.openURL(link);
 		});
-		interp.variables.set("SysExit", function(value){
-			Sys.exit(value);
-		});
+/*
+		interp.variables.set("addImage", function(image){
+			var balls:FlxSprite = new FlxSprite().loadGraphic(Paths.image('image'));
+			balls.screenCenter();
+			add(balls);
+		});*/ //work in progress
 		//gonna add these individualy
 
 		interp.variables.set("camGame", camGame); 
