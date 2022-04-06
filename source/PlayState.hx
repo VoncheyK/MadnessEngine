@@ -2594,15 +2594,22 @@ class PlayState extends MusicBeatState
 		});
 		combo = 0;
 
-		health -= daNote.missHealth;
+                switch (daNote.noteType) {
+                    case "Death Note": // dont give a miss to the player wtf
+                        health -= 2;
+                    case "Heal Note":
+                        health -= 0;
+                    default:
+                        health -= daNote.missHealth;
 
-		//For testing purposes
-		//trace(daNote.missHealth);
-		songMisses++;
-		vocals.volume = 0;
+		        //For testing purposes
+		        //trace(daNote.missHealth);
+		        songMisses++;
+		        vocals.volume = 0;
 		
-		totalPlayed++;
-		RecalculateRating();
+		        totalPlayed++;
+		        RecalculateRating();
+                }
 
 		var char:Character = boyfriend;
 
@@ -2651,7 +2658,13 @@ class PlayState extends MusicBeatState
 				if (combo > 9999)
 					combo = 9999;
 			}
-			health += note.hitHealth;
+
+                        switch (daNote.noteType) {
+                            case "Heal Note":
+                                health += 0.5;
+                            default:
+                                health += note.hitHealth;
+                        }
 
 			var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
 			boyfriend.playAnim(animToPlay, true);
