@@ -1707,11 +1707,7 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.keys.justPressed.SEVEN)
 		{
-			MusicBeatState.switchState(new ChartingState());
-
-			#if desktop
-			DiscordClient.changePresence("Chart Editor", null, null, true);
-			#end
+			chartingMenu();
 		}
 
 		// FlxG.watch.addQuick('VOL', vocals.amplitudeLeft);
@@ -2027,6 +2023,18 @@ class PlayState extends MusicBeatState
 		#if debug
 		if (FlxG.keys.justPressed.ONE)
 			endSong();
+		#end
+	}
+
+	function chartingMenu()
+	{
+		persistentUpdate = false;
+		paused = true;
+		cancelMusicFadeTween();
+		MusicBeatState.switchState(new ChartingState());
+
+		#if desktop
+		DiscordClient.changePresence("Chart Editor", null, null, true);
 		#end
 	}
 
@@ -2659,12 +2667,13 @@ class PlayState extends MusicBeatState
 					combo = 9999;
 			}
 
-                        switch (daNote.noteType) {
-                            case "Heal Note":
-                                health += 0.5;
-                            default:
-                                health += note.hitHealth;
-                        }
+			switch (note.noteType)
+			{
+				case "Heal Note":
+					health += 0.5;
+				default:
+					health += note.hitHealth;
+			}
 
 			var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
 			boyfriend.playAnim(animToPlay, true);
