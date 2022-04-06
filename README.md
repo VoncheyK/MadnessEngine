@@ -5,7 +5,7 @@
 > ### Dependencies
 
 - Git
-- Haxe (4.1.5, you can use the latest version but it may not work properly)
+- Haxe (The latest one(dont use 4.1.5 wtf, the latest versions dont have problem with git libs no more), you can use the latest version but it may not work properly)
 - Visual Studio Community (Windows Only)
 
 > ### OPTIONAL Dependencies
