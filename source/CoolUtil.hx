@@ -117,7 +117,7 @@ class CoolUtil
 		#end
 	}
 	
-	//this is an utility that formats the song name,
+	/*//this is an utility that formats the song name,
 	//for example, if the song is winter-horrorland
 	//this utility makes the song name Winter Horrorland
 	//useful for adding watermarks etc.
@@ -142,5 +142,5 @@ class CoolUtil
             }
     
             return swag;
-        }
+        }*/ // my bad for commenting this out but a song formatter function was already in the source, go to Paths.hx and seach for formatToSongPath
 }
