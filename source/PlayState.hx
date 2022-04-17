@@ -1847,6 +1847,30 @@ class PlayState extends MusicBeatState
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
 		}
 
+		if (curSong.toLowerCase() == 'blammed')
+		{
+			var sh_r:Float = 600;
+			var rotRateDad = curStep / 9.5;
+			var dad_toY = -2450 + -Math.sin(rotRateDad * 2) * sh_r * 0.45;
+			var dad_toX = -330 -Math.cos(rotRateDad) * sh_r;
+
+			sh_r += (60 - sh_r) / 32;
+
+			rotRateDad *= 1.2;
+
+			dad.x += (dad_toX - dad.x) / 12;
+			dad.y += (dad_toY - dad.y) / 12;
+
+			var pene = 0.07;
+			dad.angle = Math.sin(rotRateDad) * sh_r * pene / 4;
+
+			boyfriend.alpha = 1;
+			boyfriend.angle = Math.sin(rotRateDad) * sh_r * pene; // + Math.cos(curStep) * 5;
+
+			boyfriend.x = dad.x + 120 + Math.cos((boyfriend.angle + 90) * (Math.PI / 180)) * 150;
+			boyfriend.y = dad.y + 300 + Math.sin((boyfriend.angle + 90) * (Math.PI / 180)) * 150;
+		}
+
 		FlxG.watch.addQuick("beatShit", curBeat);
 		FlxG.watch.addQuick("stepShit", curStep);
 

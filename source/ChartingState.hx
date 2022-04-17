@@ -65,8 +65,8 @@ class ChartingState extends MusicBeatState
 	var undos = [];
 	var redos = [];
 
-	var defKeyPad:FlxVirtualPad;
-	var dPad:FlxVirtualPad;
+	/*var defKeyPad:FlxVirtualPad;
+	var dPad:FlxVirtualPad;*/
 
 	var _file:FileReference;
 
@@ -296,7 +296,7 @@ class ChartingState extends MusicBeatState
 		UI_box.y = 25;
 		UI_box.scrollFactor.set();
 
-		text =
+		/*text =
 		"A button pad/X button pad/Left dpad/Right dpad or Mouse Wheel - Change Conductor's strum time
 		\nY button pad or Left dpad/B button pad or Right dpad - Go to the previous/next section
 		\nHold Shift to move 4x faster
@@ -304,13 +304,24 @@ class ChartingState extends MusicBeatState
 		\nZ keyboard/X keyboard - Zoom in/out
 		\nEnter - Play your chart
 		\nQ/E - Decrease/Increase Note Sustain Length
+		\nSpace - Stop/Resume song";*/ // old text but ima keep it here
+
+		text =
+		"W/S or Mouse Wheel - Change Conductor's strum time
+		\nA or Left/D or Right - Go to the previous/next section
+		\nHold Shift to move 4x faster
+		\nHold Control and click on an arrow to select it
+		\nZ/X - Zoom in/out
+		\nQ/E - Decrease/Increase Note Sustain Length
+		\n
+		\nEnter - Play your chart
 		\nSpace - Stop/Resume song";
 
 		var tipTextArray:Array<String> = text.split('\n');
 		for (i in 0...tipTextArray.length) {
-			var tipText:FlxText = new FlxText(UI_box.x, UI_box.y + UI_box.height + 8, 0, tipTextArray[i], 12);
+			var tipText:FlxText = new FlxText(UI_box.x, UI_box.y + UI_box.height + 8, 0, tipTextArray[i], 16);
 			tipText.y += i * 14;
-			tipText.setFormat(Paths.font("vcr.ttf"), 12, FlxColor.WHITE, LEFT/*, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK*/);
+			tipText.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT/*, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK*/);
 			//tipText.borderSize = 2;
 			tipText.scrollFactor.set();
 			add(tipText);
@@ -339,11 +350,11 @@ class ChartingState extends MusicBeatState
 		zoomTxt.scrollFactor.set();
 		add(zoomTxt);
 
-		defKeyPad = new FlxVirtualPad(FlxDPadMode.NONE, FlxActionMode.A_B_X_Y);
+		/*defKeyPad = new FlxVirtualPad(FlxDPadMode.NONE, FlxActionMode.A_B_X_Y);
 		add(defKeyPad);
 
 		dPad = new FlxVirtualPad(FlxDPadMode.FULL, FlxActionMode.NONE);
-		add(dPad);
+		add(dPad);*/ // those pads are cool, ima keep them here if we need it someday
 		
 		updateGrid();
 		super.create();
@@ -1263,7 +1274,7 @@ class ChartingState extends MusicBeatState
 
 			//ARROW VORTEX SHIT NO DEADASS
 			
-			var wKey:Bool = defKeyPad.buttonX.pressed;
+			/*var wKey:Bool = defKeyPad.buttonX.pressed;
 			var aKey:Bool = defKeyPad.buttonB.justPressed;
 			var sKey:Bool = defKeyPad.buttonA.pressed;
 			var dKey:Bool = defKeyPad.buttonY.justPressed;
@@ -1273,9 +1284,9 @@ class ChartingState extends MusicBeatState
 			var downArrow2:Bool = dPad.buttonDown.justPressed;
 			var upArrow:Bool = dPad.buttonUp.pressed;
 			var upArrow2:Bool = dPad.buttonUp.justPressed;
-			var rightArrow:Bool = dPad.buttonRight.justPressed;
+			var rightArrow:Bool = dPad.buttonRight.justPressed;*/
 			
-			if (wKey || sKey)
+			if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
 			{
 				FlxG.sound.music.pause();
 
@@ -1285,11 +1296,11 @@ class ChartingState extends MusicBeatState
 
 				var daTime:Float = 700 * FlxG.elapsed * holdingShift;
 
-				if (wKey)
+				if (FlxG.keys.pressed.W)
 				{
 					FlxG.sound.music.time -= daTime;
 				}
-				else if (sKey)
+				else
 					FlxG.sound.music.time += daTime;
 
 				if(vocals != null) {
@@ -1329,22 +1340,22 @@ class ChartingState extends MusicBeatState
 					datimess.push(sectionStartTime() + daTime * i);
 				}
 			
-			if (leftArrow)
+			if (FlxG.keys.justPressed.LEFT)
 			{
 				--curQuant;
 				if (curQuant < 0) curQuant = 0;
 				
 				daquantspot *=  Std.int(32/quants[curQuant]);
 			}
-			if (rightArrow)
+			if (FlxG.keys.justPressed.RIGHT)
 			{
 				curQuant ++;
 				if (curQuant > quants.length-1) curQuant = quants.length-1;
 				daquantspot *=  Std.int(32/quants[curQuant]);
 			}
 			quant.animation.play('q', true, false, curQuant);
-			var feces:Float = 0.0;
-			if (upArrow2 || downArrow2)
+			var feces:Float;
+			if (FlxG.keys.justPressed.UP || FlxG.keys.justPressed.DOWN  )
 			{
 				FlxG.sound.music.pause();
 
@@ -1353,7 +1364,7 @@ class ChartingState extends MusicBeatState
 				//FlxG.sound.music.time = (Math.round(curStep/quants[curQuant])*quants[curQuant]) * Conductor.stepCrochet;
 				
 					//(Math.floor((curStep+quants[curQuant]*1.5/(quants[curQuant]/2))/quants[curQuant])*quants[curQuant]) * Conductor.stepCrochet;//snap into quantization
-				if (upArrow)
+				if (FlxG.keys.pressed.UP)
 				{
 					
 					//var tosnapto = 0.00;
@@ -1370,7 +1381,7 @@ class ChartingState extends MusicBeatState
 					//FlxG.sound.music.time -= daTime;
 					 feces = FlxG.sound.music.time - daTime;
 				}
-				else if (downArrow) {
+				else{
 					
 					var foundaspot = false;
 					for (i in datimess){
@@ -1421,9 +1432,9 @@ class ChartingState extends MusicBeatState
 			if (FlxG.keys.pressed.SHIFT)
 				shiftThing = 4;
 
-			if (rightArrow && !vortex|| dKey)
+			if (FlxG.keys.justPressed.RIGHT && !vortex|| FlxG.keys.justPressed.D)
 				changeSection(curSection + shiftThing);
-			if (leftArrow && !vortex|| aKey) {
+			if (FlxG.keys.justPressed.LEFT && !vortex|| FlxG.keys.justPressed.A) {
 				if(curSection <= 0) {
 					changeSection(_song.notes.length-1);
 				} else {
