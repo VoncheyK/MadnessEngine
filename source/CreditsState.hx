@@ -34,7 +34,7 @@ class CreditsState extends MusicBeatState { // so today i sto- COUGH COUGH, borr
 		['Madness Engine Team'],
 		['Vonchyy', 'vonch', 'Lead Coder', 'https://twitter.com/realvonchyy', 'FFF0E6'],
 		['Jorge', 'jorge', 'Coder', 'noLink', 'FFF0E6'],
-		['BeastlyGhost', 'noIcon', 'Coder', 'noLink', 'FFFFFF'],
+		['BeastlyGhost', 'ghost', 'Coder', 'https://twitter.com/Fan_de_RPG', '00ffbf'],
 		['k2notfound', 'k2', 'Coder', 'noLink', '72805F'],
 		['TheRealJake', 'realjake', 'Coder', 'noLink', 'FFFFFF'],
 		['nintendofan44', 'nintendofan44', 'Coder', 'noLink', 'E16500']
