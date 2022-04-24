@@ -99,14 +99,15 @@ class CustomFPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			text = "Framerate: " + currentFPS;
+			// less text means more in this case.
+			text = "FPS: " + currentFPS;
 			var memoryMegas:Float = 0;
 			
 			#if openfl
 			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
-			text += "\nMemory Usage: " + memoryMegas + " MB";
+			text += "\nMemory: " + memoryMegas + " MB";
 			#end
-			text += "\nMadness Engine: v" + Main.engineVer;
+			text += "\nME: v" + Main.engineVer;
 
 			textColor = 0xFFFFFFFF;
 			if (memoryMegas > 3000 || currentFPS <= ClientSettings.framerate / 2)

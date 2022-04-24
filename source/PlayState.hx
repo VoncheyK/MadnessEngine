@@ -301,6 +301,8 @@ class PlayState extends MusicBeatState
 		if (SONG == null)
 			SONG = Song.loadFromJson('tutorial');
 
+		smallestRating = ratingIndexArray[0];
+
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
@@ -1609,56 +1611,21 @@ class PlayState extends MusicBeatState
 		//SONG.speed = interp.variables.get("Speed"); // replaced by speed changing function, also this is kinda lame ngl
 		SONG.bpm = interp.variables.get("BPM");
 
-		//bulky not very pog rating system
-		/*var fcRank:String;
-		var accRank:String;
 		var divider:String = ' | ';
 
-		// im crying looking at this bro
-		// ranks
-		fcRank = "[UNRATED]";
-		accRank = "F";
+		scoreTxt.text = 'Score: ' + songScore;
+		scoreTxt.text += divider + 'Misses: ' + songMisses;
 
-		if (sicks > 0)
-			fcRank = "[SFC]"; // Sick Full Combo
-		if (goods > 0)
-			fcRank = "[GFC]"; // Good Full Combo
-		if (bads > 0 || shits > 0)
-			fcRank = "[FC]"; // Full Combo
-		if (misses > 0)
-			fcRank = "[SDCB]"; // Single Digit Combo Breaks
-		if (misses > 9)
-			fcRank = "[Clear]";
-
-		if (accuracy > 99)
-			accRank = "S+";
-		if (accuracy < 100)
-			accRank = "S";
-		if (accuracy < 91)
-			accRank = "A";
-		if (accuracy < 85)
-			accRank = "B";
-		if (accuracy < 81)
-			accRank = "C";
-		if (accuracy < 75)
-			accRank = "D";
-		if (accuracy < 71)
-			accRank = "E";
-		if (accuracy < 61)
-			accRank = "F";*/
-
-		if (ClientSettings.displayAccuracy) {
-			if(ratingName == '?') {
-				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rank: ' + ratingName;
-			} else {
-				scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses + ' | Rank: ' + ratingName + ' | Accuracy: ' + '(' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%)' + ' - ' + ratingFC;
-			}
+		if (ClientSettings.displayAccuracy)
+		{
+			scoreTxt.text += divider + 'Accuracy: ' + Highscore.floorDecimal(ratingPercent * 100, 2) + '%';
+			scoreTxt.text += divider + 'Rank: ' + ratingName;
+			if (songMisses <= 0)
+				scoreTxt.text += fcString;
+		}
 			#if desktop
 			detailsText = scoreTxt.text;
 			#end
-		} else {
-			scoreTxt.text = 'Score: ' + songScore + ' | Misses: ' + songMisses;
-		}
 
 		if (ClientSettings.botPlay)
 		{
@@ -2276,6 +2243,12 @@ class PlayState extends MusicBeatState
 			spawnNoteSplashOnNote(note);
 		}
 
+		if (songMisses <= 0) {
+			if (ratingIndexArray.indexOf(daRating) > ratingIndexArray.indexOf(smallestRating))
+				smallestRating = daRating;
+			fcString = returnArray[ratingIndexArray.indexOf(smallestRating)];
+		}
+
 		if(!ClientSettings.botPlay) {
 			songScore += score;
 			songHits++;
@@ -2781,8 +2754,21 @@ class PlayState extends MusicBeatState
 	// psych / kade sort of thing
 	public var ratingName:String = '?';
 	public var ratingPercent:Float;
-	public var ratingFC:String;
+
+	public var fcString:String = '';
+	public var ratingIndexArray:Array<String> = ["sick", "good", "bad", "shit"];
+	public var returnArray:Array<String> = [" [SFC]", " [GFC]", " [FC]", ""];
+	public var smallestRating:String;
 	//pog rating system
+
+	/*
+		shouldn't be a surprise at this point but we should really avoid
+		adding stuff from Psych Engine or Kade Engine, it basically shows them how much of an asshole
+		ME devs can be
+		I will leave this here and it's up to whoever added this to remove it and actually write a unique accuracy system
+		-BeastlyGhost
+	*/
+
 	public function RecalculateRating()
 	{
 		if (totalPlayed < 1) // Prevent divide by 0
@@ -2810,19 +2796,6 @@ class PlayState extends MusicBeatState
 				}
 			}
 		}
-
-		// Rating FC
-		ratingFC = "";
-		if (sicks > 0)
-			ratingFC = "SFC";
-		if (goods > 0)
-			ratingFC = "GFC";
-		if (bads > 0 || shits > 0)
-			ratingFC = "FC";
-		if (songMisses > 0 && songMisses < 10)
-			ratingFC = "SDCB";
-		else if (songMisses >= 10)
-			ratingFC = "Clear";
 	}
 
 	function StrumPlayAnim(isDad:Bool, id:Int, time:Float) {
