@@ -1,30 +1,49 @@
 package;
 
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 
+class CharInfo
+{
+	public var x(default, null):Int;
+	public var y(default, null):Int;
+	public var scale(default, null):Float;
+	public var flippedX(default, null):Bool;
+
+	public function new(x:Int = 0, y:Int = 0, scale:Float = 1.0, flippedX:Bool = false)
+	{
+		this.x = x;
+		this.y = y;
+		this.scale = scale;
+		this.flippedX = flippedX;
+	}
+}
+
 class MenuCharacter extends FlxSprite
 {
-	public var character:String;
-	private var danceLeft:Bool = false;
-
 	//will softcode later im lazye also credits to kade!!!
-	private var data:Map<String, Array<Dynamic>> = [
-		'bf' => [0, -20, 1.0],
-		'gf' => [50, 80, 1.5],
-		'dad' => [-15, 130],
-		'spooky' => [20, 30],
-		'pico' => [0, 0, 1.0],
-		'mom' => [-30, 140, 0.85],
-		'parents-christmas' => [100, 130, 1.8],
-		'senpai' => [-40, -45, 1.4]
-	];
+	private static var infos:Map<String, CharInfo> = [
+		'bf' => new CharInfo(0, -20, 1.0, true),
+		'gf' => new CharInfo(50, 80, 1.5, true),
+		'dad' => new CharInfo(-15, 130),
+		'spooky' => new CharInfo(20, 30),
+		'pico' => new CharInfo(0, 0, 1.0, true),
+		'mom' => new CharInfo(-30, 140, 0.85),
+		'parents-christmas' => new CharInfo(100, 130, 1.8),
+		'senpai' => new CharInfo(-40, -45, 1.4)
+	]; // sorry, this will be removed later
+	// just so the engine ui doesnt look weird until we do it
 
-	public function new(x:Float, character:String = 'bf')
+	private var flippedX:Bool = false;
+
+	private var danceLeft:Bool = false;
+	private var character:String = '';
+
+	public function new(x:Int, y:Int, scale:Float, flippedX:Bool)
 	{
-		super(x);
-
-		this.character = character;
+		super(x, y);
+		this.flippedX = flippedX;
 
 		antialiasing = true;
 
@@ -41,15 +60,14 @@ class MenuCharacter extends FlxSprite
 		animation.addByPrefix('mom', "Mom Idle BLACK LINES", 24, false);
 		animation.addByPrefix('parents-christmas', "Parent Christmas Idle", 24, false);
 		animation.addByPrefix('senpai', "SENPAI idle Black Lines", 24, false);
-		// Parent Christmas Idle
 
-		animation.play(character);
+		setGraphicSize(Std.int(width * scale));
 		updateHitbox();
 	}
 
 	public function setCharacter(character:String):Void
 	{
-		var sameCharacter:Bool = character == this.character;
+		var isCharSame:Bool = character == this.character;
 		this.character = character;
 		if (character == '')
 		{
@@ -61,14 +79,15 @@ class MenuCharacter extends FlxSprite
 			visible = true;
 		}
 
-		if (!sameCharacter)
+		if (!isCharSame)
 		{
 			dance(true);
 		}
 
-		var data = this.data[character];
-		offset.set(data[0], data[1]);
-		setGraphicSize(Std.int(width * data[2]));
+		var info:CharInfo = infos[character];
+		offset.set(info.x, info.y);
+		setGraphicSize(Std.int(width * info.scale));
+		flipX = info.flippedX != flippedX;
 	}
 
 	public function dance(LastFrame:Bool = false):Void
@@ -85,7 +104,7 @@ class MenuCharacter extends FlxSprite
 		else if (character == '')
 		{
 			return;
-		} 
+		}
 		else
 		{
 			if (animation.name == "bfConfirm")

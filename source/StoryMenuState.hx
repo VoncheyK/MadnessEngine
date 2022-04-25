@@ -122,33 +122,9 @@ class StoryMenuState extends MusicBeatState
 
 		trace("Line 96");
 
-		for (char in 0...3)
-		{
-			var weekCharacterThing:MenuCharacter = new MenuCharacter((FlxG.width * 0.25) * (1 + char) - 150, weekData.weekCharacters[curWeek][char]);
-			weekCharacterThing.y += 70;
-			weekCharacterThing.antialiasing = true;
-			switch (weekCharacterThing.character)
-			{
-				case 'dad':
-					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.5));
-					weekCharacterThing.updateHitbox();
-
-				case 'bf':
-					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.9));
-					weekCharacterThing.updateHitbox();
-					weekCharacterThing.x -= 80;
-				case 'gf':
-					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.5));
-					weekCharacterThing.updateHitbox();
-				case 'pico':
-					weekCharacterThing.flipX = true;
-				case 'parents-christmas':
-					weekCharacterThing.setGraphicSize(Std.int(weekCharacterThing.width * 0.9));
-					weekCharacterThing.updateHitbox();
-			}
-
-			grpWeekCharacters.add(weekCharacterThing);
-		}
+		grpWeekCharacters.add(new MenuCharacter(0, 100, 0.5, false));
+		grpWeekCharacters.add(new MenuCharacter(450, 25, 0.9, true));
+		grpWeekCharacters.add(new MenuCharacter(850, 100, 0.5, true));
 
 		difficultySelectors = new FlxGroup();
 		add(difficultySelectors);
@@ -408,12 +384,7 @@ class StoryMenuState extends MusicBeatState
 
 		grpWeekCharacters.members[0].dance();
 		grpWeekCharacters.members[1].dance();
-
-		if (weekData.weekCharacters[curWeek][0] == 'spooky' || weekData.weekCharacters[curWeek][0] == 'gf')
-			grpWeekCharacters.members[0].dance();
-
-		if (weekData.weekCharacters[curWeek][2] == 'spooky' || weekData.weekCharacters[curWeek][2] == 'gf')
-			grpWeekCharacters.members[2].dance();
+		grpWeekCharacters.members[2].dance();
 	}
 }
 

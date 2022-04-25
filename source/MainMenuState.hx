@@ -34,15 +34,23 @@ class MainMenuState extends MusicBeatState
 
 	var bg:FlxSprite;
 	var magenta:FlxSprite;
-	var interp:Interp;
 	var camFollow:FlxObject;
 	var tween:FlxTween;
 
-	public function callInterp(func_name:String, args:Array<Dynamic>){
-        if (!interp.variables.exists(func_name)) return;
+	// hscript stuff
+	public var hsArray:Array<FunkyHscript> = [];
 
-        var method = interp.variables.get(func_name);
-        Reflect.callMethod(interp,method,args);
+	public function callInterp(func_name:String, args:Array<Dynamic>)
+	{
+		for (i in 0...hsArray.length) {
+			hsArray[i].call(func_name, args);
+		}
+	}
+
+	public function setInterp(key:String, val:Dynamic) {
+		for (i in 0...hsArray.length) {
+			hsArray[i].interp.variables.set(key, val);
+		}
 	}
 
 	override function create()
@@ -52,7 +60,23 @@ class MainMenuState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus", null);
 		#end
 
-		interp = new Interp();
+		/*var pushedFiles:Array<String> = []; // doin' this later maybe?
+		var foldersToScan:Array<String> = [Paths.getPreloadPath('scripts/')];
+
+		for (folder in foldersToScan)
+		{
+			if(FileSystem.exists(folder))
+			{
+				for (file in FileSystem.readDirectory(folder))
+				{
+					if(file.endsWith('.lua') && !pushedFiles.contains(file))
+					{
+						hsArray.push(new FunkyHscript(folder + file));
+						pushedFiles.push(file);
+					}
+				}
+			}
+		}*/
 
 		if (!FlxG.sound.music.playing)
 		{
@@ -91,8 +115,8 @@ class MainMenuState extends MusicBeatState
 
 		for (i in 0...optionShit.length)
 		{
-			var offsetY:Float = -90;
-			var offsetX:Float = -10;
+			var offsetY:Float = -270;
+			var offsetX:Float = -230;
 			var menuItem:FlxSprite = new FlxSprite(0 + offsetX, (i * 160) + offsetY);
 			menuItem.scale.x = scale;
 			menuItem.scale.y = scale;

@@ -1,5 +1,6 @@
 package;
 
+import sys.FileSystem;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
 import hscript.Checker;
@@ -62,10 +63,6 @@ class PlayState extends MusicBeatState
 	 */
 	public static var instance:PlayState;
 
-	public static var script:String = '';
-
-	var interp:Interp;
-
 	public static var curStage:String = '';
 	public static var SONG:SwagSong;
 	public static var isStoryMode:Bool = false;
@@ -90,8 +87,8 @@ class PlayState extends MusicBeatState
 	private static var prevCamFollow:FlxObject;
 
 	public var strumLineNotes:FlxTypedGroup<Strum>;
-	private var cpuStrums:FlxTypedGroup<Strum>;
-	private var playerStrums:FlxTypedGroup<Strum>;
+	public var cpuStrums:FlxTypedGroup<Strum>;
+	public var playerStrums:FlxTypedGroup<Strum>;
 	public var grpNoteSplashes:FlxTypedGroup<NoteSplash>;
 
 	private var camZooming:Bool = false;
@@ -140,11 +137,11 @@ class PlayState extends MusicBeatState
 
 	private var iconP1:HealthIcon;
 	private var iconP2:HealthIcon;
-	private var camHUD:FlxCamera;
 
+	//the cameras
+	public var camGame:FlxCamera;
+	public var camHUD:FlxCamera;
 	public var camCustom:FlxCamera;
-
-	private var camGame:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 
@@ -220,13 +217,20 @@ class PlayState extends MusicBeatState
 	// Less laggy controls
 	private var keysArray:Array<Dynamic>;
 
+	// hscript stuff
+	public var hsArray:Array<FunkyHscript> = [];
+
 	public function callInterp(func_name:String, args:Array<Dynamic>)
 	{
-		if (!interp.variables.exists(func_name))
-			return;
+		for (i in 0...hsArray.length) {
+			hsArray[i].call(func_name, args);
+		}
+	}
 
-		var method = interp.variables.get(func_name);
-		Reflect.callMethod(interp, method, args);
+	public function setInterp(key:String, val:Dynamic) {
+		for (i in 0...hsArray.length) {
+			hsArray[i].interp.variables.set(key, val);
+		}
 	}
 
 	override public function create()
@@ -240,44 +244,6 @@ class PlayState extends MusicBeatState
 		misses = 0;
 		combo = 0;
 		highestCombo = 0;
-
-		if (Assets.exists(Paths.script("script")))
-		{
-			script = CoolUtil.useless(Paths.script("script"));
-		}
-		else
-		{
-			script = "trace('No script was found. Ignoring!')";
-		}
-
-		interp = new Interp();
-		var parser = new Parser();
-		var program = parser.parseString(script);
-
-		// setup vars :()
-		interp.variables.set("SongName", SONG.song.toLowerCase());
-		interp.variables.set("Speed", songSpeed);
-		interp.variables.set("BPM", SONG.bpm);
-
-		interp.variables.set("curStep", curStep);
-		interp.variables.set("curBeat", curBeat);
-
-		interp.variables.set("Math", Math);
-			interp.variables.set("openCoolLink", function(link:String){
-			FlxG.openURL(link);
-		});
-
-		// gonna add these individualy
-
-		interp.variables.set("camGame", camGame);
-		interp.variables.set("camHud", camHUD);
-
-		// wtf is this
-		interp.variables.set("camCustom", camCustom);
-
-		interp.execute(program);
-
-		callInterp("onCreate", []);
 
 		// var gameCam:FlxCamera = FlxG.camera;
 		camGame = new FlxCamera();
@@ -801,9 +767,23 @@ class PlayState extends MusicBeatState
 
 		add(boyfriend);
 
-		interp.variables.set("bf", boyfriend);
-		interp.variables.set("dad", dad);
-		interp.variables.set("gf", gf);
+		var pushedFiles:Array<String> = [];
+		var foldersToScan:Array<String> = [Paths.getPreloadPath('scripts/')];
+
+		for (folder in foldersToScan)
+		{
+			if(FileSystem.exists(folder))
+			{
+				for (file in FileSystem.readDirectory(folder))
+				{
+					if(file.endsWith('.lua') && !pushedFiles.contains(file))
+					{
+						hsArray.push(new FunkyHscript(folder + file));
+						pushedFiles.push(file);
+					}
+				}
+			}
+		}
 
 		var doof:DialogueBox = new DialogueBox(false, dialogue);
 		// doof.x += 70;
@@ -828,10 +808,6 @@ class PlayState extends MusicBeatState
 
 		cpuStrums = new FlxTypedGroup<Strum>();
 		playerStrums = new FlxTypedGroup<Strum>();
-
-		interp.variables.set("strumLineNotes", strumLineNotes);
-		interp.variables.set("playerStrums", playerStrums);
-		interp.variables.set("cpuStrums", cpuStrums);
 
 		// startCountdown();
 
@@ -924,8 +900,6 @@ class PlayState extends MusicBeatState
 		scoreTxt.borderSize = 2;
 		add(scoreTxt);
 
-		interp.variables.set("scoreTxt", scoreTxt);
-
 		botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
@@ -969,14 +943,6 @@ class PlayState extends MusicBeatState
 
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
-
-		interp.variables.set("tweenObject", function(object:Dynamic, result:Dynamic, time:Float, ease:String) { 
-			var newTween = FlxTween.tween(object, result, time, {ease: getFlxEaseByString(ease)});
-		});
-
-		interp.variables.set("changeSpeed", function(speed:Float, time:Float) { 
-			changeSpeed(speed, time);
-		});
 
 		var daSong:String = Paths.formatToSongPath(curSong);
 		if (isStoryMode)
@@ -1034,6 +1000,7 @@ class PlayState extends MusicBeatState
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, handleInput);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, releaseInput);
 
+		callInterp("onCreatePost", []);
 		super.create();
 
 		CustomFadeTransition.nextCamera = camCustom;
@@ -1609,7 +1576,9 @@ class PlayState extends MusicBeatState
 		callInterp("onUpdate", [elapsed]);
 
 		//SONG.speed = interp.variables.get("Speed"); // replaced by speed changing function, also this is kinda lame ngl
-		SONG.bpm = interp.variables.get("BPM");
+		for (i in 0...hsArray.length) {
+			SONG.bpm = hsArray[i].interp.variables.get("BPM");
+		}
 
 		var divider:String = ' | ';
 
@@ -2825,7 +2794,7 @@ class PlayState extends MusicBeatState
 		super.stepHit();
 
 		callInterp("onStepHit", []);
-		interp.variables.set("curStep", curStep);
+		setInterp("curStep", curStep);
 
 		if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > 20
 			|| (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > 20))
@@ -2845,7 +2814,7 @@ class PlayState extends MusicBeatState
 		super.beatHit();
 
 		callInterp("onBeatHit", []);
-		interp.variables.set("curBeat", curBeat);
+		setInterp("curBeat", curBeat);
 
 		if (generatedMusic)
 		{
@@ -3080,7 +3049,7 @@ class PlayState extends MusicBeatState
 
 	var curLight:Int = 0;
 
-	function changeSpeed(newValue:Float, changeDuration:Float) {
+	public function changeSpeed(newValue:Float, changeDuration:Float) {
 		songSpeedTween = FlxTween.tween(this, {songSpeed: newValue}, changeDuration, {ease: FlxEase.linear, onComplete:
 			function (twn:FlxTween)
 			{
@@ -3096,47 +3065,5 @@ class PlayState extends MusicBeatState
 			finishTimer.active = condition;
 		if (songSpeedTween != null)
 			songSpeedTween.active = condition;
-	}
-
-	function getFlxEaseByString(?ease:String = '') {
-		switch(ease.toLowerCase().trim()) {
-			case 'backin': return FlxEase.backIn;
-			case 'backinout': return FlxEase.backInOut;
-			case 'backout': return FlxEase.backOut;
-			case 'bouncein': return FlxEase.bounceIn;
-			case 'bounceinout': return FlxEase.bounceInOut;
-			case 'bounceout': return FlxEase.bounceOut;
-			case 'circin': return FlxEase.circIn;
-			case 'circinout': return FlxEase.circInOut;
-			case 'circout': return FlxEase.circOut;
-			case 'cubein': return FlxEase.cubeIn;
-			case 'cubeinout': return FlxEase.cubeInOut;
-			case 'cubeout': return FlxEase.cubeOut;
-			case 'elasticin': return FlxEase.elasticIn;
-			case 'elasticinout': return FlxEase.elasticInOut;
-			case 'elasticout': return FlxEase.elasticOut;
-			case 'expoin': return FlxEase.expoIn;
-			case 'expoinout': return FlxEase.expoInOut;
-			case 'expoout': return FlxEase.expoOut;
-			case 'quadin': return FlxEase.quadIn;
-			case 'quadinout': return FlxEase.quadInOut;
-			case 'quadout': return FlxEase.quadOut;
-			case 'quartin': return FlxEase.quartIn;
-			case 'quartinout': return FlxEase.quartInOut;
-			case 'quartout': return FlxEase.quartOut;
-			case 'quintin': return FlxEase.quintIn;
-			case 'quintinout': return FlxEase.quintInOut;
-			case 'quintout': return FlxEase.quintOut;
-			case 'sinein': return FlxEase.sineIn;
-			case 'sineinout': return FlxEase.sineInOut;
-			case 'sineout': return FlxEase.sineOut;
-			case 'smoothstepin': return FlxEase.smoothStepIn;
-			case 'smoothstepinout': return FlxEase.smoothStepInOut;
-			case 'smoothstepout': return FlxEase.smoothStepInOut;
-			case 'smootherstepin': return FlxEase.smootherStepIn;
-			case 'smootherstepinout': return FlxEase.smootherStepInOut;
-			case 'smootherstepout': return FlxEase.smootherStepOut;
-		}
-		return FlxEase.linear;
 	}
 }
