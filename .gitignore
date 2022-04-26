@@ -1,3 +1,4 @@
 export/
 .vscode/
 art/flashFiles/credits.fla
+.DS_Store
