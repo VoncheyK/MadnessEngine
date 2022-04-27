@@ -78,11 +78,6 @@ class MainMenuState extends MusicBeatState
 			}
 		}*/
 
-		if (!FlxG.sound.music.playing)
-		{
-			FlxG.sound.playMusic(Paths.music('freakyMenu'));
-		}
-
 		persistentUpdate = persistentDraw = true;
 
 		bg = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));

@@ -34,7 +34,7 @@ class FreeplayState extends MusicBeatState
 	var intendedScore:Int = 0;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
-	private var curPlaying:Bool = false;
+	public static var songPlaying:Bool = false;
 
 	private var iconArray:Array<HealthIcon> = [];
 	private var scoreBG:FlxSprite;
@@ -52,15 +52,6 @@ class FreeplayState extends MusicBeatState
 	override function create()
 	{
 		persistentUpdate = true;
-
-		if (FlxG.sound.music.playing)
-			Conductor.changeBPM(102);
-
-		if (FlxG.sound.music != null)
-		{
-			if (!FlxG.sound.music.playing)
-				FlxG.sound.playMusic(Paths.music('freakyMenu'));
-		}
  
 		#if desktop
 		// Updating Discord Rich Presence
@@ -90,6 +81,10 @@ class FreeplayState extends MusicBeatState
 
 			songs.push(meta);
 		}
+
+		#if PRELOAD_ALL
+		if (!songPlaying) Conductor.changeBPM(102);
+		#end
 
 		bg = new FlxSprite().loadGraphic(Paths.image('menuBGBlue'));
 		add(bg);
@@ -272,6 +267,7 @@ class FreeplayState extends MusicBeatState
 				vocals.volume = 0.7;
 
 				instPlaying = curSelected;
+				songPlaying = true;
 
 				trace('playing ' + poop);
 

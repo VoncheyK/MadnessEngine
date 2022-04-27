@@ -135,8 +135,8 @@ class PlayState extends MusicBeatState
 
 	private var bgGirls:BackgroundGirls;
 
-	private var iconP1:HealthIcon;
-	private var iconP2:HealthIcon;
+	public var iconP1:HealthIcon;
+	public var iconP2:HealthIcon;
 
 	//the cameras
 	public var camGame:FlxCamera;
@@ -144,6 +144,16 @@ class PlayState extends MusicBeatState
 	public var camCustom:FlxCamera;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
+
+	var curText:Int = 0;
+	// Text - Color - Italic
+	var botplayQuotes:Array<Dynamic> = [
+		["[BOTPLAY]", "FFFFFF", false],
+		["[SKILL ISSUE]", "FFFFFF", false],
+		["[HI MOM]", "FFFFFF", false],
+		["Rank: [BFC]", "FFFFFF", false], // BFC stands for Bot Full Combo
+		["[FORKLIFT CERTIFICATE REVOKED]", "FF0000", true] // haha get noobed
+	];
 
 	var hscriptObjects:Array<Dynamic> = [];
 	var wiggleShit:WiggleEffect = new WiggleEffect();
@@ -272,7 +282,8 @@ class PlayState extends MusicBeatState
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
 
-		switch (SONG.song.toLowerCase())
+		var dialogueSong:String = Paths.formatToSongPath(SONG.song);
+		switch (dialogueSong.toLowerCase())
 		{
 			case 'senpai':
 				dialogue = CoolUtil.coolTextFile(Paths.txt('senpai/senpaiDialogue'));
@@ -348,7 +359,7 @@ class PlayState extends MusicBeatState
 				add(halloweenBG);
 
 				isHalloween = true;
-			case 'pico' | 'blammed' | 'philly':
+			case 'pico' | 'blammed' | 'philly-nice':
 				curStage = 'philly';
 
 				var bg:FlxSprite = new FlxSprite(-100).loadGraphic(Paths.image('philly/sky'));
@@ -634,7 +645,11 @@ class PlayState extends MusicBeatState
 			 */
 
 			default:
-				defaultCamZoom = 0.9;
+				if (SONG.song.toLowerCase() == "disruption")
+					defaultCamZoom = 0.6;
+				else
+					defaultCamZoom = 0.9;
+
 				curStage = 'stage';
 				var bg:FlxSprite = new FlxSprite(-600, -200).loadGraphic(Paths.image('stageback'));
 				bg.antialiasing = true;
@@ -691,6 +706,12 @@ class PlayState extends MusicBeatState
 
 		switch (SONG.player2)
 		{
+			case 'bamfor':
+				camPos.set(dad.getMidpoint().x + 150, dad.getMidpoint().y + 500);
+				camPos.x += -190;
+				dad.x += -1870;
+				dad.y += -2300;
+				dad.scale.set(1.2, 1.2);
 			case 'gf':
 				dad.setPosition(gf.x, gf.y);
 				gf.visible = false;
@@ -887,11 +908,11 @@ class PlayState extends MusicBeatState
 		timeBarBG.sprTracker = timeBar;
 
 		iconP1 = new HealthIcon(SONG.player1, true);
-		iconP1.y = healthBar.y - (iconP1.height / 2);
+		iconP1.y = healthBar.y - 75;
 		add(iconP1);
 
 		iconP2 = new HealthIcon(SONG.player2, false);
-		iconP2.y = healthBar.y - (iconP2.height / 2);
+		iconP2.y = healthBar.y - 75;
 		add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
@@ -910,17 +931,10 @@ class PlayState extends MusicBeatState
 			botplayTxt.y = timeBarBG.y - 78;
 		}
 
-		switch (FlxG.random.int(1, 4))
-		{
-			case 1:
-				botplayTxt.text = "[BOTPLAY]";
-			case 2:
-				botplayTxt.text = "[SKILL ISSUE]";
-			case 3:
-				botplayTxt.text = "[HI MOM]";
-			case 4:
-				botplayTxt.text = "Rank: [BFC]"; // BFC stands for Bot Full Combo
-		}
+		curText = FlxG.random.int(0, botplayQuotes.length);
+		botplayTxt.text = botplayQuotes[curText][0];
+		botplayTxt.color = getBotplayTxtColor(1);
+		botplayTxt.italic = botplayQuotes[curText][2];
 
 		botplayTxt.cameras = [camCustom];
 		strumLineNotes.cameras = [camHUD];
@@ -1549,27 +1563,20 @@ class PlayState extends MusicBeatState
 		else if (!ClientSettings.botPlay && alreadyChanged)
 		{
 			scoreTxt.visible = true;
-			switch (FlxG.random.int(1, 4))
-			{
-				case 1:
-					botplayTxt.text = "[BOTPLAY]";
-				case 2:
-					botplayTxt.text = "[SKILL ISSUE]";
-				case 3:
-					botplayTxt.text = "[HI MOM]";
-				case 4:
-					botplayTxt.text = "Rank: [BFC]"; // BFC stands for Bot Full Combo
-			}
+			curText = FlxG.random.int(0, botplayQuotes.length);
+			botplayTxt.text = botplayQuotes[curText][0];
+			botplayTxt.color = getBotplayTxtColor(1);
+			botplayTxt.italic = botplayQuotes[curText][2];
 			alreadyChanged = false;
 		}
 
 		if (FlxG.keys.justPressed.NINE)
 		{
-			if (iconP1.animation.curAnim.name == 'bf-old')
-				iconP1.animation.play(SONG.player1);
-			else
-				iconP1.animation.play('bf-old');
+			iconP1.swapOldIcon();
 		}
+
+		if (dad.curCharacter == "bamfor")
+			dad.y += (Math.sin(elapsed) * 0.6);
 
 		super.update(elapsed);
 
@@ -1779,32 +1786,8 @@ class PlayState extends MusicBeatState
 
 		if (camZooming)
 		{
-			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, 0.95);
-			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, 0.95);
-		}
-
-		if (curSong.toLowerCase() == 'blammed')
-		{
-			var sh_r:Float = 600;
-			var rotRateDad = curStep / 9.5;
-			var dad_toY = -2450 + -Math.sin(rotRateDad * 2) * sh_r * 0.45;
-			var dad_toX = -330 -Math.cos(rotRateDad) * sh_r;
-
-			sh_r += (60 - sh_r) / 32;
-
-			rotRateDad *= 1.2;
-
-			dad.x += (dad_toX - dad.x) / 12;
-			dad.y += (dad_toY - dad.y) / 12;
-
-			var pene = 0.07;
-			dad.angle = Math.sin(rotRateDad) * sh_r * pene / 4;
-
-			boyfriend.alpha = 1;
-			boyfriend.angle = Math.sin(rotRateDad) * sh_r * pene; // + Math.cos(curStep) * 5;
-
-			boyfriend.x = dad.x + 120 + Math.cos((boyfriend.angle + 90) * (Math.PI / 180)) * 150;
-			boyfriend.y = dad.y + 300 + Math.sin((boyfriend.angle + 90) * (Math.PI / 180)) * 150;
+			FlxG.camera.zoom = FlxMath.lerp(defaultCamZoom, FlxG.camera.zoom, CoolUtil.bound(1 - (elapsed * 3.125), 0, 1));
+			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, CoolUtil.bound(1 - (elapsed * 3.125), 0, 1));
 		}
 
 		FlxG.watch.addQuick("beatShit", curBeat);
@@ -2896,7 +2879,7 @@ class PlayState extends MusicBeatState
 
 				if (FlxG.random.bool(10) && fastCarCanDrive)
 					fastCarDrive();
-			case "philly":
+			case "philly-nice":
 				if (!trainMoving)
 					trainCooldown += 1;
 
@@ -3065,5 +3048,13 @@ class PlayState extends MusicBeatState
 			finishTimer.active = condition;
 		if (songSpeedTween != null)
 			songSpeedTween.active = condition;
+	}
+
+	function getBotplayTxtColor(num:Int) {
+		var col:String = botplayQuotes[curText][num];
+		if (!col.startsWith('0x')) {
+			col = '0xFF' + col;
+		}
+		return Std.parseInt(col);
 	}
 }

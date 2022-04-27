@@ -1,6 +1,5 @@
 package;
 
-import flixel.FlxG;
 import flixel.FlxSprite;
 import openfl.utils.Assets as OpenFlAssets;
 
@@ -8,46 +7,49 @@ using StringTools;
 
 class HealthIcon extends FlxSprite
 {
-	public var char:String = 'bf';
-	public var isPlayer:Bool = false;
-	public var isOldIcon:Bool = false;
+	private var char:String = '';
+	private var isPlayer:Bool = false;
+	private var isOldIcon:Bool = false;
 	public var sprTracker:FlxSprite;
+	public var size:Int;
 
-	public function new(?char:String = "bf", ?isPlayer:Bool = false)
+	public function new(char:String = 'bf', isPlayer:Bool = false, size:Int = 150)
 	{
 		super();
-
-		this.char = char;
+		isOldIcon = (char == 'bf-old');
 		this.isPlayer = isPlayer;
-
-		isPlayer = isOldIcon = false;
-
+		this.size = size;
 		changeIcon(char);
 		scrollFactor.set();
 	}
 
 	public function swapOldIcon()
 	{
-		(isOldIcon = !isOldIcon) ? changeIcon("bf-old") : changeIcon(char);
+		if (isOldIcon = !isOldIcon)
+			changeIcon('bf-old');
+		else
+			changeIcon('bf');
 	}
 
 	public function changeIcon(char:String)
 	{
-		if (char != 'bf-pixel' && char != 'bf-old')
-			char = char.split("-")[0];
+		if (this.char != char)
+		{
+			var name:String = 'icons/' + char;
+			if (!Paths.assetExists('images/' + name + '.png', IMAGE))
+				name = 'icons/icon-' + char;
+			if (!Paths.assetExists('images/' + name + '.png', IMAGE))
+				name = 'icons/icon-face';
+			var file:Dynamic = Paths.image(name);
+			loadGraphic(file, true, size, size);
 
-		if (!OpenFlAssets.exists(Paths.image('icons/icon-' + char)))
-			char = 'face';
+			animation.add(char, [0, 1], 0, false, isPlayer);
+			animation.play(char);
+			this.char = char;
 
-		loadGraphic(Paths.loadImage('icons/icon-' + char), true, 150, 150);
-
-		if (char.endsWith('-pixel') || char.startsWith('senpai') || char.startsWith('spirit'))
-			antialiasing = false
-		else
-			antialiasing = FlxG.save.data.antialiasing;
-
-		animation.add(char, [0, 1], 0, false, isPlayer);
-		animation.play(char);
+			antialiasing = true;
+			if (char.endsWith('-pixel')) antialiasing = false;
+		}
 	}
 
 	override function update(elapsed:Float)

@@ -12,6 +12,10 @@ class Paths
 {
 	inline public static var SOUND_EXT = #if web "mp3" #else "ogg" #end;
 
+	// god mode activated
+	public static var voicesFile = "Voices";
+	public static var instFile = "Inst";
+
 	static var currentLevel:String;
 
 	static public function setCurrentLevel(name:String)
@@ -51,6 +55,19 @@ class Paths
 	public static function getPreloadPath(file:String = "")
 	{
 		return 'assets/$file';
+	}
+
+	static public function audioExists(daPath:String) { // wasn't hard to do this at all
+		if (daPath == null || daPath == "")
+			return false;
+		return OpenFlAssets.exists(daPath, AssetType.SOUND) || OpenFlAssets.exists(daPath, AssetType.MUSIC);
+	}
+
+	inline static public function assetExists(key:String, type:AssetType, ?library:String) { // better i think?
+		if (OpenFlAssets.exists(Paths.getPath(key, type, library))) {
+			return true;
+		}
+		return false;
 	}
 
 	inline static public function formatToSongPath(path:String) {
@@ -97,14 +114,13 @@ class Paths
 		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
 	}
 
-	inline static public function voices(song:String)
-	{
-		return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+	inline static public function voices(song:String):Any {
+		var result = 'songs:assets/songs/${song.toLowerCase().replace(' ', '-')}/' + voicesFile + '.' + SOUND_EXT;
+		return audioExists(result) ? result : null;
 	}
 
-	inline static public function inst(song:String)
-	{
-		return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+	inline static public function inst(song:String):Any {
+		return 'songs:assets/songs/${song.toLowerCase().replace(' ', '-')}/' + instFile + '.' + SOUND_EXT;
 	}
 
 	inline static public function image(key:String, ?library:String)
