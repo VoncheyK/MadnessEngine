@@ -797,7 +797,7 @@ class PlayState extends MusicBeatState
 			{
 				for (file in FileSystem.readDirectory(folder))
 				{
-					if(file.endsWith('.lua') && !pushedFiles.contains(file))
+					if(file.endsWith('.hscript') && !pushedFiles.contains(file))
 					{
 						hsArray.push(new FunkyHscript(folder + file));
 						pushedFiles.push(file);
@@ -1981,7 +1981,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public var isDead:Bool = false; // Don't mess with this on Lua!!!
+	public var isDead:Bool = false; // Don't mess with this on Hscript!!!
 	function doDeathCheck(?skipHealthCheck:Bool = false)
 	{
 		if (((skipHealthCheck) || health <= 0) && !isDead)
