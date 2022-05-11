@@ -23,7 +23,7 @@ class FunkyHscript
 
 		// heck yea
 		interp.variables.set("addScript", function(hscriptFile:String, ?ignoreRunning:Bool = false) {
-			var daScript = hscriptFile + ".lua";
+			var daScript = hscriptFile + ".hscript";
 			var push = false;
 
 			daScript = Paths.getPreloadPath(daScript);
