@@ -21,6 +21,7 @@ class Character extends FlxSprite
 
 	public var holdTimer:Float = 0;
 
+	public var iconColor:String = "FF000000";
 	public function new(x:Float, y:Float, ?character:String = "bf", ?isPlayer:Bool = false)
 	{
 		super(x, y);
@@ -457,6 +458,53 @@ class Character extends FlxSprite
 
 				antialiasing = false;
 
+			case 'bfnightmareCup':
+				//long line
+				//Paths.getSparrowAtlas('BoyFriend_NM', 'mods/cuphead');
+				var img = Paths.image('BoyFriend_NM', 'mods/cuphead');
+				var xml = Paths.file('images/BoyFriend_NM.xml', 'mods/cuphead');
+				var splitimg = img.split(':');
+				trace(splitimg);
+				var splitxml = xml.split(':');
+				trace(splitxml);
+				frames = Paths.alternateSparrowAtlas(splitimg[1],splitxml[1]);
+
+				animation.addByPrefix('idle', 'BF idle dance instance 1', 24, false);
+				animation.addByPrefix('singUP', 'BF NOTE UP instance 1', 24, false);
+				animation.addByPrefix('singDOWN', 'BF NOTE DOWN instance 1' ,24, false);
+				animation.addByPrefix('singLEFT', 'BF NOTE LEFT instance 1', 24, false);
+				animation.addByPrefix('singRIGHT', 'BF NOTE RIGHT instance 1', 24, false);
+				animation.addByPrefix('singRIGHTmiss', 'BF NOTE RIGHT MISS instance 1', 24, false);
+				animation.addByPrefix('singLEFTmiss', 'BF NOTE LEFT MISS instance 1', 24, false);
+				animation.addByPrefix('singDOWNmiss', 'BF NOTE DOWN MISS instance 1', 24, false);
+				animation.addByPrefix('singUPmiss', 'BF NOTE UP MISS instance 1', 24, false);
+				animation.addByPrefix('attack', '0BF attack instance 1', 24, false);
+				animation.addByPrefix('dodge', 'boyfriend dodge instance 1', 24, false);
+				animation.addByPrefix('hit', 'BF hit instance 1', 24, false);
+
+				addOffset('idle');
+				addOffset('singUP');
+				addOffset('singDOWN');
+				addOffset('singLEFT');
+				addOffset('singRIGHT');
+				addOffset('singRIGHTmiss');
+				addOffset('singLEFTmiss');
+				addOffset('singDOWNmiss');
+				addOffset('singUPmiss');
+				addOffset('attack');
+				addOffset('dodge');
+				addOffset('hit');
+
+				playAnim('idle');
+
+				flipX = true;
+
+				antialiasing = true;
+
+			case 'cupheadNightmare':
+				
+				
+
 			case 'spirit':
 				frames = Paths.getPackerAtlas('weeb/spirit');
 				animation.addByPrefix('idle', "idle spirit_", 24, false);
@@ -505,6 +553,17 @@ class Character extends FlxSprite
 				playAnim('idle');
 		}
 
+		//iconcolor shit
+		var colorSheet:Array<String> = CoolUtil.coolTextFile(Paths.txt('iconColor'));			
+		for (data in colorSheet)
+		{	//each line
+			var colorData:Array<String> = data.split(':');
+			
+			//checks if the name matches the character
+			if(colorData[0] == curCharacter)
+				iconColor = colorData[1];
+		}
+
 		dance();
 
 		if (isPlayer)
@@ -543,11 +602,8 @@ class Character extends FlxSprite
 		/*
 			this wasn't tested, and I don't wanna risk
 			use this to load offset files
-
 			loadOffsetFile(curCharacter);
-
 			needs to be added before playAnim('idle'); or playAnim('danceRight');
-
 		*/
 	}
 

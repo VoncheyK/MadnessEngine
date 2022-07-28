@@ -51,6 +51,15 @@ class Paths
 		return 'assets/$file';
 	}
 
+	inline static public function mods(modLib:String)
+	{
+		return 'assets/mods/$modLib';
+	}
+
+	inline static public function getFromMods(modLib:String, dir:String, file:String){
+		return Paths.mods(modLib)+'/$dir/'+file; //dumbass me (ziad/zoardedz) made a typo here and it was making it look like modname,/DIR/filename nad the dir wouldnt change it would just be dir bec i forgor $ sign
+	}
+
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)
 	{
 		return getPath(file, type, library);
@@ -132,10 +141,21 @@ class Paths
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
+		/*trace(image(key, library));
+		trace(file('images/$key.xml', library));*/
+	}
+
+	inline static public function alternateSparrowAtlas(image:Dynamic, xml:Dynamic)
+	{
+		return FlxAtlasFrames.fromSparrow(image, xml);
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
+	}
+	
+	inline static public function getZip(key:String, library:String){
+		return 'assets/$library/$key.zip';
 	}
 }

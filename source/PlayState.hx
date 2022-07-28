@@ -48,6 +48,7 @@ import openfl.display.StageQuality;
 import openfl.filters.ShaderFilter;
 import ClientSettings;
 import FunkyHscript;
+import helpers.Vector3;
 
 using StringTools;
 
@@ -150,6 +151,8 @@ class PlayState extends MusicBeatState
 	var songScore:Int = 0;
 	public var scoreTxt:FlxText;
 	public var timeTxt:FlxText;
+	public static var loadingFromMods:Bool = false;
+	public static var modlib:String = "";
 
 	var songLength:Float = 0;
 
@@ -179,6 +182,8 @@ class PlayState extends MusicBeatState
 	// Botplay Text and Blink (Sine)
 	public var botplaySine:Float = 0;
 	public var botplayTxt:FlxText;
+
+	public static var trackedAssets:Array<FlxBasic> = [];
 
 	public function callInterp(func_name:String, args:Array<Dynamic>){
         if (!interp.variables.exists(func_name)) {return;}
@@ -218,6 +223,16 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curBeat", curBeat); 
 
 		interp.variables.set("Math", Math); 
+
+		interp.variables.set("isModLib", loadingFromMods);
+
+		interp.variables.set("setProperty", function(property:String, newValue:Dynamic){
+			Reflect.setProperty(this, property, newValue);
+		});
+
+		interp.variables.set("getProperty", function(property:String){
+			return Reflect.getProperty(this, property);
+		});
 		
 		interp.execute(program);
 	
@@ -1830,9 +1845,10 @@ class PlayState extends MusicBeatState
 			vocals.stop();
 			FlxG.sound.music.stop();
 
-			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 
-			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, loadingFromMods,modlib));
+			unloadAssets();
+			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, loadingFromMods));
 			
 			#if desktop
 			// Game Over doesn't get his own variable because it's only used here
@@ -1901,6 +1917,8 @@ class PlayState extends MusicBeatState
 				transIn = FlxTransitionableState.defaultTransIn;
 				transOut = FlxTransitionableState.defaultTransOut;
 
+				unloadAssets();
+
 				FlxG.switchState(new StoryMenuState());
 
 				// if ()
@@ -1943,12 +1961,14 @@ class PlayState extends MusicBeatState
 
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
 				FlxG.sound.music.stop();
+				unloadAssets();
 
-				LoadingState.loadAndSwitchState(new PlayState());
+				LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods, modlib);
 			}
 		}
 		else
 		{
+			unloadAssets();
 			trace('WENT BACK TO FREEPLAY??');
 			FlxG.switchState(new FreeplayState());
 		}
@@ -2326,7 +2346,7 @@ class PlayState extends MusicBeatState
 				health -= 1000;
 			
 			default:
-				trace("Since it's a normal note, do nothing!");
+				//nada
 		}
 	}
 
@@ -2755,6 +2775,24 @@ class PlayState extends MusicBeatState
 		PlayState.boyfriend.playAnim('scared', true);
 		PlayState.gf.playAnim('scared', true);
 	}
+
+	override function add(Object:FlxBasic):FlxBasic
+		{
+			trackedAssets.insert(trackedAssets.length, Object);
+			return super.add(Object);
+		}
+	
+		public function unloadAssets():Void
+		{
+			openfl.utils.Assets.unloadLibrary("shared");
+			if (loadingFromMods)
+				openfl.utils.Assets.unloadLibrary("mods" + "/" + modlib);
+
+			for (asset in trackedAssets)
+			{
+				remove(asset);
+			}
+		}
 	
 
 	var curLight:Int = 0;

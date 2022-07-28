@@ -95,6 +95,17 @@ class PauseSubState extends MusicBeatSubstate
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
 
+	function unloadPlayStateAssets():Void
+	{
+		openfl.utils.Assets.unloadLibrary("shared");
+		if (PlayState.loadingFromMods)
+			openfl.utils.Assets.unloadLibrary("mods" + "/" + PlayState.modlib);
+
+		for (asset in PlayState.trackedAssets){
+			remove(asset);
+		}
+	}
+
 	override function update(elapsed:Float)
 	{
 		if (pauseMusic.volume < 0.5)
@@ -143,9 +154,15 @@ class PauseSubState extends MusicBeatSubstate
 					ClientSettings.botPlay = false;
 					botText.visible = false;
 					if(PlayState.isStoryMode)
+					{
+						unloadPlayStateAssets();
 						FlxG.switchState(new StoryMenuState());
+					}
 					else
+					{
+						unloadPlayStateAssets();
 						FlxG.switchState(new FreeplayState());
+					}
 			}
 		}
 

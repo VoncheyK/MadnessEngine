@@ -14,10 +14,16 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	var stageSuffix:String = "";
 
-	public function new(x:Float, y:Float)
+	var loadingFromMods:Bool;
+
+	var directorymod:String;
+
+	public function new(x:Float, y:Float, loadingFromMods:Bool, modDir:String)
 	{
 		var daStage = PlayState.curStage;
 		var daBf:String = '';
+		this.loadingFromMods = loadingFromMods;
+		this.directorymod = modDir;
 		switch (daStage)
 		{
 			case 'school':
@@ -60,9 +66,17 @@ class GameOverSubstate extends MusicBeatSubstate
 			endBullshit();
 		}
 
+			if (bf.animation.curAnim.name == 'firstDeath' && bf.animation.curAnim.finished)
+			{
+				bf.playAnim('deathLoop');
+			}
+
 		if (controls.BACK)
 		{
 			FlxG.sound.music.stop();
+
+			remove(camFollow);
+			remove(bf);
 
 			if (PlayState.isStoryMode)
 				FlxG.switchState(new StoryMenuState());
@@ -107,7 +121,12 @@ class GameOverSubstate extends MusicBeatSubstate
 			{
 				FlxG.camera.fade(FlxColor.BLACK, 2, false, function()
 				{
-					LoadingState.loadAndSwitchState(new PlayState());
+					remove(camFollow);
+					remove(bf);
+					if (loadingFromMods)
+						LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods, directorymod);
+					else
+						LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods);
 				});
 			});
 		}

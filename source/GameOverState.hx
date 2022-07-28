@@ -12,13 +12,17 @@ class GameOverState extends FlxTransitionableState
 {
 	var bfX:Float = 0;
 	var bfY:Float = 0;
+	var loadingFromMods:Bool;
+	var modDir:String;
 
-	public function new(x:Float, y:Float)
+	public function new(x:Float, y:Float, loadingFromMods:Bool, modDir:String)
 	{
 		super();
 
 		bfX = x;
 		bfY = y;
+		this.loadingFromMods = loadingFromMods;
+		this.modDir = modDir;
 	}
 
 	override function create()
@@ -74,7 +78,10 @@ class GameOverState extends FlxTransitionableState
 			FlxG.sound.music.fadeOut(0.5, 0, function(twn:FlxTween)
 			{
 				FlxG.sound.music.stop();
-				LoadingState.loadAndSwitchState(new PlayState());
+				if (loadingFromMods)
+					LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods, modDir);
+				else
+					LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods);
 			});
 		}
 		super.update(elapsed);

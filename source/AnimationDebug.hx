@@ -44,13 +44,20 @@ class AnimationDebug extends FlxState
 
 		if (isDad)
 		{
-			dad = new Character(0, 0, daAnim);
+			/*dad = new Character(0, 0, daAnim);
 			dad.screenCenter();
 			dad.debugMode = true;
 			add(dad);
 
 			char = dad;
-			dad.flipX = false;
+			dad.flipX = false;*/
+			bf = new Boyfriend(0, 0);
+			bf.screenCenter();
+			bf.debugMode = true;
+			add(bf);
+
+			char = bf;
+			bf.flipX = false;
 		}
 		else
 		{

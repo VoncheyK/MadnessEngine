@@ -1,5 +1,7 @@
 package;
 
+import helpers.Vector3;
+import helpers.Modsupport;
 #if desktop
 import Discord.DiscordClient;
 import sys.thread.Thread;
@@ -27,6 +29,8 @@ import flixel.util.FlxTimer;
 import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
+import GameJolt.GameJoltAPI;
+import GameJolt;
 
 using StringTools;
 
@@ -41,14 +45,20 @@ class TitleState extends MusicBeatState
 	var ngSpr:FlxSprite;
 
 	var curWacky:Array<String> = [];
+	var trackedAssets:Array<Dynamic> = [];
 
 	var wackyImage:FlxSprite;
 
 	override public function create():Void
 	{
+		//fuck polymod!!11
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['testMod']});
 		#end
+		
+
+		var mods:Array<String> = CoolUtil.coolTextFile('mods.txt');
+		helpers.Modsupport.init("mods", mods);
 
 		PlayerSettings.init();
 
@@ -59,8 +69,9 @@ class TitleState extends MusicBeatState
 		super.create();
 
 		// normally APIStuff things would be in here but it's only for NG builds, aka it's useless
-		
 		FlxG.save.bind('funkin', 'ninjamuffin99');
+		GameJoltAPI.connect();
+		GameJoltAPI.authDaUser(FlxG.save.data.gjUser, FlxG.save.data.gjToken);
 
 		Highscore.load();
 
@@ -79,8 +90,10 @@ class TitleState extends MusicBeatState
 		}
 
 		#if FREEPLAY
+		unloadAssets();
 		FlxG.switchState(new FreeplayState());
 		#elseif CHARTING
+		unloadAssets();
 		FlxG.switchState(new ChartingState());
 		#else
 		new FlxTimer().start(1, function(tmr:FlxTimer)
@@ -280,6 +293,7 @@ class TitleState extends MusicBeatState
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
 				// Check if version is outdated
+				unloadAssets();
 				FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
@@ -402,4 +416,18 @@ class TitleState extends MusicBeatState
 			skippedIntro = true;
 		}
 	}
+
+	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
+		{
+			trackedAssets.insert(trackedAssets.length, Object);
+			return super.add(Object);
+		}
+	
+		function unloadAssets():Void
+		{
+			for (asset in trackedAssets)
+			{
+				remove(asset);
+			}
+		}
 }

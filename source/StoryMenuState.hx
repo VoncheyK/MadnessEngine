@@ -21,6 +21,9 @@ import lime.utils.Assets;
 #if polymod
 import polymod.Polymod;
 #end
+#if desktop
+import sys.FileSystem;
+#end
 
 using StringTools;
 
@@ -33,6 +36,7 @@ class StoryMenuState extends MusicBeatState
 	var curDifficulty:Int = 1;
 
 	public static var weekUnlocked:Array<Bool> = [];
+	var trackedAssets:Array<flixel.FlxBasic> = [];
 
 	var txtWeekTitle:FlxText;
 
@@ -282,6 +286,8 @@ class StoryMenuState extends MusicBeatState
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 
 				grpWeekText.members[curWeek].startFlashing();
+				unloadAssets();
+
 				grpWeekCharacters.members[1].animation.play('bfConfirm');
 				stopspamming = true;
 			}
@@ -305,10 +311,29 @@ class StoryMenuState extends MusicBeatState
 			PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + diffic, PlayState.storyPlaylist[0].toLowerCase());
 			PlayState.storyWeek = curWeek;
 			PlayState.campaignScore = 0;
-			new FlxTimer().start(1, function(tmr:FlxTimer)
-			{
-				LoadingState.loadAndSwitchState(new PlayState(), true);
-			});
+
+			var tempo:String = FileSystem.absolutePath(PlayState.storyPlaylist[0].toLowerCase());
+			var deez:Array<String> = tempo.split("/");
+
+			for (i in 0...deez.length){
+				if (deez[i] == "mods")
+					{
+						new FlxTimer().start(1, function(tmr:FlxTimer)
+							{
+								trace("loading from mods!");
+								LoadingState.loadAndSwitchState(new PlayState(), true, true, deez[i + 1]);
+							});
+					}
+					else
+					{
+						new FlxTimer().start(1, function(tmr:FlxTimer)
+							{
+								trace("loading from normal library!");
+								LoadingState.loadAndSwitchState(new PlayState(), true, false);
+							});
+					}
+			}
+
 		}
 	}
 
@@ -380,12 +405,14 @@ class StoryMenuState extends MusicBeatState
 
 	function updateText()
 	{
-		grpWeekCharacters.members[0].animation.play(weekData.weekCharacters[curWeek][0]);
-		grpWeekCharacters.members[1].animation.play(weekData.weekCharacters[curWeek][1]);
-		grpWeekCharacters.members[2].animation.play(weekData.weekCharacters[curWeek][2]);
-		txtTracklist.text = "Tracks\n\n";
+		for (i in 0...2)
+			grpWeekCharacters.members[i].animation.play(weekData.weekCharacters[curWeek][i]);
+		
+		txtTracklist.text = "Tracks\n";
 
-		switch (grpWeekCharacters.members[0].animation.curAnim.name)
+		var member0 = grpWeekCharacters.members[0];
+
+		switch (member0.animation.curAnim.name)
 		{
 			case 'parents-christmas':
 				grpWeekCharacters.members[0].offset.set(200, 200);
@@ -425,6 +452,20 @@ class StoryMenuState extends MusicBeatState
 		intendedScore = Highscore.getWeekScore(curWeek, curDifficulty);
 		#end
 	}
+
+	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
+		{
+			trackedAssets.insert(trackedAssets.length, Object);
+			return super.add(Object);
+		}
+	
+		function unloadAssets():Void
+		{
+			for (asset in trackedAssets)
+			{
+				remove(asset);
+			}
+		}
 }
 
 typedef WeekStuff = {

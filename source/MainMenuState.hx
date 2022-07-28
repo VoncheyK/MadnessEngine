@@ -1,5 +1,6 @@
 package;
 
+import netTest.MultiplayerMenu;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -30,11 +31,14 @@ class MainMenuState extends MusicBeatState
 		'story mode',
 		'freeplay',
 		//#if !switch 'switch', #end
-		'options'
+		'options',
+		'donate'
 	];
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
+
+	var trackedAssets:Array<Dynamic> = [];
 
 	override function create()
 	{
@@ -154,11 +158,7 @@ class MainMenuState extends MusicBeatState
 			{
 				if (optionShit[curSelected] == 'donate')
 				{
-					#if linux
-					Sys.command('/usr/bin/xdg-open', ["https://ninja-muffin24.itch.io/funkin", "&"]);
-					#else
-					FlxG.openURL('https://ninja-muffin24.itch.io/funkin');
-					#end
+					FlxG.switchState(new MultiplayerMenu());
 				}
 				else
 				{
@@ -184,7 +184,7 @@ class MainMenuState extends MusicBeatState
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
 								var daChoice:String = optionShit[curSelected];
-
+								unloadAssets();
 								switch (daChoice)
 								{
 									case 'story mode':
@@ -193,6 +193,7 @@ class MainMenuState extends MusicBeatState
 										FlxG.switchState(new FreeplayState());
 									case 'options':
 										FlxG.switchState(new OptionsMenu());
+									
 								}
 							});
 						}
@@ -231,4 +232,17 @@ class MainMenuState extends MusicBeatState
 			spr.updateHitbox();
 		});
 	}
+	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
+		{
+			trackedAssets.insert(trackedAssets.length, Object);
+			return super.add(Object);
+		}
+	
+		function unloadAssets():Void
+		{
+			for (asset in trackedAssets)
+			{
+				remove(asset);
+			}
+		}
 }

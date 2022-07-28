@@ -57,6 +57,7 @@
 		<library name="week4"    preload="true" />
 		<library name="week5"    preload="true" />
 		<library name="week6"    preload="true" />
+		<library name="mods"     preload="true"/>
 	</section>
 	
 	<section if="NO_PRELOAD_ALL">
@@ -69,8 +70,10 @@
 		<library name="week4"    preload="false" />
 		<library name="week5"    preload="false" />
 		<library name="week6"    preload="false" />
+		<library name="mods"     preload="false"/>
 	</section>
 	
+	<assets path="radmin/"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.ogg" if="web"/>
 	<assets path="assets/songs"    library="songs"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/shared"   library="shared"   exclude="*.ogg" if="web"/>
@@ -89,6 +92,10 @@
 	<assets path="assets/week5"    library="week5"    exclude="*.mp3" unless="web"/>
 	<assets path="assets/week6"    library="week6"    exclude="*.ogg" if="web"/>
 	<assets path="assets/week6"    library="week6"    exclude="*.mp3" unless="web"/>
+	<assets path="assets/mods"     library="mods"     exclude="*.ogg" if="web"/>
+	<assets path="assets/mods"     library="mods"    exclude="*.mp3" unless="web"/>
+	<assets path="MadnessCrashHandler.exe"/>
+	<assets path="mods.txt"/>
 	
 	<assets path='example_mods' rename='mods' embed='false'/>
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />
@@ -117,7 +124,13 @@
 	<haxelib name="faxe" if='switch'/>
 	<!-- haxelib name="polymod"-->
 	<haxelib name="discord_rpc" if="desktop"/>
-	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+	<haxelib name="hxcpp-debug-server" if="desktop"/>
+	<haxelib name="colyseus" />
+	<haxelib name="colyseus-websocket" />
+	<haxelib name="tentools" />
+	<haxelib name="systools" />
+	<ndll name="systools" haxelib="systools" />
+	<haxelib name="flixel-studio"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
@@ -160,6 +173,12 @@
 	<!-- _________________________________ Custom _______________________________ -->
 
 	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
+
+
+	
+	<haxedef name="HXCPP_CHECK_POINTER"/>  <!--makes null references cause errors-->
+	<haxedef name="HXCPP_STACK_LINE" />    <!--if you want line numbers-->
+	<haxedef name="HXCPP_STACK_TRACE"/>    <!--if you want stack traces-->
 	
 	<icon path="art/icon16.png" size='16'/>
 	<icon path="art/icon32.png" size='32'/>

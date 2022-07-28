@@ -1,6 +1,9 @@
 package;
 
 #if desktop
+import sys.FileSystem;
+#end
+#if desktop
 import Discord.DiscordClient;
 #end
 import flash.text.TextField;
@@ -41,6 +44,9 @@ class FreeplayState extends MusicBeatState
 
 	var text:FlxText;
 
+	var trackedAssets:Array<Dynamic> = [];
+
+	var isMod:Bool = false;
 	#if PRELOAD_ALL
 	var leText:String = "Press SPACE to listen to the Song";
 	var size:Int = 16;
@@ -63,9 +69,8 @@ class FreeplayState extends MusicBeatState
 		for (i in 0...initSonglist.length)
 		{
 			var data = initSonglist[i].split(":");
-			songs.push(new SongMetadata(data[0], Std.parseInt(data[1]), data[2]));
+			songs.push(new SongMetadata(data[0], Std.parseInt(data[1]), data[2]));	
 		}
-
 		/* 
 			if (FlxG.sound.music != null)
 			{
@@ -262,11 +267,29 @@ class FreeplayState extends MusicBeatState
 
 			PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 			PlayState.isStoryMode = false;
+
 			PlayState.storyDifficulty = curDifficulty;
+
+			var tempo:String = FileSystem.absolutePath(songs[curSelected].songName.toLowerCase());
+			var deez:Array<String> = tempo.split("/");
 
 			PlayState.storyWeek = songs[curSelected].week;
 			trace('CUR WEEK' + PlayState.storyWeek);
-			LoadingState.loadAndSwitchState(new PlayState());
+			for(i in 0...deez.length){
+				if (deez[i] == "mods")
+				{
+					unloadAssets();
+					LoadingState.loadAndSwitchState(new PlayState(), false, true, deez[i + 1]);
+					trace("loading from mods!");
+				}
+				else
+				{
+					unloadAssets();
+					LoadingState.loadAndSwitchState(new PlayState(), false, false);
+					trace("loading from default library!");
+				}
+			}
+
 
 			#if PRELOAD_ALL
 			destroyFreeplayVocals();
@@ -418,6 +441,21 @@ class FreeplayState extends MusicBeatState
 
 		//yee
 	}
+	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
+		{
+			trackedAssets.insert(trackedAssets.length, Object);
+			return super.add(Object);
+		}
+	
+		function unloadAssets():Void
+		{
+			if(isMod)
+				openfl.utils.Assets.unloadLibrary("mods");
+			for (asset in trackedAssets)
+			{
+				remove(asset);
+			}
+		}
 }
 
 class SongMetadata
