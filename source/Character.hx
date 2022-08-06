@@ -458,16 +458,8 @@ class Character extends FlxSprite
 
 				antialiasing = false;
 
-			case 'bfnightmareCup':
-				//long line
-				//Paths.getSparrowAtlas('BoyFriend_NM', 'mods/cuphead');
-				var img = Paths.image('BoyFriend_NM', 'mods/cuphead');
-				var xml = Paths.file('images/BoyFriend_NM.xml', 'mods/cuphead');
-				var splitimg = img.split(':');
-				trace(splitimg);
-				var splitxml = xml.split(':');
-				trace(splitxml);
-				frames = Paths.alternateSparrowAtlas(splitimg[1],splitxml[1]);
+			case 'bfnightmareCup': //it works now :)
+				frames = Paths.modSparrowAtlas("BoyFriend_NM", "cuphead"); //turns out that THE FUCKING THING SEARCHES IN EVERY FOLDER WITH THE NAME OF IMAGES
 
 				animation.addByPrefix('idle', 'BF idle dance instance 1', 24, false);
 				animation.addByPrefix('singUP', 'BF NOTE UP instance 1', 24, false);

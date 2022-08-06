@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TextureAtlas imagePath="Nightmare_Cuphead.png">
+<TextureAtlas imagePath="cumhead.png">
 	<!-- Created with Adobe Animate version 22.0.0.93 -->
 	<!-- http://www.adobe.com/products/animate.html -->
 	<SubTexture name="Beamm instance 10000" x="10" y="10" width="449" height="341" frameX="0" frameY="0" frameWidth="468" frameHeight="341"/>

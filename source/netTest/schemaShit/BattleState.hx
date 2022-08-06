@@ -5,6 +5,6 @@ import io.colyseus.serializer.schema.types.*;
 
 class BattleState extends Schema
 {
-    @:type("player")
-    public var entities:ArraySchema<Player>;
+    @:type("map", Player)
+    public var players:MapSchema<Player> = new MapSchema<Player>();
 }

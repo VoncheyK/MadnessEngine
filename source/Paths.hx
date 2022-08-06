@@ -141,13 +141,11 @@ class Paths
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
-		/*trace(image(key, library));
-		trace(file('images/$key.xml', library));*/
 	}
 
-	inline static public function alternateSparrowAtlas(image:Dynamic, xml:Dynamic)
+	inline static public function modSparrowAtlas(key:String, modName:String)
 	{
-		return FlxAtlasFrames.fromSparrow(image, xml);
+		return FlxAtlasFrames.fromSparrow('mods:assets/mods/$modName/images/$key.png', 'mods:assets/mods/$modName/images/$key.xml');
 	}
 
 	inline static public function getPackerAtlas(key:String, ?library:String)

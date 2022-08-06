@@ -1,6 +1,6 @@
 package;
 
-import netTest.MultiplayerMenu;
+import netTest.Director;
 #if desktop
 import Discord.DiscordClient;
 #end
@@ -158,7 +158,7 @@ class MainMenuState extends MusicBeatState
 			{
 				if (optionShit[curSelected] == 'donate')
 				{
-					FlxG.switchState(new MultiplayerMenu());
+					FlxG.switchState(new Director());
 				}
 				else
 				{
