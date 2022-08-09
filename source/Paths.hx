@@ -148,6 +148,11 @@ class Paths
 		return FlxAtlasFrames.fromSparrow('mods:assets/mods/$modName/images/$key.png', 'mods:assets/mods/$modName/images/$key.xml');
 	}
 
+	inline static public function getSparrowAtlasW7(key:String, ?library:String)
+	{
+			return FlxAtlasFrames.fromSparrow(image(key, library), getPath('images/$key.xml', TEXT, library));
+	}
+
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));

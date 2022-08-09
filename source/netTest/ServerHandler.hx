@@ -1,5 +1,7 @@
 package netTest;
 
+import flixel.FlxSubState;
+import ui.Prompt;
 import io.colyseus.Room;
 import netTest.schemaShit.BattleState;
 import lime.app.Application;
@@ -21,6 +23,8 @@ class ServerHandler extends MusicBeatState
 	override function create()
 	{
 		FlxG.mouse.visible = true;
+
+		openPrompt(MultiplayerPromptShit.showGameJoltLogin());
 
 		//handle server stuff
 		//init the j
@@ -68,7 +72,7 @@ class ServerHandler extends MusicBeatState
 					});
 		}, 3000);
 
-		this.cliente.joinOrCreate("state_handler", [], BattleState, function(err, room){
+		this.cliente.joinOrCreate("my_room", [], BattleState, function(err, room){
 			if (err != null) {
                 trace("ERROR! " + err);
                 return;
@@ -80,4 +84,29 @@ class ServerHandler extends MusicBeatState
             }
 		});
 	}
+
+	public function openPrompt(target:FlxSubState, ?openCallback:Void->Void)
+		{
+			target.closeCallback = function()
+			{
+				if (openCallback != null)
+					openCallback();
+			}
+	
+			openSubState(target);
+		}
+
+		public function openPromptW(target:FlxSubState, ?openCallback:Void->Void)
+			{
+				var whatever:Void->Void;
+		
+				if (openCallback != null)
+				{
+					whatever = function() {
+						openCallback();
+					}
+				}
+		
+				openPrompt(target, openCallback);
+			}
 }
