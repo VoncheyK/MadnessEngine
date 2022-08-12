@@ -89,7 +89,6 @@ class Main extends Sprite
 		#end
 
 		gjToastManager = new GJToastManager();
-		addChild(gjToastManager);
 	
 		// fuck you, persistent caching stays ON during sex
 		FlxGraphic.defaultPersist = true;
@@ -98,6 +97,7 @@ class Main extends Sprite
 
 		#if !mobile
 		fpsVar = new openfl.display.CustomFPS(10, 3, 0xFFFFFF);
+		addChild(gjToastManager);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;

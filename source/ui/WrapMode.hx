@@ -2,8 +2,8 @@ package ui;
 
 enum WrapMode
 {
-    Horizontal;
-    Vertical;
-    Both;
-    None;
+	Horizontal;
+	Vertical;
+	Both;
+	None;	
 }

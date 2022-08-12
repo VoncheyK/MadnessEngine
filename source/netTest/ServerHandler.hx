@@ -16,15 +16,21 @@ import flixel.FlxSprite;
 
 class ServerHandler extends MusicBeatState
 {
-
-	private var cliente = new Client("ws://localhost:2567");
+	//put server location in the client thing
+	private var cliente = new Client("");
 	private var room:Room<BattleState>;
+	var prompt:MultiPrompt;
+	var acceptsControls:Bool = true;
+	//String = name(key), Character = sprite and shit
+	#if (haxe >= "4.0.0")
+	var players:Map<String, Character> = [];
+	#else
+	var players:Map<String, Character> = new Map<String, Character>();
+	#end
 
 	override function create()
 	{
 		FlxG.mouse.visible = true;
-
-		openPrompt(MultiplayerPromptShit.showGameJoltLogin());
 
 		//handle server stuff
 		//init the j
@@ -38,7 +44,26 @@ class ServerHandler extends MusicBeatState
 			#if linux
 			radminPath = "./" + radminPath;
 			#end
-			new Process('powershell', [".\\" + radminPath]);
+			prompt = new MultiPrompt("\nRadmin VPN required\n for Multiplayer. Run it?", Yes_No);
+			acceptsControls = false;
+			prompt.back.alpha = 0.6;
+			prompt.onYes = function()
+				{
+					new Process('powershell', [".\\" + radminPath]);
+					prompt.setButtons(None);
+					acceptsControls = true;
+					prompt.exists = false;
+					prompt.close();
+				}
+			prompt.onNo = function()
+				{
+					FlxG.switchState(new MainMenuState());
+					prompt.setButtons(None);
+					acceptsControls = true;
+					prompt.exists = false;
+					prompt.close();		
+				}
+				openSubState(prompt);
 		}
 		else
 		{
@@ -55,7 +80,7 @@ class ServerHandler extends MusicBeatState
 		add(bg);
 
 		haxe.Timer.delay(function() {
-				this.cliente.getAvailableRooms("", function(err, rooms)
+				this.cliente.getAvailableRooms("my_room", function(err, rooms)
 					{
 						if (err != null)
 							{
@@ -72,6 +97,19 @@ class ServerHandler extends MusicBeatState
 					});
 		}, 3000);
 
+		this.cliente.create("my_room", [], BattleState, function(err, room){
+			if (err != null) {
+                trace("ERROR! " + err);
+                return;
+            }
+
+			this.room = room;
+			this.room.state.players.onAdd = function(player, key){
+				trace("Player added at: ", key);
+				trace("yip");
+			}
+		});
+
 		this.cliente.joinOrCreate("my_room", [], BattleState, function(err, room){
 			if (err != null) {
                 trace("ERROR! " + err);
@@ -84,29 +122,4 @@ class ServerHandler extends MusicBeatState
             }
 		});
 	}
-
-	public function openPrompt(target:FlxSubState, ?openCallback:Void->Void)
-		{
-			target.closeCallback = function()
-			{
-				if (openCallback != null)
-					openCallback();
-			}
-	
-			openSubState(target);
-		}
-
-		public function openPromptW(target:FlxSubState, ?openCallback:Void->Void)
-			{
-				var whatever:Void->Void;
-		
-				if (openCallback != null)
-				{
-					whatever = function() {
-						openCallback();
-					}
-				}
-		
-				openPrompt(target, openCallback);
-			}
 }

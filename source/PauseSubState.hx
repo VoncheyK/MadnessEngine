@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxBasic;
 import Controls.Control;
 import flixel.FlxG;
 import flixel.FlxSprite;
@@ -25,9 +26,13 @@ class PauseSubState extends MusicBeatSubstate
 
 	var pauseMusic:FlxSound;
 
-	public function new(x:Float, y:Float)
+	var playStateAssets:Array<FlxBasic>;
+
+	public function new(x:Float, y:Float, trackedAssets:Array<FlxBasic>)
 	{
 		super();
+
+		this.playStateAssets = trackedAssets;
 
 		if (!PlayState.isStoryMode) {
 			menuItems = ['Resume', 'Restart Song', 'Toggle Botplay', 'Exit to menu'];
@@ -85,7 +90,7 @@ class PauseSubState extends MusicBeatSubstate
 		for (i in 0...menuItems.length)
 		{
 			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-			songText.isMenuItem = true;
+			songText.scrollType = "Center";
 			songText.targetY = i;
 			grpMenuShit.add(songText);
 		}
@@ -95,13 +100,15 @@ class PauseSubState extends MusicBeatSubstate
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
 	}
 
-	function unloadPlayStateAssets():Void
-	{
-		openfl.utils.Assets.unloadLibrary("shared");
-		if (PlayState.loadingFromMods)
-			openfl.utils.Assets.unloadLibrary("mods" + "/" + PlayState.modlib);
+	override function add(object:FlxBasic):FlxBasic
+		{
+			playStateAssets.insert(playStateAssets.length, object);
+			return super.add(object);
+		}
 
-		for (asset in PlayState.trackedAssets){
+	function unloadAssets():Void
+	{
+		for (asset in playStateAssets){
 			remove(asset);
 		}
 	}
@@ -155,12 +162,12 @@ class PauseSubState extends MusicBeatSubstate
 					botText.visible = false;
 					if(PlayState.isStoryMode)
 					{
-						unloadPlayStateAssets();
+						unloadAssets();
 						FlxG.switchState(new StoryMenuState());
 					}
 					else
 					{
-						unloadPlayStateAssets();
+						unloadAssets();
 						FlxG.switchState(new FreeplayState());
 					}
 			}

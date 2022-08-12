@@ -112,85 +112,68 @@ class Prompt extends FlxSubState
 	}
 }
 
-class MultiplayerPromptShit extends Prompt
+class MultiPrompt extends Prompt
 {
-    public function new(name:String, buttonStyle:ButtonStyle = Yes_No)
+    public function new(text:String, buttonStyle:ButtonStyle = Yes_No)
         {
-            super(name, buttonStyle);
+            super(text, buttonStyle);
+            create();
+            createBgFromMargin(120, 0xFF808080);
+            back.scrollFactor.set(0,0);
         }
-    
-    public static function showGameJoltLogin():FlxSubState {
-            switch(GameJoltAPI.getStatus())
-            {
-                case false:
-                    return showLoginPrompt(true);
-                case true:
-                    return showLoginPrompt(true);
-            }
-            return null;
-    }
 
-    public static function showLoginPrompt(show:Bool):FlxSubState 
-    {
-        var svPrompt = new MultiplayerPromptShit("GameJolt Authentication Required", None);
-        var whatthej = function(iinput:Void->Void)
-            {
-                var d = show ? "Login to GameJolt?" : null;
-                if (d != null) 
+    /*public function showLoginPrompt(show:Bool)
+        {
+            var svPrompt = new MultiPrompt("\nGameJolt Authentication\n Required", None);
+            var whatthej = function(iinput:Void->Void)
                 {
-                        /**                ngPrompt.setText(d);
-                    ngPrompt.setButtons(Yes_No);
-                    //ngPrompt.buttons.getItem('yes').fireInstantly = true;
-                    ngPrompt.onYes = function() {
-                        ngPrompt.setText('Connecting...\n(check your popup blocker)');
-                        ngPrompt.setButtons(None);
-                        c();
-                    }**/
-                        svPrompt.setText(d);
-                        svPrompt.setButtons(Yes_No);
-                        svPrompt.buttons.getItem('yes').fireInstantly = true;
-                        svPrompt.onYes = function()
-                            {
-                                svPrompt.setText('Redirecting.');
-                                svPrompt.setButtons(None);
-                                GameJoltInfo.changeState = new Director();
-                                GameJoltInfo.fontPath = 'assets/fonts/emptyLetters.ttf';
-                                GameJoltInfo.font = Paths.font('emptyLetters.ttf');
-                                trace("SwitchedState");
-                                FlxG.switchState(new GameJoltLogin());
-                                /*svPrompt.close();
-                                svPrompt = null;*/
-                                iinput();
-                            }
-                        svPrompt.onNo = function() 
-                            {
-                                trace("Cancelled");
-                                Director.cancelledRequestShit();
-                                /*svPrompt.close();
-                                svPrompt = null;*/
-                            } 
-                }
-                else
+                    var d = show ? "Login to GameJolt?" : null;
+                    if (d != null) 
                     {
-                        svPrompt.setText('Connecting...');
-                        trace("Connected");
-                        switch(GameJoltAPI.getStatus())
-                        {
-                            case true:
-                                FlxG.switchState(new ServerHandler());
-                            case false:
-                                svPrompt.setText('Failed to connect! Redirecting to GameJolt Log in screen.');
-                                GameJoltInfo.changeState = new Director();
-                                GameJoltInfo.fontPath = 'assets/fonts/emptyLetters.ttf';
-                                GameJoltInfo.font = Paths.font('emptyLetters.ttf');
-                                FlxG.switchState(new GameJoltLogin());
-                                /*svPrompt.close();
-                                svPrompt = null;*/
-                        }
-
-                        iinput();
+                            svPrompt.setText(d);
+                            svPrompt.setButtons(Yes_No);
+                            svPrompt.buttons.getItem('yes').fireInstantly = true;
+                            svPrompt.onYes = function()
+                                {
+                                    svPrompt.setText('Redirecting.');
+                                    svPrompt.setButtons(None);
+                                    GameJoltInfo.changeState = new Director();
+                                    GameJoltInfo.fontPath = 'assets/fonts/emptyLetters.ttf';
+                                    GameJoltInfo.font = Paths.font('emptyLetters.ttf');
+                                    trace("SwitchedState");
+                                    FlxG.switchState(new GameJoltLogin());
+                                    svPrompt.close();
+                                    svPrompt = null;
+                                    iinput();
+                                }
+                            svPrompt.onNo = function() 
+                                {
+                                    trace("Cancelled");
+									svPrompt.close();
+                                    FlxG.switchState(new MainMenuState());
+                                } 
                     }
-            }
+                    else
+                        {
+                            svPrompt.setText('Connecting...');
+                            trace("Connected");
+                            switch(GameJoltAPI.getStatus())
+                            {
+                                case true:
+                                    FlxG.switchState(new ServerHandler());
+                                case false:
+                                    svPrompt.setText('\nFailed to connect!\n\n\n\n Redirecting to GameJolt\n\n Log in screen.');
+                                    GameJoltInfo.changeState = new Director();
+                                    GameJoltInfo.fontPath = 'assets/fonts/emptyLetters.ttf';
+                                    GameJoltInfo.font = Paths.font('emptyLetters.ttf');
+                                    FlxG.switchState(new GameJoltLogin());
+                                    svPrompt.close();
+                                    svPrompt = null;
+                            }
+
+                            iinput();
+                        }
+                }  
 
         svPrompt.openCallback = function()
         {
@@ -198,56 +181,5 @@ class MultiplayerPromptShit extends Prompt
         }
         
         return svPrompt;
-    }
-}
-
-class NgPrompt extends Prompt
-{
-    public function new(name:String, buttonStyle:ButtonStyle = Yes_No)
-    {
-        super(name, buttonStyle);
-    }
-
-    public static function showLogin():FlxSubState {
-        return showLoginPrompt(true);
-    }
-
-    public static function showSavedSessionFailed():FlxSubState {
-        return showLoginPrompt(false);
-    }
-
-    public static function showLoginPrompt(show:Bool):FlxSubState
-    {
-        var ngPrompt = new NgPrompt("Talking to server...", None);
-
-        var whatever = function(c:Void->Void) {
-            var d = show ? "Login to Newgrounds?" : "Your session has expired.\n Please login again.";
-            if (d != null)
-            {
-                ngPrompt.setText(d);
-                ngPrompt.setButtons(Yes_No);
-                //ngPrompt.buttons.getItem('yes').fireInstantly = true;
-                ngPrompt.onYes = function() {
-                    ngPrompt.setText('Connecting...\n(check your popup blocker)');
-                    ngPrompt.setButtons(None);
-                    c();
-                }
-                
-                ngPrompt.onNo = function() {
-                    ngPrompt.close();
-                    ngPrompt = null;
-                }
-            }
-            else
-            {
-                ngPrompt.setText('Connecting...');
-                c();
-            }
-        }
-
-        ngPrompt.openCallback = function() {
-        }
-
-        return ngPrompt;
-    }
+        }*/
 }

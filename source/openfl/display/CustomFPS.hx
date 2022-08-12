@@ -5,27 +5,10 @@ import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
 import flixel.math.FlxMath;
-import flixel.FlxG;
-import flixel.FlxObject;
-import flixel.FlxSprite;
-import flixel.FlxCamera;
-import flixel.addons.transition.FlxTransitionableState;
-import flixel.effects.FlxFlicker;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.text.FlxText;
-import flixel.math.FlxMath;
-import flixel.tweens.FlxEase;
-import flixel.tweens.FlxTween;
-import flixel.util.FlxColor;
-import lime.app.Application;
-import flixel.input.keyboard.FlxKey;
-
 #if gl_stats
 import openfl.display._internal.stats.Context3DStats;
 import openfl.display._internal.stats.DrawCallContext;
 #end
-
 #if flash
 import openfl.Lib;
 #end
@@ -63,10 +46,10 @@ class CustomFPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("VCR OSD Mono", 16, color);
+		defaultTextFormat = new TextFormat("_sans", 14, color);
 		autoSize = LEFT;
 		multiline = true;
-		text = "Framerate: ";
+		text = "FPS: ";
 
 		cacheCount = 0;
 		currentTime = 0;
@@ -99,14 +82,13 @@ class CustomFPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			text = "Framerate: " + currentFPS;
+			text = "FPS: " + currentFPS;
 			var memoryMegas:Float = 0;
 			
 			#if openfl
 			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
-			text += "\nMemory Usage: " + memoryMegas + " MB";
+			text += "\nMemory: " + memoryMegas + " MB";
 			#end
-			text += "\nMadness Engine: v" + Main.engineVer;
 
 			textColor = 0xFFFFFFFF;
 			if (memoryMegas > 3000 || currentFPS <= ClientSettings.framerate / 2)

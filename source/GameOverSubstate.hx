@@ -14,16 +14,10 @@ class GameOverSubstate extends MusicBeatSubstate
 
 	var stageSuffix:String = "";
 
-	var loadingFromMods:Bool;
-
-	var directorymod:String;
-
-	public function new(x:Float, y:Float, loadingFromMods:Bool, modDir:String)
+	public function new(x:Float, y:Float)
 	{
 		var daStage = PlayState.curStage;
 		var daBf:String = '';
-		this.loadingFromMods = loadingFromMods;
-		this.directorymod = modDir;
 		switch (daStage)
 		{
 			case 'school':
@@ -123,10 +117,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				{
 					remove(camFollow);
 					remove(bf);
-					if (loadingFromMods)
-						LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods, directorymod);
-					else
-						LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods);
+					LoadingState.loadAndSwitchState(new PlayState(), false);
 				});
 			});
 		}

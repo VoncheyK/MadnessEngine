@@ -4,8 +4,6 @@ import flixel.util.FlxStringUtil;
 import haxe.ds.EnumValueMap;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxSpriteGroup.FlxTypedSpriteGroup;
-import ui.AtlasFont;
-import ui.Case;
 
 class AtlasText extends FlxTypedSpriteGroup<AtlasChar>
 {
@@ -129,7 +127,7 @@ class AtlasFontData
 	public function new(font:AtlasFont)
 	{
 		var path = 'fonts/'+font.getName().toLowerCase();
-		atlas = Paths.getSparrowAtlasW7(path);
+		atlas = Paths.getSparrowAtlas(path);
 		atlas.parent.destroyOnNoUse = false;
 		atlas.parent.persist = true;
 

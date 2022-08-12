@@ -18,6 +18,11 @@ class CoolUtil
 		return difficultyArray[PlayState.storyDifficulty];
 	}
 
+	
+	inline public static function bound(value:Float, min:Float, max:Float):Float {
+		return Math.max(min, Math.min(max, value));
+	}
+
 	public static function useless(path:String):String {
 		var daText = Assets.getText(path);
 

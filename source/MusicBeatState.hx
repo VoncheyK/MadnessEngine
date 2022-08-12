@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxState;
 import Conductor.BPMChangeEvent;
 import flixel.FlxG;
 import flixel.addons.transition.FlxTransitionableState;
@@ -20,7 +21,7 @@ class MusicBeatState extends FlxUIState
 		return PlayerSettings.player1.controls;
 
 
-	public static function switchState(newState:MusicBeatState, oldState:MusicBeatState)
+	public static function switchState(newState:FlxState, ?oldState:FlxState)
 	{
 		FlxG.switchState(newState);
 		return oldState;

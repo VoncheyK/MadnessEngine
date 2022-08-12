@@ -151,8 +151,6 @@ class PlayState extends MusicBeatState
 	var songScore:Int = 0;
 	public var scoreTxt:FlxText;
 	public var timeTxt:FlxText;
-	public static var loadingFromMods:Bool = false;
-	public static var modlib:String = "";
 
 	var songLength:Float = 0;
 
@@ -223,8 +221,6 @@ class PlayState extends MusicBeatState
 		interp.variables.set("curBeat", curBeat); 
 
 		interp.variables.set("Math", Math); 
-
-		interp.variables.set("isModLib", loadingFromMods);
 
 		interp.variables.set("setProperty", function(property:String, newValue:Dynamic){
 			Reflect.setProperty(this, property, newValue);
@@ -1639,7 +1635,7 @@ class PlayState extends MusicBeatState
 				FlxG.switchState(new GitarooPause());
 			}
 			else
-				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, trackedAssets));
 		
 			#if desktop
 			DiscordClient.changePresence(detailsPausedText, SONG.song + " (" + storyDifficultyText + ")", iconRPC);
@@ -1648,6 +1644,7 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.keys.justPressed.SEVEN)
 		{
+			unloadAssets();
 			FlxG.switchState(new ChartingState());
 
 			#if desktop
@@ -1687,7 +1684,10 @@ class PlayState extends MusicBeatState
 
 		#if debug
 		if (FlxG.keys.justPressed.EIGHT)
-			FlxG.switchState(new AnimationDebug(SONG.player2));
+			{
+				unloadAssets();
+				FlxG.switchState(new AnimationDebug(SONG.player2));
+			}
 		#end
 
 		if (startingSong)
@@ -1845,10 +1845,9 @@ class PlayState extends MusicBeatState
 			vocals.stop();
 			FlxG.sound.music.stop();
 
-
-			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, loadingFromMods,modlib));
 			unloadAssets();
-			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, loadingFromMods));
+			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 			
 			#if desktop
 			// Game Over doesn't get his own variable because it's only used here
@@ -1918,7 +1917,6 @@ class PlayState extends MusicBeatState
 				transOut = FlxTransitionableState.defaultTransOut;
 
 				unloadAssets();
-
 				FlxG.switchState(new StoryMenuState());
 
 				// if ()
@@ -1963,13 +1961,13 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.stop();
 				unloadAssets();
 
-				LoadingState.loadAndSwitchState(new PlayState(), false, loadingFromMods, modlib);
+				LoadingState.loadAndSwitchState(new PlayState(), false);
 			}
 		}
 		else
 		{
-			unloadAssets();
 			trace('WENT BACK TO FREEPLAY??');
+			unloadAssets();
 			FlxG.switchState(new FreeplayState());
 		}
 	}
@@ -2150,7 +2148,114 @@ class PlayState extends MusicBeatState
 	private function keyShit():Void
 	{
 		if (ClientSettings.botPlay) return;
-		//HOLDING
+		var holdingArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
+		var controlArray:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];
+		var releaseArray:Array<Bool> = [controls.LEFT_R, controls.DOWN_R, controls.UP_R, controls.RIGHT_R];
+
+		// FlxG.watch.addQuick('asdfa', upP);
+		if (holdingArray.contains(true) && generatedMusic)
+		{
+			notes.forEachAlive(function(daNote:Note)
+			{
+				if (daNote.isSustainNote && daNote.canBeHit && daNote.mustPress && holdingArray[daNote.noteData])
+					goodNoteHit(daNote);
+			});
+		}
+		if (controlArray.contains(true) && generatedMusic)
+		{
+			boyfriend.holdTimer = 0;
+
+			var possibleNotes:Array<Note> = [];
+
+			var ignoreList:Array<Int> = [];
+
+			var removeList:Array<Note> = [];
+
+			notes.forEachAlive(function(daNote:Note)
+			{
+				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit)
+				{
+					if (ignoreList.contains(daNote.noteData))
+					{
+						for (possibleNote in possibleNotes)
+						{
+							if (possibleNote.noteData == daNote.noteData && Math.abs(daNote.strumTime - possibleNote.strumTime) < 10)
+							{
+								removeList.push(daNote);
+							}
+							else if (possibleNote.noteData == daNote.noteData && daNote.strumTime < possibleNote.strumTime)
+							{
+								possibleNotes.remove(possibleNote);
+								possibleNotes.push(daNote);
+							}
+						}
+					}
+					else
+					{
+						possibleNotes.push(daNote);
+						ignoreList.push(daNote.noteData);
+					}
+				}
+			});
+
+			for (badNote in removeList)
+			{
+				badNote.kill();
+				notes.remove(badNote, true);
+				badNote.destroy();
+			}
+
+			possibleNotes.sort(function(note1:Note, note2:Note)
+			{
+				return Std.int(note1.strumTime - note2.strumTime);
+			});
+
+			if (perfectMode)
+			{
+				goodNoteHit(possibleNotes[0]);
+			}
+			else if (possibleNotes.length > 0)
+			{
+				for (i in 0...controlArray.length)
+				{
+					if (controlArray[i] && !ignoreList.contains(i))
+					{
+						badNoteHit();
+					}
+				}
+				for (possibleNote in possibleNotes)
+				{
+					if (controlArray[possibleNote.noteData])
+					{
+						goodNoteHit(possibleNote);
+					}
+				}
+			}
+			else
+				badNoteHit();
+		}
+		if (boyfriend.holdTimer > 0.004 * Conductor.stepCrochet && !holdingArray.contains(true) && boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.animation.curAnim.name.endsWith('miss'))
+		{
+			boyfriend.playAnim('idle');
+		}
+		playerStrums.forEach(function(spr:FlxSprite)
+		{
+			if (controlArray[spr.ID] && spr.animation.curAnim.name != 'confirm')
+				spr.animation.play('pressed');
+			if (!holdingArray[spr.ID])
+				spr.animation.play('static');
+
+			if (spr.animation.curAnim.name != 'confirm' || curStage.startsWith('school'))
+				spr.centerOffsets();
+			else
+			{
+				spr.centerOffsets();
+				spr.offset.x -= 13;
+				spr.offset.y -= 13;
+			}
+		});
+
+		/*//HOLDING
 		var holdArray:Array<Bool> = [
 			controls.LEFT,
 			controls.DOWN,
@@ -2251,7 +2356,7 @@ class PlayState extends MusicBeatState
 		/*else if (!ghost tapping stuff)
 		    for (i in 0...pressArray.length)
 		        if (pressArray[i])
-		            noteMiss(i);*/
+		            noteMiss(i);
 		
 		//this shit is broken for some reason
 		//TODO fix later
@@ -2276,7 +2381,8 @@ class PlayState extends MusicBeatState
 				spr.centerOffsets();
 			}
 				
-		});
+		});*/
+
 	}
 
 	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
@@ -2327,6 +2433,25 @@ class PlayState extends MusicBeatState
 		if (rightP)
 			noteMiss(3);
 	}
+
+	function badNoteHit()
+		{
+			// just double pasting this shit cuz fuk u
+			// REDO THIS SYSTEM!
+			var leftP = controls.LEFT_P;
+			var downP = controls.DOWN_P;
+			var upP = controls.UP_P;
+			var rightP = controls.RIGHT_P;
+	
+			if (leftP)
+				noteMiss(0);
+			if (downP)
+				noteMiss(1);
+			if (upP)
+				noteMiss(2);
+			if (rightP)
+				noteMiss(3);
+		}
 
 	/*function noteCheck(keyP:Bool, note:Note):Void
 	{
@@ -2776,18 +2901,14 @@ class PlayState extends MusicBeatState
 		PlayState.gf.playAnim('scared', true);
 	}
 
-	override function add(Object:FlxBasic):FlxBasic
+	override function add(object:FlxBasic):FlxBasic
 		{
-			trackedAssets.insert(trackedAssets.length, Object);
-			return super.add(Object);
+			trackedAssets.insert(trackedAssets.length, object);
+			return super.add(object);
 		}
 	
 		public function unloadAssets():Void
 		{
-			openfl.utils.Assets.unloadLibrary("shared");
-			if (loadingFromMods)
-				openfl.utils.Assets.unloadLibrary("mods" + "/" + modlib);
-
 			for (asset in trackedAssets)
 			{
 				remove(asset);

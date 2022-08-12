@@ -306,7 +306,9 @@ class GameJoltInfo extends FlxSubState
         "This isn't an NFT. Crazy right?",
         "no not the null reference :(",
         "Thank you BrightFyre for your help :)",
-        "Thank you Firubii for the notification code :)"
+        "Thank you Firubii for the notification code :)", 
+        "frrrr",
+        "multiplayer verirfication?!!?"
     ];
 }
 
@@ -332,7 +334,6 @@ class GameJoltLogin extends MusicBeatSubstate
     // var trophy:FlxBar;
     // var trophyText:FlxText;
     // var missTrophyText:FlxText;
-    public static var charBop:FlxSprite;
     // var icon:FlxSprite;
     var baseX:Int = -190;
     var versionText:FlxText;
@@ -365,21 +366,6 @@ class GameJoltLogin extends MusicBeatSubstate
 		bg.scrollFactor.set();
 		bg.alpha = 0.25;
 		add(bg);
-
-        charBop = new FlxSprite(FlxG.width - 400, 250);
-		charBop.frames = Paths.getSparrowAtlas('BOYFRIEND');
-		charBop.animation.addByPrefix('idle', 'BF idle dance', 24, false);
-        charBop.animation.addByPrefix('loggedin', 'BF HEY', 24, false);
-        charBop.setGraphicSize(Std.int(charBop.width * 1.4));
-		charBop.antialiasing = true;
-        charBop.flipX = false;
-		add(charBop);
-
-        /*charBop = new Boyfriend(FlxG.width - 400, 250);
-        charBop.setGraphicSize(Std.int(charBop.width * 1.4));
-        charBop.antialiasing =true;
-        charBop.flipX = false;
-        add(charBop);*/
 
         gamejoltText1 = new FlxText(0, 25, 0, "GameJolt + FNF Integration", 16);
         gamejoltText1.screenCenter(X);
@@ -576,11 +562,6 @@ class GameJoltLogin extends MusicBeatSubstate
         super.update(elapsed);
     }
 
-    override function beatHit()
-    {
-        super.beatHit();
-        charBop.animation.play((GameJoltAPI.getStatus() ? "hey" : "idle"));
-    }
     function openLink(url:String)
     {
         #if linux
