@@ -1,5 +1,6 @@
 package netTest;
 
+import netTest.schemaShit.ChatRoom;
 import flixel.FlxSubState;
 import ui.Prompt;
 import io.colyseus.Room;
@@ -17,8 +18,8 @@ import flixel.FlxSprite;
 class ServerHandler extends MusicBeatState
 {
 	//put server location in the client thing
-	private var cliente = new Client("");
-	private var room:Room<BattleState>;
+	private var cliente = new Client("ws://localhost:3000");
+	private var room:Room<ChatRoom>;
 	var prompt:MultiPrompt;
 	var acceptsControls:Bool = true;
 	//String = name(key), Character = sprite and shit
@@ -80,7 +81,7 @@ class ServerHandler extends MusicBeatState
 		add(bg);
 
 		haxe.Timer.delay(function() {
-				this.cliente.getAvailableRooms("my_room", function(err, rooms)
+				this.cliente.getAvailableRooms("chat", function(err, rooms)
 					{
 						if (err != null)
 							{
@@ -93,33 +94,25 @@ class ServerHandler extends MusicBeatState
 							trace("clients: " + room.clients);
 							trace("maxClients: " + room.maxClients);
 							trace("metadata: " + room.metadata);
+					
 						}
 					});
 		}, 3000);
 
-		this.cliente.create("my_room", [], BattleState, function(err, room){
+		this.cliente.join("chat", ["name" => "Croneriel", "accessToken" => "000000"],ChatRoom , function(err, room){
 			if (err != null) {
-                trace("ERROR! " + err);
-                return;
-            }
-
-			this.room = room;
-			this.room.state.players.onAdd = function(player, key){
-				trace("Player added at: ", key);
-				trace("yip");
+				trace("ERROR! " + err);
+				return;
 			}
-		});
+			
+			this.room = room;
+			
+			this.room.send("message", "Funne Message");
 
-		this.cliente.joinOrCreate("my_room", [], BattleState, function(err, room){
-			if (err != null) {
-                trace("ERROR! " + err);
-                return;
-            }
-
-            this.room = room;
-			this.room.state.players.onAdd = function(player, key) {
-                trace("PLAYER ADDED AT: ", key);
-            }
+			this.room.onMessage("message", function(message)
+				{
+					trace("onMessage: 'message' => " + message);
+				});
 		});
 	}
 }
