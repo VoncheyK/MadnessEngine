@@ -9,17 +9,8 @@ package netTest.schemaShit;
 import io.colyseus.serializer.schema.Schema;
 import io.colyseus.serializer.schema.types.*;
 
-class Player extends Schema {
-	@:type("boolean")
-	public var left: Bool = false;
-
-	@:type("boolean")
-	public var right: Bool = false;
-
-	@:type("boolean")
-	public var up: Bool = false;
-
-	@:type("boolean")
-	public var down: Bool = false;
+class ChatState extends Schema {
+	@:type("map", Player)
+	public var players: MapSchema<Player> = new MapSchema<Player>();
 
 }

@@ -184,14 +184,16 @@ class MainMenuState extends MusicBeatState
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
 								var daChoice:String = optionShit[curSelected];
-								unloadAssets();
 								switch (daChoice)
 								{
 									case 'story mode':
+										unloadAssets();
 										FlxG.switchState(new StoryMenuState());
 									case 'freeplay':
+										unloadAssets();
 										FlxG.switchState(new FreeplayState());
 									case 'options':
+										unloadAssets();
 										FlxG.switchState(new OptionsMenu());
 									
 								}

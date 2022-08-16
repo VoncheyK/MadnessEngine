@@ -1,6 +1,7 @@
 package netTest;
 
-import netTest.schemaShit.ChatRoom;
+import netTest.schemaShit.Player;
+import netTest.schemaShit.ChatState;
 import flixel.FlxSubState;
 import ui.Prompt;
 import io.colyseus.Room;
@@ -14,12 +15,14 @@ import Sys;
 import io.colyseus.Client;
 import flixel.FlxG;
 import flixel.FlxSprite;
+import SpecialKeys;
+import GameJolt;
 
 class ServerHandler extends MusicBeatState
 {
 	//put server location in the client thing
-	private var cliente = new Client("ws://localhost:3000");
-	private var room:Room<ChatRoom>;
+	private var cliente = new Client(SpecialKeys.host);
+	private var room:Room<ChatState>;
 	var prompt:MultiPrompt;
 	var acceptsControls:Bool = true;
 	//String = name(key), Character = sprite and shit
@@ -99,14 +102,34 @@ class ServerHandler extends MusicBeatState
 					});
 		}, 3000);
 
-		this.cliente.join("chat", ["name" => "Croneriel", "accessToken" => "000000"],ChatRoom , function(err, room){
+		this.cliente.create("chat", ["name" => FlxG.save.data.gjUser, "accessToken" => FlxG.save.data.gjToken, "authorizationKey" => SpecialKeys.authorizationKey, "map" => "stage", "password" => ""], ChatState, function(err, room){
 			if (err != null) {
 				trace("ERROR! " + err);
 				return;
 			}
-			
 			this.room = room;
+
+			this.room.state.players.onAdd = function(player, key) {
+                trace("PLAYER ADDED AT: ", key);
+            }
+
+			this.room.state.players.onRemove = function(player, key) {
+                trace("PLAYER REMOVED AT: ", key);
+            }
 			
+			this.room.onStateChange += function(state)
+			{
+				trace("STATE CHANGE: " + Std.string(state));
+			}
+
+			this.room.onError += function(code: Int, message: String) {
+                trace("ROOM ERROR: " + code + " => " + message);
+            };
+
+			this.room.onLeave += function() {
+                trace("ROOM LEAVE");
+            }
+
 			this.room.send("message", "Funne Message");
 
 			this.room.onMessage("message", function(message)
@@ -114,5 +137,49 @@ class ServerHandler extends MusicBeatState
 					trace("onMessage: 'message' => " + message);
 				});
 		});
+	}
+
+	override function update(elapsed:Float)
+	{
+		if (acceptsControls)
+			{
+				if (controls.DOWN_P)
+				{
+					this.room.send("downP", "");
+				}
+				else if (controls.DOWN_R)
+				{
+					this.room.send("downR", "");
+				}
+			
+				if (controls.UP_P)
+				{
+					this.room.send("upP", "");
+				}
+				else if(controls.UP_R)
+				{
+					this.room.send("upR", "");
+				}
+
+				if (controls.LEFT_P)
+				{
+					this.room.send("leftP", "");
+				}
+				else if (controls.LEFT_R)
+				{
+					this.room.send("leftR", "");
+				}
+
+				if (controls.RIGHT_P)
+				{
+					this.room.send("rightP", "");
+				}
+				else if (controls.RIGHT_R)
+				{
+					this.room.send("rightR", "");
+				}
+			}
+
+		super.update(elapsed);
 	}
 }

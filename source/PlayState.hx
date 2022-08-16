@@ -225,7 +225,7 @@ class PlayState extends MusicBeatState
 		interp.variables.set("setProperty", function(property:String, newValue:Dynamic){
 			Reflect.setProperty(this, property, newValue);
 		});
-
+		//you cannot get properties from other states hahahha!
 		interp.variables.set("getProperty", function(property:String){
 			return Reflect.getProperty(this, property);
 		});
