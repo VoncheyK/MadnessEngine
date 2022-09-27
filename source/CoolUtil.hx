@@ -29,6 +29,11 @@ class CoolUtil
 		return daText;
 	}
 
+	public static function GetTypeOf(thing:Dynamic):Dynamic
+	{
+		return Type.typeof(thing);
+	}
+
 	public static function coolTextFile(path:String):Array<String>
 	{
 		var daList:Array<String> = Assets.getText(path).trim().split('\n');
