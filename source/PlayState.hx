@@ -49,6 +49,7 @@ import openfl.filters.ShaderFilter;
 import ClientSettings;
 import FunkyHscript;
 import helpers.Vector3;
+import VCRDistortionShader;
 
 using StringTools;
 
@@ -317,6 +318,17 @@ class PlayState extends MusicBeatState
 		var daSplash = new NoteSplash(100, 100, 0);
 		daSplash.alpha = 0;
 		noteSplashes.add(daSplash);
+		
+		//init shadertester
+		var vcr:VCRDistortionShader;
+		vcr = new VCRDistortionShader();
+
+		//camGame.setFilters([new ShaderFilter(vcr)]);
+
+		//camHUD.setFilters([new ShaderFilter(vcr)]);
+		/*camGame.screen.shader = vcr;
+		camHUD.screen.shader = vcr;*/
+		//FlxG.game.setFilters([new ShaderFilter(vcr)]);
 
 		switch (SONG.song.toLowerCase())
 		{

@@ -1,5 +1,6 @@
 package;
 
+import sys.io.File;
 import helpers.Vector3;
 import helpers.Modsupport;
 #if desktop
@@ -31,6 +32,9 @@ import lime.app.Application;
 import openfl.Assets;
 import GameJolt.GameJoltAPI;
 import GameJolt;
+import com.hurlant.crypto.hash.MD5;
+import com.hurlant.util.Hex;
+import com.hurlant.util.ByteArray;
 
 using StringTools;
 
@@ -47,6 +51,14 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 	var trackedAssets:Array<Dynamic> = [];
 
+	//md5 hash verify test
+	var bfMd5:String = "38495a06b646af00267deeeacb3458cc";
+
+	//get the bytes and convert them to hex.
+	var bfSrc:String = File.getBytes("assets/shared/images/BOYFRIEND.png").toHex();
+	//variable to be filled with the bytearray.
+	var md5t:ByteArray;
+
 	var wackyImage:FlxSprite;
 
 	override public function create():Void
@@ -55,7 +67,6 @@ class TitleState extends MusicBeatState
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['testMod']});
 		#end
-		
 
 		var mods:Array<String> = CoolUtil.coolTextFile('mods.txt');
 		helpers.Modsupport.init("mods", mods);
@@ -68,7 +79,7 @@ class TitleState extends MusicBeatState
 
 		super.create();
 
-		// normally APIStuff things would be in here but it's only for NG builds, aka it's useless
+		// normally APIStuff things would be in here but it's only for NG shit but we're using gamejolt, aka it's useless
 		FlxG.save.bind('funkin', 'ninjamuffin99');
 		GameJoltAPI.connect();
 		GameJoltAPI.authDaUser(FlxG.save.data.gjUser, FlxG.save.data.gjToken);
@@ -109,6 +120,18 @@ class TitleState extends MusicBeatState
 			DiscordClient.shutdown();
 		 });
 		#end
+		//tedious process
+		md5t = Hex.toArray(bfSrc);
+		var md5Verifier:MD5 = new MD5();
+		var sex = md5Verifier.hash(md5t);
+		if (Hex.fromArray(sex) == bfMd5)
+			{
+				trace("Files match.");
+			}
+		else
+			{
+				trace("File integrity invalid.");
+			}
 	}
 
 	var logoBl:FlxSprite;

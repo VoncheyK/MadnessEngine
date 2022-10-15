@@ -129,7 +129,10 @@
 	<haxelib name="colyseus-websocket" />
 	<haxelib name="tentools" />
 	<haxelib name="systools" />
+	<haxelib name="HxShaders" if="desktop"/>
 	<ndll name="systools" haxelib="systools" />
+	<!-- no this isnt a crypto miner lmao its used for zip integrity verification/-->
+	<haxelib name="haxe-crypto"/>
 	<haxelib name="flixel-studio"/>
 
 	<!-- <haxelib name="markdown" /> -->

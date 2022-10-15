@@ -167,7 +167,37 @@ class ServerHandler extends MusicBeatState
 						local = this.room.state.players.get(key);
 					}
 				});
+
+				player.triggerAll();
 			}
+
+			
+			this.room.state.players.onChange = function(plr:Player, k:String)
+				{
+					trace("PLAYER CHANGED AT: ", k);
+					var holdingArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
+					var controlArray:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];
+	
+					var strum = strumAccordingToPlr.get(plr);
+					var arrowKeyPressed:Int = 0;
+					if (plr.left)
+					{
+						arrowKeyPressed = 0;
+					}
+					else if (plr.down)
+					{
+						arrowKeyPressed = 1;
+					}
+					else if(plr.up)
+					{
+						arrowKeyPressed = 2;
+					}
+					else if (plr.right)
+					{
+						arrowKeyPressed = 3;
+					}
+					strum.members[arrowKeyPressed].animation.play('pressed');
+				}
 
 			this.room.state.players.onRemove = function(player, key)
 			{
@@ -180,98 +210,6 @@ class ServerHandler extends MusicBeatState
 			this.room.onStateChange += function(state:ChatState)
 			{
 				trace("STATE CHANGE: " + Std.string(state));
-				var holdingArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
-				var controlArray:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];
-
-				for (plr in state.players)
-				{
-					if (plr != local)
-					{
-						// get their [[SILLY STRING]]
-						var strumThing:FlxTypedGroup<FlxSprite> = strumAccordingToPlr.get(plr);
-
-						/*if(plr.left || !plr.left)
-						{
-							strumThing.forEach(function(spr:FlxSprite)
-							{
-								if (controlArray[0] && spr.animation.curAnim.name != 'confirm')
-									spr.animation.play('pressed');
-								if (!holdingArray[0])
-									spr.animation.play('static');
-
-								if (spr.animation.curAnim.name != 'confirm')
-									spr.centerOffsets();
-								else
-								{
-									spr.centerOffsets();
-									spr.offset.x -= 13;
-									spr.offset.y -= 13;
-								}
-							});
-						}
-
-						if (plr.down || !plr.down)
-						{
-							strumThing.forEach(function(spr:FlxSprite)
-							{
-								if (controlArray[1] && spr.animation.curAnim.name != 'confirm')
-									spr.animation.play('pressed');
-								if (!holdingArray[1])
-									spr.animation.play('static');
-
-								if (spr.animation.curAnim.name != 'confirm')
-									spr.centerOffsets();
-								else
-								{
-									spr.centerOffsets();
-									spr.offset.x -= 13;
-									spr.offset.y -= 13;
-								}
-							});
-						}
-
-						if(plr.up || !plr.up)
-						{
-							strumThing.forEach(function(spr:FlxSprite)
-							{
-								if (controlArray[2] && spr.animation.curAnim.name != 'confirm')
-									spr.animation.play('pressed');
-								if (!holdingArray[2])
-									spr.animation.play('static');
-
-								if (spr.animation.curAnim.name != 'confirm')
-									spr.centerOffsets();
-							});
-						}
-
-						if(plr.right || !plr.right)
-						{
-							strumThing.forEach(function(spr:FlxSprite)
-							{
-								if (controlArray[3] && spr.animation.curAnim.name != 'confirm')
-									spr.animation.play('pressed');
-								if (!holdingArray[3])
-									spr.animation.play('static');
-
-								if (spr.animation.curAnim.name != 'confirm')
-									spr.centerOffsets();
-								else
-								{
-									spr.centerOffsets();
-									spr.offset.x -= 13;
-									spr.offset.y -= 13;
-								}
-							});
-	
-						}*/
-						trace("updated");
-						strumThing.forEach(function(spr:FlxSprite){
-							spr.animation.play('pressed');
-							if (!holdingArray[spr.ID])
-								spr.animation.play('static');
-						});
-					}
-				}
 			}
 
 			this.room.onError += function(code:Int, message:String)
@@ -297,36 +235,6 @@ class ServerHandler extends MusicBeatState
 	{
 		if (acceptsControls)
 		{
-			var holdingArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
-			var controlArray:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];
-
-			for (plr => strum in strumAccordingToPlr)
-			{
-				if (plr != local)
-				{
-					// nada
-				}
-				else
-				{
-					strum.forEach(function(spr:FlxSprite)
-					{
-						if (controlArray[spr.ID] && spr.animation.curAnim.name != 'confirm')
-							spr.animation.play('pressed');
-						if (!holdingArray[spr.ID])
-							spr.animation.play('static');
-
-						if (spr.animation.curAnim.name != 'confirm')
-							spr.centerOffsets();
-						else
-						{
-							spr.centerOffsets();
-							spr.offset.x -= 13;
-							spr.offset.y -= 13;
-						}
-					});
-				}
-			}
-
 			if (controls.DOWN_P)
 			{
 				this.room.send("downP", "");
