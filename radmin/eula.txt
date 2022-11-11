@@ -1,0 +1,432 @@
+RADMIN 3.5.2 VIEWER
+END USER LICENSE AGREEMENT
+
+
+NOTICE TO USER:
+THIS IS A CONTRACT.  AT THE END, YOU WILL BE ASKED TO ACCEPT THIS
+AGREEMENT AND CONTINUE TO INSTALL OR, IF YOU DO NOT WISH TO
+ACCEPT THIS AGREEMENT, TO  DECLINE THIS AGREEMENT, IN WHICH CASE
+YOU WILL NOT BE ABLE TO USE, INSTALL  OR OPERATE THE PRODUCT, AS
+DEFINED BELOW.  BY INSTALLING THIS SOFTWARE YOU  ACCEPT ALL THE
+TERMS AND CONDITIONS OF THIS AGREEMENT.
+
+This Electronic End User License Agreement (the "Agreement") is a legal
+agreement between you (either an individual or an entity), the licensee, and 
+Famatech Corp. (collectively, the "Company"), regarding the 
+software and service titled Radmin 3.5.2 Viewer that you about to download,
+downloaded,  or otherwise obtained through other resources or media such as
+CD-ROMs, floppy disks, or though a network in object code form or other
+related services, including without limitation a) all of the contents of the
+files, disk(s), CD-ROM(s) or other media with which this Agreement is provided
+(the "Software"), and b) all successor upgrades, revisions, patches, 
+enhancements, fixes modifications, copies, additions or maintenance releases of 
+the Software, if any, licensed to you by the Company (collectively, the 
+"Updates") provided that the Updates shall not include a new subsequent 
+releases of the Radmin bearing a new first numeral such as 4.0 or 5.0 
+("New Releases") but include any minor revisions of the Radmin 3.5.2 Viewer 
+version indicated by a change in the decimal numeral, such as 3.6 or 3.7, and  
+c) related user documentation and explanatory materials or files provided in
+written, "online" or electronic form (the "Documentation" and together with
+the Software and Updates, the "Product").  You are subject to the terms and
+conditions of this End User License Agreement whether you access or obtain
+the Product directly from the Company, or through any other source. For
+purposes hereof, "you" means the individual person installing or using the
+Product on his or her own behalf; or, if the Product is being downloaded or
+installed on behalf of an organization, such as an employer, "you" means the
+organization for which the Product is downloaded or installed and it is
+represented hereby that such organization has authorized the person accepting
+this agreement to do so on its behalf.  For purposes hereof the term
+"organization", without limitation, includes any partnership, limited
+liability company, corporation, association, joint stock company, trust, joint
+venture, labor organization, unincorporated organization, or governmental
+authority.
+
+By accessing, downloading, storing, loading, installing, executing,
+displaying, copying the Product into the memory of a computer or otherwise
+benefiting from using the functionality of the Product in accordance with the
+Documentation ("Operating"), you agree to be bound by the terms of this
+Agreement. If you do not agree to the terms and conditions of this Agreement,
+the Company is unwilling to license the Product to you. In such event, you may
+not Operate or use the Product in any way.
+
+BEFORE YOU PUT A CHECKMARK by the statement "I agree with the above terms and 
+conditions" and CLICK ON THE "NEXT" BUTTON, CAREFULLY READ THE TERMS
+AND CONDITIONS OF THIS AGREEMENT. YOUR CLICK OF THE "NEXT" BUTTON
+IS A SYMBOL OF YOUR SIGNATURE  AND BY CLICKING ON THE "NEXT"
+BUTTON, YOU ARE CONSENTING TO BE BOUND BY AND ARE BECOMING A
+PARTY TO THIS AGREEMENT AND AGREE THAT THIS AGREEMENT IS
+ENFORCEABLE LIKE ANY WRITTEN NEGOTIATED AGREEMENT SIGNED BY YOU.
+IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS AGREEMENT, CLICK
+THE "EXIT" BUTTON AND THE SOFTWARE WILL NOT BE INSTALLED ON YOUR
+COMPUTER. This Product will not install on your computer unless or until
+you accept the terms of this Agreement. You may also receive a copy of this
+Agreement by contacting Famatech at:
+http://www.radmin.com/support/feedback.php
+
+1. Proprietary Rights and Non-Disclosure.
+
+  1.1. Ownership Rights.
+       You agree that the Product and the authorship, systems, ideas, methods
+       of operation, documentation and other information contained in the
+       Product, are proprietary intellectual properties and/or the valuable
+       trade secrets of the Company or its suppliers and/or licensors and are
+       protected by civil and criminal law, and by the law of copyright, trade
+       secret, trademark and patent of the United States, other countries and
+       international treaties. You may use trademarks only insofar as to
+       identify printed output produced by the Product in accordance with
+       accepted trademark practice, including identification of trademark
+       owner's name.  Such use of any trademark does not give you any rights
+       of ownership in that trademark. The Company and its suppliers own and
+       retain all right, title, and interest in and to the Product, including
+       all copyrights, patents, trade secret rights, trademarks, and other
+       intellectual property rights therein.  Your possession, installation or
+       use of the Product does not transfer to you any title to the
+       intellectual property in the Product, and you will not acquire any
+       rights to the Product except as expressly set forth in this Agreement.
+       All copies of the Product made hereunder must contain the same
+       proprietary notices that appear on and in the Product. Except as stated
+       herein, this Agreement does not grant you any intellectual property
+       rights in the Product.
+
+  1.2. Source Code.
+       You acknowledge that the source code for the Product is proprietary to
+       the Company or its suppliers and/or licensors and constitutes trade
+       secrets of the Company or its suppliers and/or licensors. You agree not
+       to modify, adapt, translate, reverse engineer, decompile, disassemble
+       or otherwise attempt to discover the source code of the Product in any
+       way.
+
+  1.3. Confidential Information.
+       You agree that, unless otherwise specifically provided herein or agreed
+       by the Company in writing, the Product, including the specific design
+       and structure of individual programs and the Product, constitute
+       confidential proprietary information of the Company or its suppliers
+       and/or licensors.  You agree not to transfer, copy, disclose, provide
+       or otherwise make available such confidential information in any form
+       to any third party without the prior written consent of the Company.
+       You agree to implement reasonable security measures to protect such
+       confidential information provided however, that you may make and
+       distribute unlimited copies of the Software in object code only,
+       including copies for commercial distribution, as long as each copy that
+       you make and distribute contains this Agreement subject to end user's
+       acceptance before the first use, the Radmin Software installer, and the
+       same copyright and other proprietary notices pertaining to this
+       Software that appear in the Software.  If you download the Software
+       from the Internet or similar on-line source, you must include the
+       copyright notices resident on the Software with any on-line
+       distribution and on any media you distribute that includes the
+       Software. 
+
+  1.4. No Modification.
+       You agree not to modify or alter the Product in any way. You may not
+       remove or alter any copyright notices or other proprietary notices on
+       any copies of the Product.
+
+2. Grant of License.
+
+  2.1. License.
+       The Company grants you the non-exclusive and non-transferable license
+       to store, load, install, execute, and display the specified version of
+       the Software on an unlimited number of computers, workstations,
+       personal digital assistants, "smart phones", mobile phones, hand-held
+       devices, or other electronic devices for which the software was
+       designed (each a "Client Device").  The Company reserves all rights 
+       not expressly granted herein.
+
+  2.2. Remote Access.
+       The Product contains various technologies that enable other
+       applications of third parties installed on a Client Device (the "Host
+       Client Device") to be used or Operated remotely from one or more other
+       Client Devices. You may need to review your license agreements relating
+       to other applicable third parties' applications to which you may be
+       able to obtain remote access using the Product in order to ascertain
+       your compliance with the restrictions and limitations of the use of
+       such third parties' applications, including the use through remote
+       access.
+
+  2.3. Updates.
+       During the Term of this Agreement, you may download Updates to the
+       Product when and as the Company publishes them in its website or
+       through other online services. Notwithstanding any provision to the
+       contrary herein, nothing is this Agreement shall be construed as to
+       grant you any rights or licenses with regard to the New Releases of
+       the Product or to entitle you to any New Release. This Agreement does
+       not obligate the Company to provide any Updates. Notwithstanding the
+       foregoing, any Updates that you may receive become part of the Product
+       and the terms of this Agreement apply to them (unless this Agreement is
+       superceded by a further Agreement accompanying such Update or modified
+       version of to the Product).
+
+  2.4. Term and Termination.
+       The term of this Agreement ("Term") shall begin when you download or
+       install the Product (whichever is earlier) and shall continue, unless
+       otherwise terminated pursuant hereto, in perpetuity or for the term
+       specified in the license granted hereunder. The Company may terminate
+       this Agreement by offering you a superseding Agreement for the Product
+       or any replacement or modified version of or upgrade or New Release of
+       the Product and conditioning your continued use of the Product or such
+       replacement, modified or upgraded version or New Release on your
+       acceptance of such superseding Agreement. This Agreement may be also
+       terminated by the Company immediately and without notice if you fail to
+       comply with any of your obligation or conditions of this Agreement.
+       Without prejudice to any other rights, this Agreement will terminate
+       automatically if you fail to comply with any of the limitations or
+       other requirements described herein.  Upon any termination or
+       expiration of this Agreement, you must immediately cease use of the
+       Product and destroy all copies of the Product.
+
+  2.5. No Rights Upon Termination.
+       Upon termination of this Agreement you will no longer be authorized to
+       Operate or use the Product in any way.
+
+3. Restrictions.
+
+  3.1. No Transfer of Rights.
+       You may not rent, lease, loan the Product. You may not reverse engineer, 
+       decompile, disassemble or otherwise reduce any party of the Product to human
+       readable form nor permit any third party to do so, except to the extent
+       the foregoing restriction is expressly prohibited by applicable law.
+       Notwithstanding the foregoing sentence, decompiling the Software is
+       permitted to the extent the laws of your jurisdiction give you the
+       right to do so to obtain information necessary to render the Software
+       interoperable with other software; provided, however, that you must
+       first request such information from the Company and the Company may,
+       in its discretion, either provide such information to you (subject to
+       confidentiality terms) or impose reasonable conditions, including a
+       reasonable fee, on such use of the Software to ensure that the
+       Company's and its suppliers and/or licensors proprietary rights in the
+       Software are protected.  You may not modify, or create derivative works
+       based upon the Product in whole or in part.
+
+  3.2. Proprietary Notices and Copies.
+       You may not remove any proprietary notices or labels on the Product.
+       You may not copy the Product except as expressly permitted in Section 2
+       above.  
+
+  3.3. No Transfer.
+       Except as otherwise specifically provided herein, you may not transfer
+       or assign any of the rights granted to you under this Agreement.
+
+  3.4. Additional Protection Measures.
+       Solely for the purpose of preventing unlicensed use of the Product, the
+       Software may install on your computer technological measures that are
+       designed to prevent unlicensed use, and the Company may use this
+       technology to confirm that you have a licensed copy of the Product.
+       The update of these technological measures may occur through the
+       installation of the Updates.  The Updates will not install on
+       unlicensed copies of the Product. If you are not using a licensed copy
+       of the Product, you are not allowed to install the Updates. The Company
+       will not collect any personally identifiable information from your
+       computer during this process.
+
+4. NO WARRANTY AND DISCLAIMER.
+
+  4.1. No Express Warranty.
+       The Software is being delivered to you "AS IS" and the Company makes no
+       warranty as to its use or performance.
+
+  4.2. NO IMPLIED OR OTHER WARRANTIES.
+       EXCEPT FOR ANY WARRANTY, CONDITION, REPRESENTATION OR TERM
+       TO THE EXTENT TO WHICH THE SAME CANNOT OR MAY NOT BE
+       EXCLUDED OR LIMITED BY LAW APPLICABLE TO YOU IN YOUR
+       JURISDICTION, THE PRODUCT IS PROVIDED "AS-IS" WITHOUT ANY
+       WARRANTY WHATSOEVER AND THE COMPANY MAKES NO PROMISES,
+       REPRESENTATIONS OR WARRANTIES, WHETHER EXPRESSED OR
+       IMPLIED, WHETHER BY STATUTE, COMMON LAW, CUSTOM, USAGE
+       OR OTHERWISE, REGARDING OR RELATING TO THE PRODUCT OR
+       CONTENT THEREIN OR TO ANY OTHER MATERIAL FURNISHED OR
+       PROVIDED TO YOU PURSUANT TO THIS AGREEMENT OR OTHERWISE.
+       YOU ASSUME ALL RISKS AND RESPONSIBILITIES FOR SELECTION
+       OF THE PRODUCT TO ACHIEVE YOUR INTENDED RESULTS, AND FOR
+       THE INSTALLATION OF, USE OF, AND RESULTS OBTAINED FROM THE
+       PRODUCT. THE COMPANY MAKES NO WARRANTY THAT THE PRODUCT
+       WILL BE ERROR FREE OR FREE FROM INTERRUPTION OR FAILURE,
+       OR THAT IT IS COMPATIBLE WITH ANY PARTICULAR HARDWARE OR
+       SOFTWARE. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
+       LAW, COMPANY DISCLAIMS ALL WARRANTIES, EITHER EXPRESS OR
+       IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES
+       OF MERCHANTABILITY, NON-INFRINGEMENT OF THIRD PARTY
+       RIGHTS, INTEGRATION, SATISFACTORY QUALITY OR FITNESS
+       FOR ANY PARTICULAR PURPOSE WITH RESPECT TO THE PRODUCT
+       AND THE ACCOMPANYING WRITTEN MATERIALS OR THE USE THEREOF.
+       SOME JURISDICTIONS DO NOT ALLOW LIMITATIONS ON IMPLIED
+       WARRANTIES, SO THE ABOVE LIMITATION MAY NOT APPLY TO YOU.
+       YOU HEREBY ACKNOWLEDGE THAT THE PRODUCT MAY NOT BE OR
+       BECOME AVAILABLE DUE TO ANY NUMBER OF FACTORS INCLUDING
+       WITHOUT LIMITATION PERIODIC SYSTEM MAINTENANCE, SCHEDULED
+       OR UNSCHEDULED, ACTS OF GOD, TECHNICAL FAILURE OF THE
+       SOFTWARE, TELECOMMUNICATIONS INFRASTRUCTURE, OR DELAY OR
+       DISRUPTION ATTRIBUTABLE TO VIRUSES, DENIAL OF SERVICE
+       ATTACKS, INCREASED OR FLUCTUATING DEMAND, AND ACTIONS
+       AND OMISSIONS OF THIRD PARTIES.  THEREFORE, THE COMPANY
+       EXPRESSLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTY
+       REGARDING SYSTEM AND/OR SOFTWARE AVAILABILITY,
+       ACCESSIBILITY, OR PERFORMANCE. THE COMPANY DISCLAIMS
+       ANY AND ALL LIABILITY FOR THE LOSS OF DATA DURING ANY
+       COMMUNICATIONS AND ANY LIABILITY ARISING FROM OR RELATED
+       TO ANY FAILURE BY THE COMPANY TO TRANSMIT ACCURATE OR
+       COMPLETE INFORMATION TO YOU.
+
+  4.3. LIMITED LIABILITY; NO LIABILITY FOR CONSEQUENTIAL DAMAGES.
+       YOU ASSUME THE ENTIRE COST OF ANY DAMAGE RESULTING FROM
+       YOUR USE OF THE PRODUCT AND THE INFORMATION CONTAINED
+       IN OR COMPILED BY THE PRODUCT, AND THE INTERACTION (OR
+       FAILURE TO INTERACT PROPERLY) WITH ANY OTHER HARDWARE OR
+       SOFTWARE WHETHER PROVIDED BY THE COMPANY OR A THIRD PARTY.
+       TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO
+       EVENT WILL THE COMPANY OR ITS SUPPLIERS OR LICENSORS BE
+       LIABLE FOR ANY DAMAGES WHATSOEVER (INCLUDING, WITHOUT
+       LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS
+       INTERRUPTION, LOSS OF BUSINESS INFORMATION, LOSS OF
+       GOODWILL, WORK STOPPAGE, HARDWARE OR SOFTWARE DISRUPTION
+       IMPAIRMENT OR FAILURE, REPAIR COSTS, TIME VALUE OR OTHER
+       PECUNIARY LOSS) ARISING OUT OF THE USE OR INABILITY TO USE
+       THE PRODUCT, OR THE INCOMPATIBILITY OF THE PRODUCT WITH
+       ANY HARDWARE SOFTWARE OR USAGE, EVEN IF SUCH PARTY HAS
+       BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. IN NO
+       EVENT WILL COMPANY'S TOTAL LIABILITY TO YOU FOR ALL
+       DAMAGES IN ANY ONE OR MORE CAUSE OF ACTION, WHETHER IN
+       CONTRACT, TORT OR OTHERWISE EXCEED THE AMOUNT PAID BY YOU
+       FOR THE PRODUCT. THIS LIMITATION OF LIABILITY SHALL NOT
+       APPLY TO LIABILITY FOR DEATH OR PERSONAL INJURY TO THE
+       EXTENT THAT APPLICABLE LAW PROHIBITS SUCH LIMITATION.
+       FURTHERMORE, BECAUSE SOME JURISDICTIONS DO NOT ALLOW THE
+       EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR
+       INCIDENTAL DAMAGES, THE ABOVE LIMITATION MAY NOT APPLY TO
+       YOU.
+
+5. U.S. Government-Restricted Rights.
+
+  5.1. Notice to U.S. Government End Users.
+       The Product and accompanying Documentation are deemed to be
+       "Commercial Items", as that term is defined at 48 C.F.R. §2.101,
+       consisting of "Commercial Computer Software" and "Commercial Computer
+       Software Documentation", respectively, as such terms are used in
+       48 C.F.R. §12.212 or 48 C.F.R. §227.7202, as applicable. Consistent
+       with 48 C.F.R. §12.212 or 48 C.F.R. §§227.7202-1
+       through 227.7202-4, as applicable, the Commercial Computer
+       Software and Commercial Computer Software Documentation are being
+       licensed to U.S. Government end users (a) only as Commercial Items
+       and (b) with only those rights, including any use, modification,
+       reproduction, release, performance, display or disclosure of the
+       Product and accompanying Documentation, as are granted to all other
+       end users pursuant to the terms and conditions herein.
+       Unpublished-rights reserved under the copyright laws of the
+       United States.
+
+  5.2. Export Restrictions.
+       You acknowledge and agree that the Product may be subject to
+       restrictions and controls imposed by the Export Administration Act and
+       the Export Administration Regulations of the United States
+       (the "Acts"). You agree and certify that neither the Product nor any
+       direct product thereof is being or will be used for any purpose
+       prohibited by the Acts. You may not Operate, download, export, or
+       re-export the Product (a) into, or to a national or resident of, any
+       country to which the United States has embargoed goods, or (b) to
+       anyone on the United States Treasury Department's list of Specially
+       Designated Nationals or the U.S. Commerce Department's Table of Deny
+       Orders. By Operating the Product, you are representing and warranting
+       that you are not located in, under the control of, or a national or
+       resident of any such country or on any such list. You acknowledge that
+       it is your sole responsibility to comply with any and all government
+       export and other applicable laws and that the Company has no further
+       responsibility for such after the initial license to you. You warrant
+       and represent that neither the U.S. Commerce Department, Bureau of
+       Export Administration nor any other U.S. federal agency has suspended,
+       revoked or denied your export privileges.
+
+6. Your Information and the Company's Privacy Policy.
+
+  6.1. Privacy Policy.
+       You hereby expressly consent to the Company's processing of your
+       personal data (which may be collected by the Company or its
+       distributors) according to the Company's current privacy policy as of
+       the date of the effectiveness hereof which is incorporated into this
+       Agreement by reference
+       ( see http://www.radmin.com/about/legal/pp.php ). By entering into this
+       Agreement, you agree that the Company may collect and retain
+       information about you, including your name, email address and credit
+       card information.  The Company employs other companies and individuals
+       to perform functions its behalf.  Examples include fulfilling orders,
+       delivering packages, sending postal mail and e-mail, removing
+       repetitive information from customer lists, analyzing data, providing
+       marketing assistance, processing credit card payments, and providing
+       customer service.  They have access to personal information needed to
+       perform their functions, but may not use it for other purposes. The
+       Company publishes a privacy policy on its web site and may amend such
+       policy from time to time in its sole discretion.  You should refer to
+       the Company's privacy policy prior to agreeing to this Agreement for a
+       more detailed explanation of how your information will be stored and
+       used by the Company.  If "you" are an organization, you will ensure
+       that each member of your organization (including employees and
+       contractors) about whom personal data may be provided to the Company
+       has given his or her express consent to the Company's processing of
+       such personal data.  Personal data will be processed by the Company or
+       its distributors in the country where it was collected, and possibly in
+       the United States and Germany.  United States laws regarding processing
+       of personal data may be less or more stringent than the laws in your
+       jurisdiction.
+
+7. Miscellaneous.
+
+  7.1. Governing Law; Jurisdiction and Venue.
+       This Agreement shall be governed by and construed and enforced in
+       accordance with the laws of the Commonwealth of Virginia without
+       reference to conflicts of law rules and principles. To the extent
+       permitted by law, the provisions of this Agreement shall supersede any
+       provisions of the Uniform Commercial Code as adopted or made applicable
+       to the Products in any competent jurisdiction.  This Agreement shall
+       not be governed by the United Nations Convention on Contracts for the
+       International Sale of Goods, the application of which is expressly
+       disclaimed and excluded.  The federal and state courts within the
+       Commonwealth of Virginia shall have exclusive jurisdiction to
+       adjudicate any dispute arising out of this Agreement. You agree that
+       this Agreement is to be performed in Commonwealth of Virginia and that
+       any action, dispute, controversy, or claim that may be instituted based
+       on this Agreement, or arising out of or related to this Agreement or
+       any alleged breach thereof, shall be prosecuted exclusively in the
+       federal or state courts in the Commonwealth of Virginia, and you, to
+       the extent permitted by applicable law, hereby waive the right to
+       change venue to any other state, county, district or jurisdiction;
+       provided, however, that the Company as claimant shall be entitled to
+       initiate proceedings in any court of competent jurisdiction.
+
+  7.2. Period for Bringing Actions.
+       No action, regardless of form, arising out of the transactions under
+       this Agreement, may be brought by either party hereto more than
+       one (1) year after the cause of action has occurred, or was discovered
+       to have occurred, except that an action for infringement of
+       intellectual property rights may be brought within the maximum
+       applicable statutory period.
+
+  7.3. Entire Agreement; Severability; No Waiver.
+       This Agreement is the entire agreement between you and Company and
+       supersedes any other prior agreements, proposals, communications or
+       advertising, oral or written, with respect to the Product or to subject
+       matter of this Agreement provided that the Company and you may limit,
+       modify or changes the applicability of the terms of this Agreement by
+       a prior, contemporaneous or subsequent written agreement by referencing
+       this Section 7.3 of the Agreement and expressly providing for such
+       limitation, modification or changes. You acknowledge that you have read
+       this Agreement, understand it and agree to be bound by its terms. If
+       any provision of this Agreement is found by a court of competent
+       jurisdiction to be invalid, void, or unenforceable for any reason, in
+       whole or in part, such provision will be more narrowly construed so
+       that it becomes legal and enforceable, and the entire Agreement will
+       not fail on account thereof and the balance of the Agreement will
+       continue in full force and effect to the fullest extent permitted by
+       law. No waiver of any breach of any provisions of this Agreement will
+       constitute a waiver of any prior, concurrent or subsequent breach and
+       no waiver will be effective unless made in writing.
+
+  7.4. Contact Information. Should you have any questions concerning this
+       Agreement, or if you desire to contact the Company for any reason,
+       Customer Department at http://www.radmin.com/support/feedback.php
+
+
+Copyright © 1999-2017 Famatech Corp. and its licensors.  All rights 
+reserved.  
+The Product, including the Software and any accompanying Documentation, are 
+copyrighted and protected by copyright laws and international copyright
+treaties, as well as other intellectual property laws and treaties  
+
