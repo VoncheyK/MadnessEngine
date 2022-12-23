@@ -1,0 +1,23 @@
+{
+    "week":"week3",
+    "weekName":"Pico",
+    "menuCharacters":["pico", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Pico",
+            "character":"pico",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Philly",
+            "character":"pico",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Blammed",
+            "character":"pico",
+            "author":"Kawai Sprite"
+        }
+    ]
+}

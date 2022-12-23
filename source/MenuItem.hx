@@ -13,10 +13,15 @@ class MenuItem extends FlxSpriteGroup
 	public var week:FlxSprite;
 	public var flashingInt:Int = 0;
 
-	public function new(x:Float, y:Float, weekNum:Int = 0)
+	public function new(x:Float, y:Float, weekName:String)
 	{
 		super(x, y);
-		week = new FlxSprite().loadGraphic(Paths.image('storymenu/week' + weekNum));
+		week = new FlxSprite();
+		if (Paths.loadImage('storymenu/' + weekName) != null)
+			week.loadGraphic(Paths.image('storymenu/' + weekName));
+		else
+			week.loadGraphic(Paths.image('storymenu/noweek'));
+
 		add(week);
 	}
 
@@ -36,7 +41,7 @@ class MenuItem extends FlxSpriteGroup
 	override function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		y = FlxMath.lerp(y, (targetY * 120) + 480, 0.17);
+		y = FlxMath.lerp(y, (targetY * 120) + 480, CoolUtil.lerpShit(elapsed, 8.4));
 
 		if (isFlashing)
 			flashingInt += 1;

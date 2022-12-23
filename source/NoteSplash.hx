@@ -2,52 +2,65 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.animation.FlxBaseAnimation;
 import flixel.graphics.frames.FlxAtlasFrames;
-
-using StringTools;
 
 class NoteSplash extends FlxSprite
 {
-	public static var colors:Array<String> = ['purple', 'blue', 'green', 'red'];
+	private var idleAnim:String;
+	private var textureLoaded:String = null;
 
-	var colorsThatDontChange:Array<String> = ['purple', 'blue', 'green', 'red'];
-
-	public function new(nX:Float, nY:Float, color:Int)
-	{
-		x = nX;
-		y = nY;
+	public function new(x:Float = 0, y:Float = 0, ?note:Int = 0) {
 		super(x, y);
-		frames = Paths.getSparrowAtlas('noteSplashes', 'shared');
-		for (i in 0...colorsThatDontChange.length)
-		{
-			animation.addByPrefix('splash 0 ' + colorsThatDontChange[i], 'note impact 1 ' + colorsThatDontChange[i], 24, false);
-			animation.addByPrefix('splash 1 ' + colorsThatDontChange[i], 'note impact 2 ' + colorsThatDontChange[i], 24, false);
-		}
-		//animation.play('splash');
-		antialiasing = true;
-		updateHitbox();
-		makeSplash(nX, nY, color);
+
+		var skin:String = 'noteSplashes';
+
+		loadAnims(skin);
+
+		setupNoteSplash(x, y, note);
 	}
 
-	public function makeSplash(nX:Float, nY:Float, color:Int) 
+	public function setupNoteSplash(x:Float, y:Float, note:Int = 0, texture:String = null) {
+		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
+		alpha = 0.6;
+
+		if(texture == null) {
+			texture = 'noteSplashes';
+		}
+
+		if(textureLoaded != texture) {
+			loadAnims(texture);
+		}
+		offset.set(10, 10);
+
+		var animNum:Int = FlxG.random.int(1, 2);
+		animation.play('note' + note + '-' + animNum, true);
+		if(animation.curAnim != null)animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
+	}
+
+	public static function loadAnimsToSprite(sprite:FlxSprite)
 	{
-        setPosition(nX - 105, nY - 110);
-		angle = FlxG.random.int(0, 360);
-        alpha = 0.6;
-        animation.play('splash ${FlxG.random.int(0,1)} ${colors[color]}', true);
-		//animation.curAnim.frameRate = 24 + FlxG.random.int(-2, 2);
-    	//offset.set(90, 80);
-        updateHitbox();
-    }
+		sprite.frames = Paths.getSparrowAtlas("noteSplashes");
+		for (i in 1...3) {
+			sprite.animation.addByPrefix("note1-" + i, "note splash blue " + i, 24, false);
+			sprite.animation.addByPrefix("note2-" + i, "note splash green " + i, 24, false);
+			sprite.animation.addByPrefix("note0-" + i, "note splash purple " + i, 24, false);
+			sprite.animation.addByPrefix("note3-" + i, "note splash red " + i, 24, false);
+		}
+	}
 
-	override public function update(elapsed) 
-	{
-        if (animation.curAnim.finished) {
-            kill();
-        }
+	function loadAnims(skin:String) {
+		frames = flixel.graphics.FlxGraphic.fromBitmapData(PlayState.instance.playstateCache.getBitmapData("nSplashes")).atlasFrames;
+		for (i in 1...3) {
+			animation.addByPrefix("note1-" + i, "note splash blue " + i, 24, false);
+			animation.addByPrefix("note2-" + i, "note splash green " + i, 24, false);
+			animation.addByPrefix("note0-" + i, "note splash purple " + i, 24, false);
+			animation.addByPrefix("note3-" + i, "note splash red " + i, 24, false);
+		}
+	}
 
-        super.update(elapsed);
-    }
+	override function update(elapsed:Float) {
+		if(animation.curAnim != null)if(animation.curAnim.finished) kill();
 
+		super.update(elapsed);
+	}
 }

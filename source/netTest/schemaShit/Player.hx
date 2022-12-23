@@ -21,5 +21,4 @@ class Player extends Schema {
 
 	@:type("boolean")
 	public var down: Bool = false;
-
 }

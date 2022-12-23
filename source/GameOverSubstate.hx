@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxSprite;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSubState;
@@ -9,33 +10,36 @@ import flixel.util.FlxTimer;
 
 class GameOverSubstate extends MusicBeatSubstate
 {
-	var bf:Boyfriend;
+	var bf:Character;
 	var camFollow:FlxObject;
 
 	var stageSuffix:String = "";
 
-	public function new(x:Float, y:Float)
+	public function new(x:Float, y:Float, play:PlayState)
 	{
+		//code transported to playstate
 		var daStage = PlayState.curStage;
-		var daBf:String = '';
 		switch (daStage)
 		{
 			case 'school':
 				stageSuffix = '-pixel';
-				daBf = 'bf-pixel-dead';
 			case 'schoolEvil':
 				stageSuffix = '-pixel';
-				daBf = 'bf-pixel-dead';
 			default:
-				daBf = 'bf';
 		}
 
 		super();
 
 		Conductor.songPosition = 0;
 
-		bf = new Boyfriend(x, y, daBf);
-		add(bf);
+		if (play.playstateCache.hasBitmapData("death"))
+		{
+			trace("found cache");
+			//using stage suffix for either loading pixel death anims or literally just load the normal bf-dead
+			bf = new Character(x, y, "die" + stageSuffix);
+			add(bf);
+		}
+		else {trace("epic fail wtf"); MusicBeatState.switchState(new StoryMenuState());}
 
 		camFollow = new FlxObject(bf.getGraphicMidpoint().x, bf.getGraphicMidpoint().y, 1, 1);
 		add(camFollow);
@@ -117,7 +121,7 @@ class GameOverSubstate extends MusicBeatSubstate
 				{
 					remove(camFollow);
 					remove(bf);
-					LoadingState.loadAndSwitchState(new PlayState(), false);
+					LoadingState.loadAndSwitchState(new PlayState(PlayState.instance.fromMod), false);
 				});
 			});
 		}

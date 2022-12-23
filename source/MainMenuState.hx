@@ -1,7 +1,12 @@
 package;
 
 import netTest.Director;
-#if desktop
+import options.OptionsMenu;
+import openfl.ui.Keyboard;
+import flixel.input.keyboard.FlxKey;
+import openfl.events.KeyboardEvent;
+import openfl.Lib;
+#if cpp
 import Discord.DiscordClient;
 #end
 import flixel.FlxG;
@@ -15,7 +20,6 @@ import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import io.newgrounds.NG;
 import lime.app.Application;
 
 using StringTools;
@@ -26,23 +30,22 @@ class MainMenuState extends MusicBeatState
 
 	var menuItems:FlxTypedGroup<FlxSprite>;
 
-	var optionShit:Array<String> = 
-	[
-		'story mode',
-		'freeplay',
-		//#if !switch 'switch', #end
-		'options',
-		'donate'
-	];
+	#if !switch
+	var optionShit:Array<String> = ['story mode', 'freeplay', 'options', 'donate'];
+	#else
+	var optionShit:Array<String> = ['story mode', 'freeplay'];
+	#end
 
 	var magenta:FlxSprite;
 	var camFollow:FlxObject;
 
-	var trackedAssets:Array<Dynamic> = [];
+	public static var instance:MainMenuState;
 
 	override function create()
 	{
-		#if desktop
+		instance = this;
+		
+		#if cpp
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("In the Menus", null);
 		#end
@@ -50,9 +53,10 @@ class MainMenuState extends MusicBeatState
 		transIn = FlxTransitionableState.defaultTransIn;
 		transOut = FlxTransitionableState.defaultTransOut;
 
-		if (!FlxG.sound.music.playing)
+		if (FlxG.sound.music != null && FlxG.sound.music.playing)
 		{
 			FlxG.sound.playMusic(Paths.music('freakyMenu'));
+			Conductor.changeBPM(102);
 		}
 
 		persistentUpdate = persistentDraw = true;
@@ -63,7 +67,7 @@ class MainMenuState extends MusicBeatState
 		bg.setGraphicSize(Std.int(bg.width * 1.1));
 		bg.updateHitbox();
 		bg.screenCenter();
-		bg.antialiasing = true;
+		bg.antialiasing = OptionsMenu.options.antialiasing;
 		add(bg);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
@@ -76,13 +80,14 @@ class MainMenuState extends MusicBeatState
 		magenta.updateHitbox();
 		magenta.screenCenter();
 		magenta.visible = false;
-		magenta.antialiasing = true;
+		magenta.antialiasing = OptionsMenu.options.antialiasing;
 		magenta.color = 0xFFfd719b;
 		add(magenta);
 		// magenta.scrollFactor.set();
 
 		menuItems = new FlxTypedGroup<FlxSprite>();
 		add(menuItems);
+
 
 		var tex = Paths.getSparrowAtlas('FNF_main_menu_assets');
 
@@ -94,126 +99,56 @@ class MainMenuState extends MusicBeatState
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
 			menuItem.animation.play('idle');
 			menuItem.ID = i;
-			// menuItem.screenCenter(X);
+			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 			menuItem.scrollFactor.set();
-			menuItem.antialiasing = true;
+			menuItem.antialiasing = OptionsMenu.options.antialiasing;
 		}
 
-		FlxG.camera.follow(camFollow, null, 0.06);
+		FlxG.camera.follow(camFollow, null,	CoolUtil.lerpShit(FlxG.elapsed, 5.3));
 
-		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, "Madness Engine v" + Main.engineVer, 12);
+		var versionShit:FlxText = new FlxText(5, FlxG.height - 18, 0, Application.current.meta.get("name") + " - " + Main.version, 12);
+		versionShit.scrollFactor.set();
+		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		add(versionShit);
+		versionShit = new FlxText(5, FlxG.height - 34, 0, "FNF - v" + Application.current.meta.get('version'), 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
 
-		// NG.core.calls.event.logEvent('swag').send();
+		//test
+		//FlxG.mouse.visible = true;
+		//add(new OutputMenu());
 
 		changeItem();
-
 		super.create();
-
-		for (i in 0...optionShit.length) {
-			FlxTween.tween(menuItems.members[i], {x: 300 + 75 * i - (i >= 1 ? 35 : 0)}, 1, {
-				onComplete: function(_) {
-					if (i == 0) {
-						remove(menuItems);
-						add(menuItems);
-					}
-				},
-				ease: FlxEase.quartInOut
-			});
-		}
 	}
 
 	var selectedSomethin:Bool = false;
 
 	override function update(elapsed:Float)
 	{
-		if (FlxG.sound.music.volume < 0.8)
+		if (FlxG.sound.music != null)
 		{
-			FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
-		}
+			if (FlxG.sound.music.volume < 0.8)
+				FlxG.sound.music.volume += 0.5 * FlxG.elapsed;
 
-		if (!selectedSomethin)
-		{
-			if (controls.UP_P)
-			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				changeItem(-1);
-			}
-
-			if (controls.DOWN_P)
-			{
-				FlxG.sound.play(Paths.sound('scrollMenu'));
-				changeItem(1);
-			}
-
-			if (controls.BACK)
-			{
-				FlxG.switchState(new TitleState());
-			}
-
-			if (controls.ACCEPT)
-			{
-				if (optionShit[curSelected] == 'donate')
-				{
-					FlxG.switchState(new Director());
-				}
-				else
-				{
-					selectedSomethin = true;
-					FlxG.sound.play(Paths.sound('confirmMenu'));
-
-					FlxFlicker.flicker(magenta, 1.1, 0.15, false);
-
-					menuItems.forEach(function(spr:FlxSprite)
-					{
-						if (curSelected != spr.ID)
-						{
-							FlxTween.tween(spr, {alpha: 0}, 0.4, {
-								ease: FlxEase.quadOut,
-								onComplete: function(twn:FlxTween)
-								{
-									spr.kill();
-								}
-							});
-						}
-						else
-						{
-							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
-							{
-								var daChoice:String = optionShit[curSelected];
-								switch (daChoice)
-								{
-									case 'story mode':
-										unloadAssets();
-										FlxG.switchState(new StoryMenuState());
-									case 'freeplay':
-										unloadAssets();
-										FlxG.switchState(new FreeplayState());
-									case 'options':
-										unloadAssets();
-										FlxG.switchState(new OptionsMenu());
-									
-								}
-							});
-						}
-					});
-				}
-			}
+			Conductor.songPosition = FlxG.sound.music.time;
 		}
 
 		super.update(elapsed);
 
 		menuItems.forEach(function(spr:FlxSprite)
 		{
-			// spr.screenCenter(X);
+			spr.screenCenter(X);
 		});
 	}
 
 	function changeItem(huh:Int = 0)
 	{
+
+		FlxG.sound.play(Paths.sound('scrollMenu'));
+
 		curSelected += huh;
 
 		if (curSelected >= menuItems.length)
@@ -228,23 +163,79 @@ class MainMenuState extends MusicBeatState
 			if (spr.ID == curSelected)
 			{
 				spr.animation.play('selected');
-				// camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
+				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y);
 			}
 
 			spr.updateHitbox();
 		});
 	}
-	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
+
+	override function keyDown(event:KeyboardEvent)
+	{
+		if (!selectedSomethin)
 		{
-			trackedAssets.insert(trackedAssets.length, Object);
-			return super.add(Object);
-		}
+			//WILL CHANGE THIS TO WORK WITH CUSTOMIZABLE KEYBINDS
+			if (event.keyCode == Keyboard.UP)
+				changeItem(-1);
 	
-		function unloadAssets():Void
-		{
-			for (asset in trackedAssets)
+			if (event.keyCode == Keyboard.DOWN)
+				changeItem(1);
+	
+			if (event.keyCode == Keyboard.ESCAPE)
+				FlxG.switchState(new TitleState());
+	
+			if (event.keyCode == Keyboard.ENTER)
 			{
-				remove(asset);
+				selectedSomethin = true;
+				FlxG.sound.play(Paths.sound('confirmMenu'));
+	
+				FlxFlicker.flicker(magenta, 1.1, 0.15, false);
+	
+				menuItems.forEach(function(spr:FlxSprite)
+				{
+					if (curSelected != spr.ID)
+					{
+						FlxTween.tween(spr, {alpha: 0}, 0.4, {
+							ease: FlxEase.quadOut,
+							onComplete: function(twn:FlxTween)
+							{
+								spr.kill();
+							}
+						});
+					}
+					else
+					{
+						FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
+						{
+							switch (optionShit[curSelected])
+							{
+								case 'story mode':
+									FlxG.switchState(new StoryMenuState());
+									trace("Story Menu Selected");
+								case 'freeplay':
+									FlxG.switchState(new FreeplayState());
+								case 'options':
+									FlxG.switchState(new OptionsMenu());
+								case 'donate':
+									FlxG.switchState(new Director());
+							}
+						});
+					}
+				});
+				
 			}
 		}
+		super.keyDown(event);
+	}
+
+	//ill see if im gonna add some beat related effects i dunno
+	override function beatHit()
+	{
+		super.beatHit();
+
+		if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
+			(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
+		else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
+			(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+	}
 }

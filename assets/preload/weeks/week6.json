@@ -1,0 +1,23 @@
+{
+    "week":"week6",
+    "weekName":"Hating Simulator",
+    "menuCharacters":["senpai", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Senpai",
+            "character":"senpai",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Roses",
+            "character":"senpai",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Thorns",
+            "character":"spirit",
+            "author":"Kawai Sprite"
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "week":"week2",
+    "weekName":"Spooky Month",
+    "menuCharacters":["spooky", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Spookeez",
+            "character":"spooky",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"South",
+            "character":"spooky",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Monster",
+            "character":"monster",
+            "author":"Kawai Sprite"
+        }
+    ]
+}

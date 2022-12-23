@@ -1,8 +1,12 @@
 package;
 
 import lime.utils.Assets;
+import haxe.ds.Map;
+import haxe.macro.Context;
+import haxe.macro.Expr;
 
 using StringTools;
+using Lambda;
 
 class CoolUtil
 {	
@@ -17,6 +21,21 @@ class CoolUtil
 	{
 		return difficultyArray[PlayState.storyDifficulty];
 	}
+	
+	//credits to yanni for the getkeyfromval code (i edited it to add types n shit)
+	public static function getKeyFromValue<KEY, VALUE>(map:Map<KEY, VALUE>, value:VALUE):KEY{
+			try {
+				for (map_key => map_value in map)
+					{
+						if(map_value == value) return map_key;
+					}
+			}
+			catch (e) {
+				trace('error: $e');
+			}
+
+			return null; //lets just do this for now
+		}
 
 	
 	inline public static function bound(value:Float, min:Float, max:Float):Float {
@@ -27,6 +46,11 @@ class CoolUtil
 		var daText = Assets.getText(path);
 
 		return daText;
+	}
+
+	
+	public static function lerpShit(elapsed:Float, mult:Float):Float {
+		return Math.max(0, Math.min(1, elapsed * mult));
 	}
 
 	public static function GetTypeOf(thing:Dynamic):Dynamic

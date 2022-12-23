@@ -5,7 +5,7 @@ import helpers.Vector3;
 
 class TransformRotation
 {
-    public static function rotatePos90Degrees(point:FlxPoint){
+    inline public static function rotatePos90Degrees(point:FlxPoint){
         var x:Float = point.x;
         var y:Float = point.y;
         
@@ -13,7 +13,7 @@ class TransformRotation
     }
     
     
-    public static function rotateNeg90Degrees(point:FlxPoint)
+    inline public static function rotateNeg90Degrees(point:FlxPoint)
     {
         var x:Float = point.x;
         var y:Float = point.y;
@@ -22,7 +22,7 @@ class TransformRotation
     }
     
     
-    public static function rotate180Degrees(point:FlxPoint)
+    inline public static function rotate180Degrees(point:FlxPoint)
     {
         var x:Float = point.x;
         var y:Float = point.y;
@@ -30,7 +30,7 @@ class TransformRotation
         return new FlxPoint(-x, -y);
     }
     
-    public static function normalTransform(point:FlxPoint, target:FlxPoint){
+    inline public static function normalTransform(point:FlxPoint, target:FlxPoint){
         var x:Float = point.x;
         var y:Float = point.y;
         
@@ -40,55 +40,32 @@ class TransformRotation
         return new FlxPoint(x + (tarX), y + (tarY));
     }
     
-    public static function methodTransformation(point:FlxPoint, method:Methods)
+    public static function methodTransformation(point:FlxPoint, method:String)
     {
-        Methods.method(point);
+        //Reflect.callMethod(method, "method",point);
+        if (Reflect.field(Methods, method))
+            Reflect.callMethod(Methods, Reflect.field(Methods, method), [point]);
     }
 }
 
 class Methods
-{
-    public static var methods:Array<String> = ["transformX", "transformY", "transformOrigin","inverseOrigin"];
-    public static var method:String = "transformX"; //idrk default is X
-    
-    public static function transformX(pos:FlxPoint)
+{    
+    inline public static function transformX(pos:FlxPoint)
     {
-        for (methodology in methods){
-            if (method != methodology){
-                method = methods[0];
-            }
-        }
-
         return new FlxPoint(pos.x, -pos.y);
     }
     
-    public static function transformY(pos:FlxPoint)
+    inline public static function transformY(pos:FlxPoint)
     {
-        for (methodology in methods){
-            if (method != methodology){
-                method = methods[0];
-            }
-        }
-
         return new FlxPoint(-pos.x, pos.y);
     }
     
-    public static function transformOrigin(pos:FlxPoint){
-        for (methodology in methods){
-            if (method != methodology){
-                method = methods[0];
-            }
-        }
+    inline public static function transformOrigin(pos:FlxPoint){
         return new FlxPoint(-pos.x, -pos.y);
     }
     
-    public static function inverseOrigin(pos:FlxPoint)
+    inline public static function inverseOrigin(pos:FlxPoint)
     {
-            for (methodology in methods){
-        if (method != methodology){
-            method = methods[0];
-        }
-    }
         return new FlxPoint(-pos.y, -pos.x);
     }
 }

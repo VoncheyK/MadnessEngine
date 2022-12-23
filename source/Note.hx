@@ -1,5 +1,6 @@
 package;
 
+import options.OptionsMenu;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -13,11 +14,8 @@ using StringTools;
 
 class Note extends FlxSprite
 {
+	
 	public var strumTime:Float = 0;
-
-	public var noteType:String = "";
-	public var noteType_mustHit:Bool = true;
-
 
 	public var mustPress:Bool = false;
 	public var noteData:Int = 0;
@@ -26,10 +24,10 @@ class Note extends FlxSprite
 	public var wasGoodHit:Bool = false;
 	public var prevNote:Note;
 
-	public var daRating:String = "shit";
-
 	public var sustainLength:Float = 0;
 	public var isSustainNote:Bool = false;
+	public var isChord:Bool = false;
+	public var parentHold:Bool = false;
 
 	public var noteScore:Float = 1;
 
@@ -39,7 +37,7 @@ class Note extends FlxSprite
 	public static var BLUE_NOTE:Int = 1;
 	public static var RED_NOTE:Int = 3;
 
-	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false, ?noteType = "")
+	public function new(strumTime:Float, noteData:Int, ?prevNote:Note, ?sustainNote:Bool = false)
 	{
 		super();
 
@@ -48,15 +46,6 @@ class Note extends FlxSprite
 
 		this.prevNote = prevNote;
 		isSustainNote = sustainNote;
-
-		this.noteType = noteType;
-
-		if (noteType == "null")
-		{
-			noteType = "";
-		}
-
-		
 
 		//how did you manage to have offcenter notes bruh
 		x += 100;
@@ -142,8 +131,7 @@ class Note extends FlxSprite
 			so it won't look weird
 		*/
 
-		if (FlxG.save.data.downScroll && sustainNote) 
-			flipY = true;
+		flipY = OptionsMenu.options.downScroll && sustainNote;
 
 		if (isSustainNote && prevNote != null)
 		{
@@ -198,14 +186,14 @@ class Note extends FlxSprite
 
 		if (mustPress)
 		{
-			// The * 0.5 is so that it's easier to hit them too late, instead of too early
-			if (strumTime > Conductor.songPosition - Conductor.safeZoneOffset
-				&& strumTime < Conductor.songPosition + (Conductor.safeZoneOffset * 0.5))
+			// it can be hit when there is a rating available or something idk how to explain help
+			if (strumTime - Conductor.songPosition < PlayState.hitTimings['shit'] 
+				|| strumTime - Conductor.songPosition < PlayState.hitTimings['sick'])
 				canBeHit = true;
 			else
 				canBeHit = false;
 
-			if (strumTime < Conductor.songPosition - (Conductor.safeZoneOffset) && !wasGoodHit)
+			if (strumTime + PlayState.hitTimings['shit'] < Conductor.songPosition && !wasGoodHit)
 				tooLate = true;
 		}
 		else

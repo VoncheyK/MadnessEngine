@@ -2,6 +2,7 @@
 	"song": {
 		"player1": "bf",
 		"player2": "bf",
+		"chartVersion":"1.0",
 		"notes": [
 			{
 				"lengthInSteps": 16,

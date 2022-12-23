@@ -1,0 +1,23 @@
+{
+    "week":"week5",
+    "weekName":"Red Snow",
+    "menuCharacters":["parents-christmas", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Cocoa",
+            "character":"parents-christmas",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Eggnog",
+            "character":"parents-christmas",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Winter Horrorland",
+            "character":"monster-christmas",
+            "author":"Kawai Sprite"
+        }
+    ]
+}

@@ -1,5 +1,6 @@
 package;
 
+import options.OptionsMenu;
 import flixel.FlxBasic;
 import Controls.Control;
 import flixel.FlxG;
@@ -26,13 +27,10 @@ class PauseSubState extends MusicBeatSubstate
 
 	var pauseMusic:FlxSound;
 
-	var playStateAssets:Array<FlxBasic>;
 
-	public function new(x:Float, y:Float, trackedAssets:Array<FlxBasic>)
+	public function new(x:Float, y:Float)
 	{
 		super();
-
-		this.playStateAssets = trackedAssets;
 
 		if (!PlayState.isStoryMode) {
 			menuItems = ['Resume', 'Restart Song', 'Toggle Botplay', 'Exit to menu'];
@@ -90,7 +88,8 @@ class PauseSubState extends MusicBeatSubstate
 		for (i in 0...menuItems.length)
 		{
 			var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-			songText.scrollType = "Center";
+			songText.isMenuItem = true;
+			//songText.scrollType = "Center";
 			songText.targetY = i;
 			grpMenuShit.add(songText);
 		}
@@ -98,19 +97,6 @@ class PauseSubState extends MusicBeatSubstate
 		changeSelection();
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
-	}
-
-	override function add(object:FlxBasic):FlxBasic
-		{
-			playStateAssets.insert(playStateAssets.length, object);
-			return super.add(object);
-		}
-
-	function unloadAssets():Void
-	{
-		for (asset in playStateAssets){
-			remove(asset);
-		}
 	}
 
 	override function update(elapsed:Float)
@@ -133,7 +119,7 @@ class PauseSubState extends MusicBeatSubstate
 			changeSelection(1);
 		}
 
-		if (ClientSettings.botPlay) {
+		if (OptionsMenu.options.botPlay) {
 			usedBot = true;
 		}
 
@@ -150,33 +136,25 @@ class PauseSubState extends MusicBeatSubstate
 				case "Resume":
 					close();
 				case "Restart Song":
-					FlxG.resetState();
+					MusicBeatState.switchState(new PlayState(PlayState.instance.fromMod));
 				case "Toggle Botplay":
-					ClientSettings.botPlay = !ClientSettings.botPlay;
-					PlayState.instance.botplayTxt.visible = ClientSettings.botPlay;
+					OptionsMenu.options.botPlay = !OptionsMenu.options.botPlay;
+					PlayState.instance.botplayTxt.visible = OptionsMenu.options.botPlay;
 					PlayState.instance.botplayTxt.alpha = 1;
 					PlayState.instance.botplaySine = 0;
 					PlayState.instance.scoreTxt.visible = false;
 				case "Exit to menu":
-					ClientSettings.botPlay = false;
+					OptionsMenu.options.botPlay = false;
 					botText.visible = false;
 					if(PlayState.isStoryMode)
 					{
-						unloadAssets();
 						FlxG.switchState(new StoryMenuState());
 					}
 					else
 					{
-						unloadAssets();
 						FlxG.switchState(new FreeplayState());
 					}
 			}
-		}
-
-		if (FlxG.keys.justPressed.J)
-		{
-			// for reference later!
-			// PlayerSettings.player1.controls.replaceBinding(Control.LEFT, Keys, FlxKey.J, null);
 		}
 	}
 

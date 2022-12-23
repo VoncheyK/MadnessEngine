@@ -1,53 +1,22 @@
 package;
 
-import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 
-class CharInfo
-{
-	public var x(default, null):Int;
-	public var y(default, null):Int;
-	public var scale(default, null):Float;
-	public var flippedX(default, null):Bool;
-
-	public function new(x:Int = 0, y:Int = 0, scale:Float = 1.0, flippedX:Bool = false)
-	{
-		this.x = x;
-		this.y = y;
-		this.scale = scale;
-		this.flippedX = flippedX;
-	}
-}
+using StringTools;
 
 class MenuCharacter extends FlxSprite
 {
-	//will softcode later im lazye also credits to kade!!!
-	private static var infos:Map<String, CharInfo> = [
-		'bf' => new CharInfo(0, -20, 1.0, true),
-		'gf' => new CharInfo(50, 80, 1.5, true),
-		'dad' => new CharInfo(-15, 130),
-		'spooky' => new CharInfo(20, 30),
-		'pico' => new CharInfo(0, 0, 1.0, true),
-		'mom' => new CharInfo(-30, 140, 0.85),
-		'parents-christmas' => new CharInfo(100, 130, 1.8),
-		'senpai' => new CharInfo(-40, -45, 1.4)
-	]; // sorry, this will be removed later
-	// just so the engine ui doesnt look weird until we do it
+	public var character:String;
 
-	private var flippedX:Bool = false;
-
-	private var danceLeft:Bool = false;
-	private var character:String = '';
-
-	public function new(x:Int, y:Int, scale:Float, flippedX:Bool)
+	public function new(x:Float, character:String = 'bf')
 	{
-		super(x, y);
-		this.flippedX = flippedX;
+		super(x);
 
-		antialiasing = true;
+		this.character = character;
 
-		frames = Paths.getSparrowAtlas('campaign_menu_UI_characters');
+		var tex = Paths.getSparrowAtlas('campaign_menu_UI_characters');
+		frames = tex;
 
 		animation.addByPrefix('bf', "BF idle dance white", 24, false);
 		animation.addByPrefix('bfConfirm', 'BF HEY!!', 24, false);
@@ -60,60 +29,31 @@ class MenuCharacter extends FlxSprite
 		animation.addByPrefix('mom', "Mom Idle BLACK LINES", 24, false);
 		animation.addByPrefix('parents-christmas', "Parent Christmas Idle", 24, false);
 		animation.addByPrefix('senpai', "SENPAI idle Black Lines", 24, false);
+		// Parent Christmas Idle
 
-		setGraphicSize(Std.int(width * scale));
 		updateHitbox();
 	}
 
-	public function setCharacter(character:String):Void
+	public function changeChar(newChar:String)
 	{
-		var isCharSame:Bool = character == this.character;
-		this.character = character;
-		if (character == '')
-		{
-			visible = false;
-			return;
-		}
-		else
-		{
-			visible = true;
-		}
-
-		if (!isCharSame)
-		{
-			dance(true);
-		}
-
-		var info:CharInfo = infos[character];
-		offset.set(info.x, info.y);
-		setGraphicSize(Std.int(width * info.scale));
-		flipX = info.flippedX != flippedX;
+		visible = newChar != '';
+		character = newChar;
+		animation.play(newChar + (character.startsWith("gf") || character.startsWith("spooky") ? "-left" : ""));
 	}
 
-	public function dance(LastFrame:Bool = false):Void
+	//this should work, right??
+	var left = true;
+	public function dance()
 	{
-		if (character == 'gf' || character == 'spooky')
+		left = !left;
+		if (character.startsWith("gf") || character.startsWith("spooky"))
 		{
-			danceLeft = !danceLeft;
-
-			if (danceLeft)
-				animation.play(character + "-left", true);
-			else
+			if (left)
 				animation.play(character + "-right", true);
-		}
-		else if (character == '')
-		{
-			return;
+			else
+				animation.play(character + "-left", true);
 		}
 		else
-		{
-			if (animation.name == "bfConfirm")
-				return;
 			animation.play(character, true);
-		}
-		if (LastFrame)
-		{
-			animation.finish();
-		}
 	}
 }

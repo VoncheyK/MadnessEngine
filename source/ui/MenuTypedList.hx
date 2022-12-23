@@ -90,21 +90,21 @@ class MenuTypedList<T:MenuItem> extends FlxTypedGroup<T>
 			switch (navControls)
 			{
 				case Horizontal:
-					var leftP:Bool = controls.UI_LEFT_P;
-					var rightP:Bool = controls.UI_RIGHT_P;
+					var leftP:Bool = controls.LEFT_P;
+					var rightP:Bool = controls.RIGHT_P;
 					nextIndex = navAxis(selectedIndex, length, leftP, rightP, wrapHorizontal);
 				case Vertical:
-					var upP:Bool = controls.UI_UP_P;
-					var downP:Bool = controls.UI_DOWN_P;
+					var upP:Bool = controls.UP_P;
+					var downP:Bool = controls.DOWN_P;
 					nextIndex = navAxis(selectedIndex, length, upP, downP, wrapVertical);
 				case Both:
-					var backwards:Bool = controls.UI_LEFT_P || controls.UI_UP_P;
-					var forwards:Bool = controls.UI_RIGHT_P || controls.UI_DOWN_P;
+					var backwards:Bool = controls.LEFT_P || controls.UP_P;
+					var forwards:Bool = controls.RIGHT_P || controls.DOWN_P;
 					nextIndex = navAxis(selectedIndex, length, backwards, forwards, wrapMode != None);
 				case Columns(num):
-					nextIndex = navGrid(num, controls.UI_LEFT_P, controls.UI_RIGHT_P, wrapHorizontal, controls.UI_UP_P, controls.UI_DOWN_P, wrapVertical);
+					nextIndex = navGrid(num, controls.LEFT_P, controls.RIGHT_P, wrapHorizontal, controls.UP_P, controls.DOWN_P, wrapVertical);
 				case Rows(num):
-					nextIndex = navGrid(num, controls.UI_UP_P, controls.UI_DOWN_P, wrapVertical, controls.UI_LEFT_P, controls.UI_RIGHT_P, wrapHorizontal);
+					nextIndex = navGrid(num, controls.UP_P, controls.DOWN_P, wrapVertical, controls.LEFT_P, controls.RIGHT_P, wrapHorizontal);
 			}
 			if (nextIndex != selectedIndex)
 			{

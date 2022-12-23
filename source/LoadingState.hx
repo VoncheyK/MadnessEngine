@@ -1,5 +1,6 @@
 package;
 
+import flixel.addons.ui.FlxUIState;
 import lime.app.Promise;
 import lime.app.Future;
 import flixel.FlxG;
@@ -19,7 +20,7 @@ class LoadingState extends MusicBeatState
 {
 	inline static var MIN_TIME = 1.0;
 	
-	var target:FlxState;
+	var target:FlxUIState;
 	var stopMusic = false;
 	var callbacks:MultiCallback;
 	
@@ -27,7 +28,7 @@ class LoadingState extends MusicBeatState
 	var gfDance:FlxSprite;
 	var danceLeft = false;
 	
-	function new(target:FlxState, stopMusic:Bool)
+	function new(target:FlxUIState, stopMusic:Bool)
 	{
 		super();
 		this.target = target;
@@ -144,12 +145,12 @@ class LoadingState extends MusicBeatState
 		return Paths.voices(PlayState.SONG.song);
 	}
 	
-	inline static public function loadAndSwitchState(target:FlxState, stopMusic = false)
+	inline static public function loadAndSwitchState(target:FlxUIState, stopMusic = false)
 	{
 		MusicBeatState.switchState(getNextState(target, stopMusic));
 	}
 	
-	static function getNextState(target:FlxState, stopMusic = false):FlxState
+	static function getNextState(target:FlxUIState, stopMusic = false):FlxUIState
 	{
 		Paths.setCurrentLevel("week" + PlayState.storyWeek);
 		#if NO_PRELOAD_ALL

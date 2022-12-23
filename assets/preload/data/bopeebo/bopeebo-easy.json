@@ -1,6 +1,7 @@
 {
 	"song": {
 		"player1": "bf",
+		"chartVersion":"1.0",
 		"notes": [
 			{
 				"sectionNotes": [

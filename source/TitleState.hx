@@ -1,5 +1,6 @@
 package;
 
+import options.OptionsData;
 import sys.io.File;
 import helpers.Vector3;
 import helpers.Modsupport;
@@ -27,7 +28,6 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 import GameJolt.GameJoltAPI;
@@ -35,6 +35,7 @@ import GameJolt;
 import com.hurlant.crypto.hash.MD5;
 import com.hurlant.util.Hex;
 import com.hurlant.util.ByteArray;
+import options.OptionsMenu;
 
 using StringTools;
 
@@ -46,10 +47,9 @@ class TitleState extends MusicBeatState
 	var credGroup:FlxGroup;
 	var credTextShit:Alphabet;
 	var textGroup:FlxGroup;
-	var ngSpr:FlxSprite;
+	var ngSpr:helpers.CompressedSprite;
 
 	var curWacky:Array<String> = [];
-	var trackedAssets:Array<Dynamic> = [];
 
 	//md5 hash verify test
 	var bfMd5:String = "38495a06b646af00267deeeacb3458cc";
@@ -78,13 +78,14 @@ class TitleState extends MusicBeatState
 		// DEBUG BULLSHIT
 
 		super.create();
-
 		// normally APIStuff things would be in here but it's only for NG shit but we're using gamejolt, aka it's useless
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('madness', 'voncheyk');
 		GameJoltAPI.connect();
 		GameJoltAPI.authDaUser(FlxG.save.data.gjUser, FlxG.save.data.gjToken);
 
 		Highscore.load();
+		OptionsData.init();
+		OptionsMenu.loadSettings();
 
 		if (FlxG.save.data.weekUnlocked != null)
 		{
@@ -101,10 +102,8 @@ class TitleState extends MusicBeatState
 		}
 
 		#if FREEPLAY
-		unloadAssets();
 		FlxG.switchState(new FreeplayState());
 		#elseif CHARTING
-		unloadAssets();
 		FlxG.switchState(new ChartingState());
 		#else
 		new FlxTimer().start(1, function(tmr:FlxTimer)
@@ -227,7 +226,8 @@ class TitleState extends MusicBeatState
 
 		credTextShit.visible = false;
 
-		ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		//ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		ngSpr = new helpers.CompressedSprite(0, FlxG.height * 0.52, Paths.image('newgrounds_logo'));
 		add(ngSpr);
 		ngSpr.visible = false;
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
@@ -274,7 +274,7 @@ class TitleState extends MusicBeatState
 			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 
-		ClientSettings.loadSettings();
+		//ClientSettings.loadSettings();
 
 		var pressedEnter:Bool = FlxG.keys.justPressed.ENTER;
 
@@ -315,8 +315,7 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-				// Check if version is outdated
-				unloadAssets();
+				// Check if version is outdated (soon)
 				FlxG.switchState(new MainMenuState());
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
@@ -439,18 +438,4 @@ class TitleState extends MusicBeatState
 			skippedIntro = true;
 		}
 	}
-
-	override function add(Object:flixel.FlxBasic):flixel.FlxBasic
-		{
-			trackedAssets.insert(trackedAssets.length, Object);
-			return super.add(Object);
-		}
-	
-		function unloadAssets():Void
-		{
-			for (asset in trackedAssets)
-			{
-				remove(asset);
-			}
-		}
 }

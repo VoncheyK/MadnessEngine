@@ -11,6 +11,15 @@ typedef SwagSection =
 	var altAnim:Bool;
 }
 
+typedef SwaggiestSection = 
+{
+	var mustHit:Bool;
+	var lengthInSteps:Int;
+	var typeOfSection:Int;
+	var changeBPM:{active:Bool,bpm:Int}; //this will most likely change later
+	var altAnim:Bool; 
+}
+
 class Section
 {
 	public var sectionNotes:Array<Dynamic> = [];

@@ -19,7 +19,7 @@ class Paths
 		currentLevel = name.toLowerCase();
 	}
 
-	static function getPath(file:String, type:AssetType, library:Null<String>)
+	public static function getPath(file:String, type:AssetType, library:Null<String>)
 	{
 		if (library != null)
 			return getLibraryPath(file, library);
@@ -48,7 +48,7 @@ class Paths
 		return '$library:assets/$library/$file';
 	}
 
-	inline static function getPreloadPath(file:String)
+	inline public static function getPreloadPath(file:String)
 	{
 		return 'assets/$file';
 	}
@@ -56,6 +56,11 @@ class Paths
 	inline static public function mods(modLib:String)
 	{
 		return 'assets/mods/$modLib';
+	}
+	
+	inline static public function modtxt(modLib:String, key:String)
+	{
+		return 'mods:${Paths.mods(modLib)}/data/$key.txt';
 	}
 
 	inline static public function getFromMods(modLib:String, dir:String, file:String){
@@ -65,6 +70,10 @@ class Paths
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)
 	{
 		return getPath(file, type, library);
+	}
+	
+	inline public static function getWeek(key:String, ?library:String){
+		return getPath('$key.json', TEXT, library);
 	}
 
 	inline static public function txt(key:String, ?library:String)
@@ -76,10 +85,18 @@ class Paths
 	{
 		return getPath('data/$key.xml', TEXT, library);
 	}
-
-	inline static public function json(key:String, ?library:String)
+	//mod is the library, key is the json name and song is the song dir or the lib
+	inline static public function modJSON(mod:String, key:String)
 	{
-		return getPath('data/$key.json', TEXT, library);
+		return 'mods:assets/mods/${mod}/data/${key}.json';
+	}
+
+	inline static public function json(key:String, ?library:String, ?mod:String)
+	{
+		if (mod == null)
+			return getPath('data/$key.json', TEXT, library) 
+		else
+			return modJSON(mod, key);
 	}
 
 	inline static public function script(key:String, ?library:String)
@@ -102,19 +119,30 @@ class Paths
 		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
 	}
 
-	inline static public function voices(song:String)
+	inline static public function voices(song:String, ?mod:String)
 	{
-		return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		if(mod == null)
+			return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		else
+			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
 	}
 
-	inline static public function inst(song:String)
+	inline static public function inst(song:String, ?mod:String)
 	{
-		return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		if (mod == null)
+			return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		else
+			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
 	}
 
 	inline static public function image(key:String, ?library:String)
 	{
 		return getPath('images/$key.png', IMAGE, library);
+	}
+
+	inline static public function getAtlas(folder:String)
+	{
+		return 'assets/shared/${folder}';
 	}
 
 	/**
@@ -142,6 +170,11 @@ class Paths
 
 	inline static public function formatToSongPath(path:String) {
 		return path.toLowerCase().replace(' ', '-');
+	}
+
+	inline public static function getScript(fileName:String)
+	{
+		return 'assets/scripts/${fileName}';
 	}
 
 	inline static public function getSparrowAtlas(key:String, ?library:String)

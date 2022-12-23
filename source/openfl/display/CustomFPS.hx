@@ -1,5 +1,6 @@
 package openfl.display;
 
+import options.OptionsMenu;
 import haxe.Timer;
 import openfl.events.Event;
 import openfl.text.TextField;
@@ -46,7 +47,7 @@ class CustomFPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("_sans", 14, color);
+		defaultTextFormat = new TextFormat("VCR OSD Mono", 12, color);
 		autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
@@ -78,7 +79,7 @@ class CustomFPS extends TextField
 
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
-		if (currentFPS > ClientSettings.framerate) currentFPS = ClientSettings.framerate;
+		if (currentFPS > OptionsMenu.options.framerate) currentFPS = OptionsMenu.options.framerate;
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
@@ -91,7 +92,7 @@ class CustomFPS extends TextField
 			#end
 
 			textColor = 0xFFFFFFFF;
-			if (memoryMegas > 3000 || currentFPS <= ClientSettings.framerate / 2)
+			if (memoryMegas > 3000 || currentFPS <= OptionsMenu.options.framerate / 2)
 			{
 				textColor = 0xFFFF0000;
 			}

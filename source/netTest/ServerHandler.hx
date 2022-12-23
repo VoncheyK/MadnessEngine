@@ -1,9 +1,13 @@
 package netTest;
 
+import options.OptionsMenu;
+import flixel.input.keyboard.FlxKey;
+import openfl.events.KeyboardEvent;
 import hxcpp.StaticRegexp;
 import flixel.FlxCamera;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tweens.FlxTween;
+import flixel.FlxG;
 import netTest.schemaShit.Player;
 import netTest.schemaShit.ChatState;
 import flixel.FlxSubState;
@@ -43,12 +47,12 @@ class ServerHandler extends MusicBeatState
 	var strumLineNotes:FlxTypedGroup<FlxSprite>;
 	var playerStrums:FlxTypedGroup<FlxSprite>;
 
-	var local:Player = null;
-
 	#if (haxe >= "4.0.0")
-	var strumAccordingToPlr:Map<Player, FlxTypedGroup<FlxSprite>> = [];
+	var strumAccordingToPlr:Map<String, FlxTypedGroup<FlxSprite>> = [];
+	var charAccordingToPlr:Map<String, Character> = [];
 	#else
-	var strumAccordingToPlr:Map<Player, FlxTypedGroup<FlxSprite>> = new Map<Player, FlxTypedGroup<FlxSprite>>();
+	var strumAccordingToPlr:Map<String, FlxTypedGroup<FlxSprite>> = new Map<String, FlxTypedGroup<FlxSprite>>();
+	var charAccordingToPlr:Map<String, Character> = new Map<String, Character>();
 	#end
 
 	private var cumHudlol:FlxCamera;
@@ -158,58 +162,21 @@ class ServerHandler extends MusicBeatState
 			this.room.state.players.onAdd = function(player, key)
 			{
 				trace("PLAYER ADDED AT: ", key);
-				strumAccordingToPlr.set(player, generateStaticArrows(player.__refId - 2));
-				this.room.send("getSessionIdOfClient", "");
-				this.room.onMessage("returnSessionId", function(message)
-				{
-					if (key == message)
-					{
-						local = this.room.state.players.get(key);
-					}
-				});
-
+				strumAccordingToPlr.set(key, generateStaticArrows(player.__refId - 2));
 				player.triggerAll();
 			}
-
-			
-			this.room.state.players.onChange = function(plr:Player, k:String)
-				{
-					trace("PLAYER CHANGED AT: ", k);
-					var holdingArray:Array<Bool> = [controls.LEFT, controls.DOWN, controls.UP, controls.RIGHT];
-					var controlArray:Array<Bool> = [controls.LEFT_P, controls.DOWN_P, controls.UP_P, controls.RIGHT_P];
-	
-					var strum = strumAccordingToPlr.get(plr);
-					var arrowKeyPressed:Int = 0;
-					if (plr.left)
-					{
-						arrowKeyPressed = 0;
-					}
-					else if (plr.down)
-					{
-						arrowKeyPressed = 1;
-					}
-					else if(plr.up)
-					{
-						arrowKeyPressed = 2;
-					}
-					else if (plr.right)
-					{
-						arrowKeyPressed = 3;
-					}
-					strum.members[arrowKeyPressed].animation.play('pressed');
-				}
 
 			this.room.state.players.onRemove = function(player, key)
 			{
 				trace("PLAYER REMOVED AT: ", key);
 				// memory cleaning process
-				strumAccordingToPlr.get(player).destroy();
-				strumAccordingToPlr.remove(player);
+				strumAccordingToPlr.get(key).destroy();
+				strumAccordingToPlr.remove(key);
 			}
 
 			this.room.onStateChange += function(state:ChatState)
 			{
-				trace("STATE CHANGE: " + Std.string(state));
+				// trace("STATE CHANGE: " + Std.string(state));
 			}
 
 			this.room.onError += function(code:Int, message:String)
@@ -228,51 +195,90 @@ class ServerHandler extends MusicBeatState
 			{
 				trace("onMessage: 'message' => " + message);
 			});
+
+			this.room.onMessage("notePress", function(message)
+			{
+				for (plr => strum in strumAccordingToPlr)
+					if (this.room.sessionId != plr)
+					{
+						strum.members[message.notedata].animation.play("pressed");
+						trace('${message.notedata} has been pressed');
+					}
+			});
+
+			this.room.onMessage("noteRaised", function(message)
+			{
+				for (plr => strum in strumAccordingToPlr)
+					if (this.room.sessionId != plr)
+					{
+						strum.members[message.notedata].animation.play("static");
+						trace('${message.notedata} has been unpressed');
+					}
+			});
 		});
+
+		Keybinds.loadKeybinds();
+		OptionsMenu.loadSettings();
+
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 	}
 
-	override function update(elapsed:Float)
+	private var pressed = [false, false, false, false];
+
+	private function onKeyDown(event:KeyboardEvent)
 	{
 		if (acceptsControls)
 		{
-			if (controls.DOWN_P)
-			{
-				this.room.send("downP", "");
-			}
-			else if (controls.DOWN_R)
-			{
-				this.room.send("downR", "");
-			}
+			final keyJustPressed = FlxKey.toStringMap.get(event.keyCode);
 
-			if (controls.UP_P)
-			{
-				this.room.send("upP", "");
-			}
-			else if (controls.UP_R)
-			{
-				this.room.send("upR", "");
-			}
+			final binds:Array<Array<FlxKey>> = [
+				Keybinds.keybinds[0][1],
+				Keybinds.keybinds[1][1],
+				Keybinds.keybinds[2][1],
+				Keybinds.keybinds[3][1]
+			];
+			var notedata:Int = -1; // null
+			for (i => bind in binds)
+				if (bind.contains(keyJustPressed))
+					notedata = i;
+			
+			if (notedata == -1)
+				return;
+			
+			if (pressed[notedata])
+				return;
 
-			if (controls.LEFT_P)
-			{
-				this.room.send("leftP", "");
-			}
-			else if (controls.LEFT_R)
-			{
-				this.room.send("leftR", "");
-			}
-
-			if (controls.RIGHT_P)
-			{
-				this.room.send("rightP", "");
-			}
-			else if (controls.RIGHT_R)
-			{
-				this.room.send("rightR", "");
-			}
+			pressed[notedata] = true;
+			this.room.send("notePress", {notedata: notedata, clientname: FlxG.save.data.gjUser});
+			// notePress
 		}
+	}
 
-		super.update(elapsed);
+	private function onKeyUp(event:KeyboardEvent)
+	{
+		if (acceptsControls)
+		{
+			final keyJustPressed = FlxKey.toStringMap.get(event.keyCode);
+
+			final binds:Array<Array<FlxKey>> = [
+				Keybinds.keybinds[0][1],
+				Keybinds.keybinds[1][1],
+				Keybinds.keybinds[2][1],
+				Keybinds.keybinds[3][1]
+			];
+			var notedata:Int = -1; // null
+			for (i => bind in binds)
+				if (bind.contains(keyJustPressed))
+					notedata = i;
+
+			if (notedata == -1)
+				return;
+
+			pressed[notedata] = false;
+			this.room.send("noteRaised", {notedata: notedata, clientname: FlxG.save.data.gjUser});
+			// noteRaised
+		}
 	}
 
 	/*lmao copying strum line code from playstate cuz lazy*/

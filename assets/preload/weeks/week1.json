@@ -1,0 +1,23 @@
+{
+    "week":"week1",
+    "weekName":"Daddy Dearest",
+    "menuCharacters":["dad", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Bopeebo",
+            "character":"dad",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Fresh",
+            "character":"dad",
+            "author":"Kawai Sprite"
+        },
+        {
+            "name":"Dadbattle",
+            "character":"dad",
+            "author":"Kawai Sprite"
+        }
+    ]
+}

@@ -1,5 +1,6 @@
 package;
 
+import openfl.system.System;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
 import flixel.FlxGame;
@@ -34,13 +35,20 @@ class Main extends Sprite
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game on fullscreen or not
 	public static var fpsVar:openfl.display.CustomFPS;
-	public static var engineVer:String = "0.0.1";
+	public static var version:String = "0.8.2";
 	public static var gjToastManager:GJToastManager;
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
 	public static function main():Void
 	{
+
+		#if sys
+		haxe.Log.trace = (arg, ?pos) -> {
+			Sys.println('${pos.className} (${pos.lineNumber}) $arg');
+		}
+		#end
+
 		Lib.current.addChild(new Main());
 	}
 
@@ -92,7 +100,7 @@ class Main extends Sprite
 	
 		// fuck you, persistent caching stays ON during sex
 		FlxGraphic.defaultPersist = true;
-		// the reason for this is we're going to be handling our own cache smartly
+		// the reason for this is we're going to be handling our own cache smartly (false.)
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
 
 		#if !mobile
@@ -191,4 +199,22 @@ class Main extends Sprite
 
 			Sys.exit(1);
 		}
+
+	//NOTE TO SELF: ADD A FUNCTION WHICH REMOVES UNUSED'S
+	public static function dumpCache()
+			{
+				@:privateAccess
+				for (key in FlxG.bitmap._cache.keys())
+				{
+					var obj = FlxG.bitmap._cache.get(key);
+					if (obj != null)
+					{
+						Assets.cache.removeBitmapData(key);
+						FlxG.bitmap._cache.remove(key);
+						obj.destroy();
+					}
+				}
+				Assets.cache.clear("songs");
+				System.gc();
+			}
 }

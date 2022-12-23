@@ -1,0 +1,13 @@
+{
+    "week":"week0",
+    "weekName":"Tutorial",
+    "menuCharacters":["", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"Tutorial",
+            "character":"gf",
+            "author":"Kawai Sprite"
+        }
+    ]
+}
