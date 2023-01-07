@@ -17,7 +17,7 @@ class MenuItem extends FlxSpriteGroup
 	{
 		super(x, y);
 		week = new FlxSprite();
-		if (Paths.loadImage('storymenu/' + weekName) != null)
+		if (Paths.image('storymenu/' + weekName) != null)
 			week.loadGraphic(Paths.image('storymenu/' + weekName));
 		else
 			week.loadGraphic(Paths.image('storymenu/noweek'));

@@ -71,9 +71,9 @@ class Song
 		this.bpm = bpm;
 	}
 
-	public static function loadFromJson(jsonInput:String, ?folder:String, ?mod:String):SwaggiestSong
+	public static function loadFromJson(jsonInput:String, ?folder:String):OneOfTwo<SwagSong, SwaggiestSong>
 	{
-		var rawJson = Assets.getText(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase(), null, mod)).trim();
+		var rawJson = Assets.getText(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase(), null)).trim();
 		while (!rawJson.endsWith("}"))
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 

@@ -61,14 +61,14 @@ class MusicBeatState extends FlxUIState
 
 	private function keyDown(event:KeyboardEvent)
 	{
-		for(script in hscripts){
-			if (callable) {script.call("keyDown", [event]);}
-		}
-
 		if (event.keyCode == Keyboard.F5){
 			callable = false;
 			for (hscript in hscripts)
-				hscript.wipeExceptVarsAndExecute("script", callable);
+				hscript.wipeExceptVarsAndExecute(hscript.fileName, callable);
+		}
+
+		for(script in hscripts){
+			if (callable) {script.call("keyDown", [event]);}
 		}
 	}
 

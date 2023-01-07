@@ -621,7 +621,7 @@ class Character extends FlxSprite
 			sprite.antialiasing = false;
 		}
 
-		sprite.antialiasing = !FlxG.save.data.antialiasing;
+		sprite.antialiasing = FlxG.save.data.antialiasing;
 
 		var animationsArray = json.animations;
 
@@ -679,7 +679,7 @@ class Character extends FlxSprite
 			iconColor = json.healthbar_colors;
 
 		antialiasing = !noAntialiasing;
-		antialiasing = !FlxG.save.data.antialiasing;
+		antialiasing = FlxG.save.data.antialiasing;
 
 		animationsArray = json.animations;
 
@@ -711,6 +711,9 @@ class Character extends FlxSprite
 				var characterPath:String = 'characters/' + character + '.json';
 
 				var path:String = Paths.getPreloadPath(characterPath);
+			
+				(!FileSystem.exists(path)) ? path = Paths.modFolders(characterPath) : null;
+
 				!Assets.exists(path) ? path = Paths.getPreloadPath('characters/' + DEFAULT_CHARACTER + '.json') : null; //If a character couldn't be found, change him to BF just to prevent a crash
 				var rawJson = File.getContent(path);
 				var json:CharacterFile = cast Json.parse(rawJson);
@@ -721,13 +724,19 @@ class Character extends FlxSprite
 				>texture atlas (spritemaps, approved by ziad)
 				*/
 				var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT, null);
+				(!FileSystem.exists(txtToFind)) ? Paths.modtxt('${json.image}.txt') : null;
 				if (FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
 					spriteType = "packer";
 
 				//if the thingy exists.
+				/*
+					var modAnimToFind:String = Paths.modFolders('images/' + json.image + '/Animation.json');
+					var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT);
+				*/
+				var modAnimToFind:String = Paths.modFolders('images/${json.image}/Animation.json');
 				var animToFind:String = Paths.getAtlas(json.image + '/Animation.json');
 				
-				if (FileSystem.exists(animToFind) || Assets.exists(animToFind))
+				if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
 					spriteType = "texture";
 
 				switch (spriteType){
@@ -766,7 +775,7 @@ class Character extends FlxSprite
 					iconColor = json.healthbar_colors;
 
 				antialiasing = !noAntialiasing;
-				antialiasing = !FlxG.save.data.antialiasing;
+				antialiasing = FlxG.save.data.antialiasing;
 
 				animationsArray = json.animations;
 

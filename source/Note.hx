@@ -173,7 +173,8 @@ class Note extends FlxSprite
 						prevNote.animation.play('redhold');
 				}
 
-				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed;
+				PlayState.SONG != null ? prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * PlayState.SONG.speed : null;
+				netTest.ServerHandler.SONG != null ? prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 / netTest.ServerHandler.SONG.speed : null;
 				prevNote.updateHitbox();
 				// prevNote.setGraphicSize();
 			}

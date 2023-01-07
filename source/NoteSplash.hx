@@ -15,6 +15,7 @@ class NoteSplash extends FlxSprite
 		var skin:String = 'noteSplashes';
 
 		loadAnims(skin);
+		textureLoaded = skin;
 
 		setupNoteSplash(x, y, note);
 	}
@@ -23,13 +24,6 @@ class NoteSplash extends FlxSprite
 		setPosition(x - Note.swagWidth * 0.95, y - Note.swagWidth);
 		alpha = 0.6;
 
-		if(texture == null) {
-			texture = 'noteSplashes';
-		}
-
-		if(textureLoaded != texture) {
-			loadAnims(texture);
-		}
 		offset.set(10, 10);
 
 		var animNum:Int = FlxG.random.int(1, 2);

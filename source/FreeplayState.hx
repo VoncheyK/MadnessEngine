@@ -34,7 +34,7 @@ class FreeplayState extends MusicBeatState
 	var selector:FlxText;
 	public static var curSelected:Int = 0;
 	public static var curDifficulty:Int = 1;
-	public static var modSongs:Array<String> = [];
+	public static var modSongs:Map<String, helpers.Modsupport.ModMetadata> = [];
 	var scoreText:FlxText;
 	var diffText:FlxText;
 	var lerpScore:Int = 0;
@@ -48,6 +48,8 @@ class FreeplayState extends MusicBeatState
 	private var bg:FlxSprite;
 
 	public static var songData:Map<String, Array<OneOfTwo<SwagSong, SwaggiestSong>>> = [];
+
+	public var possibleDiffs:Map<String, Array<String>> = [];
 
 	var text:FlxText;
 
@@ -98,34 +100,56 @@ class FreeplayState extends MusicBeatState
 
 			trace("Loaded "+ initSonglist[i] + ' difficulty');
 
+			possibleDiffs.set(data[0], diffsThatExist);
+
 			songData.set(data[0],diffs);
 
 			songs.push(meta);
 		}
 
-		for (i in 0...modSongs.length)
+		for (k => v in modSongs)
 			{
-				trace("Load "+ modSongs[i]);
-				var data = modSongs[i].split(":");
-				trace(data[1]);
+				trace("Load "+ k);
+				var song:String = k;
+				trace(song);
 	
-				var meta = new SongMetadata(data[0], null, null, data[1]);
+				var meta = new SongMetadata(k, null, null, v);
 
 				var diffs = [];
-				var diffsThatExist = ["Hard"];
+				var diffsThatExist = [];
+
+				for (folder in meta.mod.songJsons)
+					{
+						if(sys.FileSystem.isDirectory('${meta.mod.directory}data/$folder/')){
+							final actualDir = '${meta.mod.directory}data/$folder/';
+							trace(actualDir);
+							for (file in sys.FileSystem.readDirectory(actualDir))
+							{
+								if (file.contains('.json'))
+								{
+									file.contains('-hard') ? diffsThatExist.push('Hard') : null;
+									file.contains('-easy') ? diffsThatExist.push('Easy') : null;
+									final deez = '$folder.json';
+									file == deez ? diffsThatExist.push('Normal') : null;
+								}
+							}
+						}
+					}
+				trace(diffsThatExist);
 	
 				if (diffsThatExist.contains("Easy"))
-					FreeplayState.loadDiff(0, meta.songName, diffs,	meta.mod);
+					FreeplayState.loadDiff(0, meta.songName, diffs,	meta.mod.name);
 				if (diffsThatExist.contains("Normal"))
-					FreeplayState.loadDiff(1, meta.songName, diffs, meta.mod);
+					FreeplayState.loadDiff(1, meta.songName, diffs, meta.mod.name);
 				if (diffsThatExist.contains("Hard"))
-					FreeplayState.loadDiff(2, meta.songName, diffs, meta.mod);
+					FreeplayState.loadDiff(2, meta.songName, diffs, meta.mod.name);
 
-				trace("Loaded "+ modSongs[i] + ' difficulties');
+				trace("Loaded " + song + ' difficulties');
 	
-				songData.set(data[0],diffs);
+				songData.set(song, diffs);
 	
 				songs.push(meta);
+				possibleDiffs.set(song, diffsThatExist);
 			}
 	
 
@@ -215,14 +239,14 @@ class FreeplayState extends MusicBeatState
 		super.create();
 	}
 
-	public static function pushSong(songdata:String)
+	public static function pushSong(songdata:String, mod:helpers.Modsupport.ModMetadata)
 	{
-		modSongs.push(songdata);	
+		modSongs.set(songdata, mod);
 	}
 
-	public static function addSong(songName:String, weekNum:Int, songCharacter:String, mod:String)
+	public static function addSong(songName:String, weekNum:Int, songCharacter:String, mod:ModMetadata)
 	{
-		songs.push(new SongMetadata(songName, weekNum, songCharacter));
+		songs.push(new SongMetadata(songName, weekNum, songCharacter, mod));
 	}
 
 	public function addWeek(songs:Array<String>, weekNum:Int, ?songCharacters:Array<String>)
@@ -233,7 +257,7 @@ class FreeplayState extends MusicBeatState
 		var num:Int = 0;
 		for (song in songs)
 		{
-			addSong(song, weekNum, songCharacters[num], '');
+			addSong(song, weekNum, songCharacters[num], null);
 
 			if (songCharacters.length != 1)
 				num++;
@@ -271,18 +295,18 @@ class FreeplayState extends MusicBeatState
 					FlxG.sound.music.volume = 0;
 	
 					var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
-					PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase(), songs[curSelected].mod);
+					PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 					
 	
 					if (PlayState.SONG.needsVoices)
-						vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song, songs[curSelected].mod));
+						vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song, songs[curSelected].mod.name));
 					else
 						vocals = new FlxSound();
 	
 					curPlayingTxt = songs[curSelected].songName.toLowerCase();
 	
 					FlxG.sound.list.add(vocals);
-					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, songs[curSelected].mod), 0.7);
+					FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, songs[curSelected].mod.name), 0.7);
 					vocals.play();
 					vocals.persist = true;
 					vocals.looped = true;
@@ -337,7 +361,7 @@ class FreeplayState extends MusicBeatState
 				var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 				trace(poop);
 				
-				PlayState.SONG = Song.loadFromJson(poop, songLowercase, songs[curSelected].mod);
+				PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 	
 				PlayState.isStoryMode = false;
 				PlayState.storyDifficulty = curDifficulty;
@@ -345,7 +369,7 @@ class FreeplayState extends MusicBeatState
 				PlayState.storyWeek = songs[curSelected].week;
 				trace('CUR WEEK' + PlayState.storyWeek);
 				
-				LoadingState.loadAndSwitchState(new PlayState(songs[curSelected].mod));
+				LoadingState.loadAndSwitchState(new PlayState(songs[curSelected].mod.name));
 				
 				songData = [];
 				modSongs = [];
@@ -401,10 +425,39 @@ class FreeplayState extends MusicBeatState
 	{
 		curDifficulty += change;
 
+		//easy, normal, hard
+		var diffs:Map<String, Array<Bool>> = [];
+		var song = songs[curSelected].songName;
+
+		for (i => k in possibleDiffs){
+			var s = [false, false, false];
+			for (v in 0...k.length){
+				switch(k[v])
+				{
+					case "Hard":
+						s[2] = true;
+					case "Normal":
+						s[1] = true;
+					case "Easy":
+						s[0] = true;
+					default:
+				}
+			}
+			diffs.set(i, s);
+		}
+
 		if (curDifficulty < 0)
 			curDifficulty = 2;
 		if (curDifficulty > 2)
 			curDifficulty = 0;
+
+		if (diffs.get(song)[curDifficulty] == false)
+			{
+				final nums = [curDifficulty + 1, curDifficulty - 1, curDifficulty + 2, curDifficulty - 2];
+				for (n in nums){
+					diffs.get(song)[n] == true ? curDifficulty = n : null;
+				}
+			}
 
 		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
@@ -433,6 +486,8 @@ class FreeplayState extends MusicBeatState
 			curSelected = 0;
 
 		// selector.y = (70 * curSelected) + 30;
+		
+		changeDiff();
 
 		#if !switch
 		intendedScore = Highscore.getScore(songs[curSelected].songName, curDifficulty);
@@ -470,7 +525,7 @@ class FreeplayState extends MusicBeatState
 		{
 			super.beatHit();
 	
-			var zoomShit:Float = 1.04;
+			var zoomShit:Float = 1.4;
 	
 			if (OptionsMenu.options.cameraZoom)
 				bg.scale.x = bg.scale.y = zoomShit;
@@ -481,10 +536,10 @@ class FreeplayState extends MusicBeatState
 				(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
 		}
 
-	public static function loadDiff(diff:Int, songName:String, array:Array<SwaggiestSong>, ?mod:String)
+	public static function loadDiff(diff:Int, songName:String, array:Array<OneOfTwo<SwagSong, SwaggiestSong>>, ?mod:String)
 	{
 		try {
-			array.push(Song.loadFromJson(Highscore.formatSong(songName, diff), songName, mod));
+			array.push(Song.loadFromJson(Highscore.formatSong(songName, diff), songName));
 		} catch(e) {
 			trace(e);
 		}
@@ -496,9 +551,9 @@ class SongMetadata
 	public var songName:String = "";
 	public var week:Int = 0;
 	public var songCharacter:String = "";
-	public var mod:String = "";
+	public var mod:ModMetadata = null;
 
-	public function new(song:String, ?week:Int, ?songCharacter:String, ?mod:String)
+	public function new(song:String, ?week:Int, ?songCharacter:String, ?mod:ModMetadata)
 	{
 		this.songName = song;
 		this.week = week;

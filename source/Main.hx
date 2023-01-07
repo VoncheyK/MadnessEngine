@@ -141,7 +141,9 @@ class Main extends Sprite
 						"Von caused this I swear!",
 						"Hey shitass, wanna see me crash the game?",
 						"The game ran so fast that it crashed.",
-						"You made null object reference beatable!"
+						"You made null object reference beatable!",
+						"You should kill yourself NOW!",
+						"IP logged, 123.21- Disconnected."
 			];
 	
 			dateNow = StringTools.replace(dateNow, " ", "_");

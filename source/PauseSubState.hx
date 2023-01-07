@@ -27,14 +27,16 @@ class PauseSubState extends MusicBeatSubstate
 
 	var pauseMusic:FlxSound;
 
+	var songPos:Float;
 
-	public function new(x:Float, y:Float)
+	public function new(x:Float, y:Float, sp:Float)
 	{
 		super();
 
 		if (!PlayState.isStoryMode) {
 			menuItems = ['Resume', 'Restart Song', 'Toggle Botplay', 'Exit to menu'];
 		}
+		this.songPos = sp;
 
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 		pauseMusic.volume = 0;
@@ -135,6 +137,7 @@ class PauseSubState extends MusicBeatSubstate
 			{
 				case "Resume":
 					close();
+					Conductor.songPosition = songPos;
 				case "Restart Song":
 					MusicBeatState.switchState(new PlayState(PlayState.instance.fromMod));
 				case "Toggle Botplay":

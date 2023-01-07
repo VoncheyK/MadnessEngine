@@ -8,6 +8,7 @@ class FunkyHscript {
 	public var parser:Parser = null;
 	public var interpreter:Interp = null;
 	public var vars:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public var fileName:String = "";
 
 	public function new(fileName:String) {
 		try {
@@ -18,11 +19,18 @@ class FunkyHscript {
 			parser.allowJSON = true;
 			parser.allowTypes = true;
 			parser.allowMetadata = true;
-			var parsed = parser.parseString(sys.io.File.getContent(Paths.getScript(fileName)), fileName);
+			var parsed = parser.parseString(sys.io.File.getContent(Paths.script(fileName)), fileName);
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
 			
-			interpreter.variables.set("require", Type.resolveClass);
+			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
+				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+					return null;
+
+				return Type.resolveClass(name);
+			});
+
+			this.fileName = fileName;
 
 			interpreter.execute(parsed);
 			
@@ -49,7 +57,7 @@ class FunkyHscript {
 
 	public function reExecute(fileName:String):Void {
 		try {
-			var parsed = parser.parseString(sys.io.File.getContent(Paths.getScript(fileName)), fileName);
+			var parsed = parser.parseString(sys.io.File.getContent(Paths.script(fileName)), fileName);
 			var e = interpreter.execute(parsed);
 		} catch (e:haxe.Exception) {
 			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
@@ -84,7 +92,12 @@ class FunkyHscript {
 
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
-			interpreter.variables.set("require", Type.resolveClass);
+			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
+				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+					return null;
+
+				return Type.resolveClass(name);
+			});
 
 			reExecute(fileName);
 			interpreter.publicVariables = publics;
@@ -106,7 +119,12 @@ class FunkyHscript {
 
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
-			interpreter.variables.set("require", Type.resolveClass);
+			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
+				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+					return null;
+
+				return Type.resolveClass(name);
+			});
 
 			parser.allowJSON = true;
 			parser.allowTypes = true;

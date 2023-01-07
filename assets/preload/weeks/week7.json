@@ -1,0 +1,13 @@
+{
+    "week":"week7",
+    "weekName":"cumhead",
+    "menuCharacters":["dad", "bf", "gf"],
+    "weekUnlocked": true,
+    "songs":[
+        {
+            "name":"devils-gambit",
+            "character":"dad",
+            "author":"The Innuendo"
+		}
+    ]
+}

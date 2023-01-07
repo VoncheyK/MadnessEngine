@@ -58,16 +58,23 @@ class CoolUtil
 		return Type.typeof(thing);
 	}
 
-	public static function coolTextFile(path:String):Array<String>
+	public static function coolTextFile(path:String):Null<Array<String>>
 	{
-		var daList:Array<String> = Assets.getText(path).trim().split('\n');
-
-		for (i in 0...daList.length)
-		{
-			daList[i] = daList[i].trim();
+		if (sys.FileSystem.exists(path)){
+			var daList:Array<String> = Assets.getText(path).trim().split('\n');
+			if (daList != null){
+				for (i in 0...daList.length)
+				{
+					daList[i] = daList[i].trim();
+				}
+	
+				return daList;
+			}
+			else
+				return null;
 		}
-
-		return daList;
+		else
+			return null;
 	}
 
 	public static function numberArray(max:Int, ?min = 0):Array<Int>

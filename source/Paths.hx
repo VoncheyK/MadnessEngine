@@ -1,10 +1,15 @@
 package;
 
+import openfl.display.BitmapData;
+import sys.io.File;
+import helpers.Modsupport;
+import sys.FileSystem;
 import flixel.graphics.FlxGraphic;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
 import openfl.utils.AssetType;
 import openfl.utils.Assets as OpenFlAssets;
+import openfl.utils.AssetCache;
 
 using StringTools;
 
@@ -38,6 +43,17 @@ class Paths
 		return getPreloadPath(file);
 	}
 
+	//psych engine code
+	static public function modFolders(key:String) {
+		for(mod in Modsupport.modz){
+			var fileToCheck:String = mods('$mod/$key');
+			if(FileSystem.exists(fileToCheck))
+				return fileToCheck;
+
+		}
+		return 'mods/$key';
+	}
+
 	static public function getLibraryPath(file:String, library = "preload")
 	{
 		return if (library == "preload" || library == "default") getPreloadPath(file); else getLibraryPathForce(file, library);
@@ -55,12 +71,20 @@ class Paths
 
 	inline static public function mods(modLib:String)
 	{
-		return 'assets/mods/$modLib';
+		return 'mods/$modLib';
 	}
 	
-	inline static public function modtxt(modLib:String, key:String)
+	inline static public function modtxt(key:String)
 	{
-		return 'mods:${Paths.mods(modLib)}/data/$key.txt';
+		return modFolders('data/$key.txt');
+	}
+
+	inline static public function modImage(key:String) {
+		return modFolders('images/$key.png');
+	}
+
+	inline public static function modSound(key:String) {
+		return modFolders('sounds/$key.$SOUND_EXT');
 	}
 
 	inline static public function getFromMods(modLib:String, dir:String, file:String){
@@ -85,23 +109,26 @@ class Paths
 	{
 		return getPath('data/$key.xml', TEXT, library);
 	}
-	//mod is the library, key is the json name and song is the song dir or the lib
-	inline static public function modJSON(mod:String, key:String)
-	{
-		return 'mods:assets/mods/${mod}/data/${key}.json';
+
+	inline static public function modsXml(key:String) {
+		return modFolders('images/$key.xml');
 	}
 
-	inline static public function json(key:String, ?library:String, ?mod:String)
+	//mod is the library, key is the json name and song is the song dir or the lib
+	inline static public function modJSON(key:String)
 	{
-		if (mod == null)
-			return getPath('data/$key.json', TEXT, library) 
-		else
-			return modJSON(mod, key);
+		return modFolders('data/' + key + '.json');
+	}
+
+	inline static public function json(key:String, ?library:String)
+	{
+		if (FileSystem.exists(modJSON(key))) return modJSON(key);
+		return getPath('data/$key.json', TEXT, library);
 	}
 
 	inline static public function script(key:String, ?library:String)
 	{
-		return getPath('scripts/$key.hscript', TEXT, library);
+		return getPath('scripts/$key', TEXT, library);
 	}
 
 	static public function sound(key:String, ?library:String)
@@ -121,46 +148,25 @@ class Paths
 
 	inline static public function voices(song:String, ?mod:String)
 	{
-		if(mod == null)
-			return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
-		else
-			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		var s1 = 'songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		return (FileSystem.exists(modFolders(s1)) ? modFolders(s1) : (FileSystem.exists(getPath(s1, SOUND, null)) ? getPath(s1, SOUND, null) : null));
 	}
 
 	inline static public function inst(song:String, ?mod:String)
 	{
-		if (mod == null)
-			return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
-		else
-			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		var s1 = 'songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		return (FileSystem.exists(modFolders(s1)) ? modFolders(s1) : (FileSystem.exists(getPath(s1, SOUND, null)) ? getPath(s1, SOUND, null) : null));
 	}
 
 	inline static public function image(key:String, ?library:String)
 	{
+		if (FileSystem.exists(modImage(key))) return modImage(key);
 		return getPath('images/$key.png', IMAGE, library);
 	}
 
 	inline static public function getAtlas(folder:String)
 	{
 		return 'assets/shared/${folder}';
-	}
-
-	/**
-	 * Loading the image, credits to Kade Engine for this!
-	 * @param key 
-	 * @param library 
-	 * @return FlxGraphic
-	 */
-	static public function loadImage(key:String, ?library:String):FlxGraphic
-	{
-		var path = image(key, library);
-		if (OpenFlAssets.exists(path, IMAGE)) {
-			var bitmap = OpenFlAssets.getBitmapData(path);
-			return FlxGraphic.fromBitmapData(bitmap);
-		} else {
-			trace('no image found in $path');
-			return null;
-		}
 	}
 
 	inline static public function font(key:String)
@@ -172,13 +178,16 @@ class Paths
 		return path.toLowerCase().replace(' ', '-');
 	}
 
-	inline public static function getScript(fileName:String)
-	{
-		return 'assets/scripts/${fileName}';
-	}
-
 	inline static public function getSparrowAtlas(key:String, ?library:String)
 	{
+		var imageLoaded:FlxGraphic = FlxGraphic.fromBitmapData(openfl.display.BitmapData.fromFile(modImage(key)));
+		var xmlExists:Bool = false;
+		if(FileSystem.exists(modsXml(key))) {
+			xmlExists = true;
+		}
+		if (xmlExists)
+			return FlxAtlasFrames.fromSparrow((imageLoaded != null ? imageLoaded : image(key, library)), (xmlExists ? File.getContent(modsXml(key)) : file('images/$key.xml', library)));
+		
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
 	}
 

@@ -17,7 +17,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.TransitionData;
 import flixel.graphics.FlxGraphic;
 import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.group.FlxGroup;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
@@ -32,9 +32,6 @@ import lime.app.Application;
 import openfl.Assets;
 import GameJolt.GameJoltAPI;
 import GameJolt;
-import com.hurlant.crypto.hash.MD5;
-import com.hurlant.util.Hex;
-import com.hurlant.util.ByteArray;
 import options.OptionsMenu;
 
 using StringTools;
@@ -44,22 +41,30 @@ class TitleState extends MusicBeatState
 	static var initialized:Bool = false;
 
 	var blackScreen:FlxSprite;
-	var credGroup:FlxGroup;
+	var credGroup:FlxTypedGroup<Alphabet>;
 	var credTextShit:Alphabet;
-	var textGroup:FlxGroup;
-	var ngSpr:helpers.CompressedSprite;
+	var textGroup:FlxTypedGroup<Alphabet>;
+	var ngSpr:FlxSprite;
 
 	var curWacky:Array<String> = [];
 
 	//md5 hash verify test
-	var bfMd5:String = "38495a06b646af00267deeeacb3458cc";
+	//var bfMd5:String = "38495a06b646af00267deeeacb3458cc";
 
 	//get the bytes and convert them to hex.
-	var bfSrc:String = File.getBytes("assets/shared/images/BOYFRIEND.png").toHex();
+	//var bfSrc:String = File.getBytes("assets/shared/images/BOYFRIEND.png").toHex();
 	//variable to be filled with the bytearray.
-	var md5t:ByteArray;
+	//var md5t:ByteArray;
 
 	var wackyImage:FlxSprite;
+
+	var collectedSprites:Array<flixel.FlxBasic> = [];
+
+	override function add(obj:flixel.FlxBasic):flixel.FlxBasic
+	{
+		collectedSprites.push(obj);
+		return super.add(obj);
+	}
 
 	override public function create():Void
 	{
@@ -68,7 +73,7 @@ class TitleState extends MusicBeatState
 		polymod.Polymod.init({modRoot: "mods", dirs: ['testMod']});
 		#end
 
-		var mods:Array<String> = CoolUtil.coolTextFile('mods.txt');
+		var mods:Array<String> = CoolUtil.coolTextFile("mods.txt");
 		helpers.Modsupport.init("mods", mods);
 
 		PlayerSettings.init();
@@ -120,17 +125,13 @@ class TitleState extends MusicBeatState
 		 });
 		#end
 		//tedious process
-		md5t = Hex.toArray(bfSrc);
+		/*md5t = Hex.toArray(bfSrc);
 		var md5Verifier:MD5 = new MD5();
 		var sex = md5Verifier.hash(md5t);
 		if (Hex.fromArray(sex) == bfMd5)
-			{
-				trace("Files match.");
-			}
+			trace("Files match.");
 		else
-			{
-				trace("File integrity invalid.");
-			}
+			trace("File integrity invalid.");*/
 	}
 
 	var logoBl:FlxSprite;
@@ -186,11 +187,11 @@ class TitleState extends MusicBeatState
 		logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
 
-		gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
-		gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
-		gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-		gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-		gfDance.antialiasing = true;
+		//gfDance = new FlxSprite(FlxG.width * 0.4, FlxG.height * 0.07);
+		//gfDance.frames = Paths.getSparrowAtlas('gfDanceTitle');
+		//gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
+		//gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+		//gfDance.antialiasing = true;
 		// add(gfDance);
 		add(logoBl);
 
@@ -212,12 +213,12 @@ class TitleState extends MusicBeatState
 		// FlxTween.tween(logoBl, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG});
 		// FlxTween.tween(logo, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG, startDelay: 0.1});
 
-		credGroup = new FlxGroup();
-		add(credGroup);
-		textGroup = new FlxGroup();
-
 		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		credGroup.add(blackScreen);
+		add(blackScreen);
+
+		credGroup = new FlxTypedGroup<Alphabet>();
+		add(credGroup);
+		textGroup = new FlxTypedGroup<Alphabet>();
 
 		credTextShit = new Alphabet(0, 0, "ninjamuffin99\nPhantomArcade\nkawaisprite\nevilsk8er", true);
 		credTextShit.screenCenter();
@@ -227,13 +228,14 @@ class TitleState extends MusicBeatState
 		credTextShit.visible = false;
 
 		//ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
-		ngSpr = new helpers.CompressedSprite(0, FlxG.height * 0.52, Paths.image('newgrounds_logo'));
-		add(ngSpr);
-		ngSpr.visible = false;
-		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
-		ngSpr.updateHitbox();
-		ngSpr.screenCenter(X);
-		ngSpr.antialiasing = true;
+//ngSpr = new FlxSprite(0, FlxG.height * 0.52).loadGraphic(Paths.image('newgrounds_logo'));
+		//add(ngSpr);
+		//collectedSprites.push(ngSpr);
+		//ngSpr.visible = false;
+		//ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
+		//ngSpr.updateHitbox();
+		//ngSpr.screenCenter(X);
+		//ngSpr.antialiasing = true;
 
 		FlxTween.tween(credTextShit, {y: credTextShit.y + 20}, 2.9, {ease: FlxEase.quadInOut, type: PINGPONG});
 
@@ -356,6 +358,8 @@ class TitleState extends MusicBeatState
 		{
 			credGroup.remove(textGroup.members[0], true);
 			textGroup.remove(textGroup.members[0], true);
+			for (s in credGroup.members)
+				(s != null) ? collectedSprites.remove(s) : null;
 		}
 	}
 
@@ -363,15 +367,30 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
+		if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
+			(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
+		else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
+			(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+
+
+		if (options.OptionsMenu.options.cameraZoom)
+			{
+				camera.shake(0.01, 0.05);
+				for (sprBasic in collectedSprites){
+					if (sprBasic is FlxSprite)
+						cast(sprBasic, FlxSprite).scale.x = cast(sprBasic, FlxSprite).scale.y = 1.3;
+				}
+			}
+
 		logoBl.animation.play('bump');
-		danceLeft = !danceLeft;
+		//danceLeft = !danceLeft;
 
-		if (danceLeft)
-			gfDance.animation.play('danceRight');
-		else
-			gfDance.animation.play('danceLeft');
+		//if (danceLeft)
+		//	gfDance.animation.play('danceRight');
+		//else
+		//	gfDance.animation.play('danceLeft');
 
-		FlxG.log.add(curBeat);
+		//FlxG.log.add(curBeat);
 
 		switch (curBeat)
 		{
@@ -391,11 +410,11 @@ class TitleState extends MusicBeatState
 				createCoolText(['Not in association', 'with']);
 			case 7:
 				addMoreText('newgrounds');
-				ngSpr.visible = true;
+				//ngSpr.visible = true;
 			// credTextShit.text += '\nNewgrounds';
 			case 8:
 				deleteCoolText();
-				ngSpr.visible = false;
+				//ngSpr.visible = false;
 			// credTextShit.visible = false;
 
 			// credTextShit.text = 'Shoutouts Tom Fulp';
@@ -425,13 +444,23 @@ class TitleState extends MusicBeatState
 		}
 	}
 
+	override function destroy()
+	{
+		super.destroy();
+		for (b in collectedSprites) 
+			remove(b);
+
+		remove(credGroup);
+	}
+
 	var skippedIntro:Bool = false;
 
 	function skipIntro():Void
 	{
 		if (!skippedIntro)
 		{
-			remove(ngSpr);
+			//collectedSprites.remove(ngSpr);
+			//remove(ngSpr);
 
 			FlxG.camera.flash(FlxColor.WHITE, 4);
 			remove(credGroup);
