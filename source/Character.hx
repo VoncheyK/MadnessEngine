@@ -96,7 +96,7 @@ class Character extends FlxSprite
 				animation.addByIndices('hairBlow', "GF Dancing Beat Hair blowing", [0, 1, 2, 3], "", 24);
 				animation.addByIndices('hairFall', "GF Dancing Beat Hair Landing", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], "", 24, false);
 				animation.addByPrefix('scared', 'GF FEAR', 24);
-
+				
 				addOffset('cheer');
 				addOffset('sad', -2, -2);
 				addOffset('danceLeft', 0, -9);
@@ -874,11 +874,7 @@ class Character extends FlxSprite
 					if (!animation.curAnim.name.startsWith('hair'))
 					{
 						danced = !danced;
-
-						if (danced)
-							playAnim('danceRight', forced);
-						else
-							playAnim('danceLeft', forced);
+						(danced) ? playAnim('danceRight', forced) : playAnim('danceLeft', forced);
 					}
 
 				case 'gf-christmas':

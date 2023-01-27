@@ -47,7 +47,6 @@ class CoolUtil
 
 		return daText;
 	}
-
 	
 	public static function lerpShit(elapsed:Float, mult:Float):Float {
 		return Math.max(0, Math.min(1, elapsed * mult));

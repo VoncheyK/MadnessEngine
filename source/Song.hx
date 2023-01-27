@@ -5,6 +5,7 @@ import Section.SwaggiestSection;
 import Section.SwagSection;
 import haxe.Json;
 import haxe.format.JsonParser;
+import sys.io.File;
 import lime.utils.Assets;
 
 using StringTools;
@@ -13,7 +14,7 @@ using StringTools;
 typedef SwagSong =
 {
 	var song:String;
-	var notes:Array<SwagSection>; //var sectionNotes:Array<Dynamic>;var lengthInSteps:Int;var typeOfSection:Int;var mustHitSection:Bool;var bpm:Int;var changeBPM:Bool;var altAnim:Bool;
+	var notes:Array<SwagSection>;
 	var bpm:Int;
 	var needsVoices:Bool;
 	var speed:Float;
@@ -73,7 +74,7 @@ class Song
 
 	public static function loadFromJson(jsonInput:String, ?folder:String):OneOfTwo<SwagSong, SwaggiestSong>
 	{
-		var rawJson = Assets.getText(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase(), null)).trim();
+		var rawJson = File.getContent(Paths.json(folder.toLowerCase() + '/' + jsonInput.toLowerCase(), null)).trim();
 		while (!rawJson.endsWith("}"))
 			rawJson = rawJson.substr(0, rawJson.length - 1);
 
@@ -88,10 +89,8 @@ class Song
 		if (parsedShit.chartVersion == null || parsedShit.chartVersion != "1.5")
 		{
 			var data:SwagSong = cast parsedShit;
-			if (parsedShit.chartVersion == '1.0'){
-				trace("parsedShit on old type");
+			if (parsedShit.chartVersion == '1.0')
 				swagShit = data;
-			}
 			else
 				swagShit = translate(data);
 		}
@@ -141,43 +140,6 @@ class Song
 			sections: swagSections,
 			chartVersion: "1.5",
 			stage: 'stage'
-		}
-	}
-
-	overload extern inline public static function translate(song:SwaggiestSong):SwagSong
-	{
-		var sections:Array<SwagSection> = [];
-		var ver:String = song.chartVersion;
-		for (i => section in song.sections)
-		{
-			var sectionNotes:Array<Array<Dynamic>> = [];
-			for (note in song.notes)
-				if (note.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * i
-					&& note.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * (i + 1))
-					sectionNotes.push([note.strumTime, note.noteData, note.sustainLength]);
-
-			sections.push({
-				sectionNotes: sectionNotes,
-				lengthInSteps: section.lengthInSteps,
-				typeOfSection: section.typeOfSection,
-				mustHitSection: section.mustHit,
-				bpm: section.changeBPM.bpm,
-				changeBPM: section.changeBPM.active,
-				altAnim: section.altAnim
-			});
-		}
-
-		return {
-			song: song.song,
-			notes: sections,
-			bpm: song.bpm,
-			needsVoices: song.needsVoices,
-			speed: song.speed,
-			player1: song.player1,
-			player2: song.player2,
-			validScore: song.validScore,
-			stage: 'stage',
-			chartVersion: ver
 		}
 	}
 }

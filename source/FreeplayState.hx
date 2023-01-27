@@ -82,11 +82,8 @@ class FreeplayState extends MusicBeatState
 		
 		for (i in 0...initSonglist.length)
 		{
-			trace("Load "+ initSonglist[i]);
 			var data = initSonglist[i].split(":");
 			var meta = new SongMetadata(data[0], Std.parseInt(data[1]), data[2]);
-
-			trace("Loaded "+ initSonglist[i] + " data");
 
 			var diffs = [];
 			var diffsThatExist = ["Easy","Normal","Hard"];
@@ -98,8 +95,6 @@ class FreeplayState extends MusicBeatState
 			if (diffsThatExist.contains("Hard"))
 				FreeplayState.loadDiff(2, meta.songName, diffs);
 
-			trace("Loaded "+ initSonglist[i] + ' difficulty');
-
 			possibleDiffs.set(data[0], diffsThatExist);
 
 			songData.set(data[0],diffs);
@@ -109,9 +104,7 @@ class FreeplayState extends MusicBeatState
 
 		for (k => v in modSongs)
 			{
-				trace("Load "+ k);
 				var song:String = k;
-				trace(song);
 	
 				var meta = new SongMetadata(k, null, null, v);
 
@@ -120,9 +113,8 @@ class FreeplayState extends MusicBeatState
 
 				for (folder in meta.mod.songJsons)
 					{
-						if(sys.FileSystem.isDirectory('${meta.mod.directory}data/$folder/')){
-							final actualDir = '${meta.mod.directory}data/$folder/';
-							trace(actualDir);
+						final actualDir = '${meta.mod.directory}data/$folder/';
+						if(sys.FileSystem.isDirectory(actualDir)){
 							for (file in sys.FileSystem.readDirectory(actualDir))
 							{
 								if (file.contains('.json'))
@@ -135,7 +127,6 @@ class FreeplayState extends MusicBeatState
 							}
 						}
 					}
-				trace(diffsThatExist);
 	
 				if (diffsThatExist.contains("Easy"))
 					FreeplayState.loadDiff(0, meta.songName, diffs,	meta.mod.name);
@@ -144,8 +135,6 @@ class FreeplayState extends MusicBeatState
 				if (diffsThatExist.contains("Hard"))
 					FreeplayState.loadDiff(2, meta.songName, diffs, meta.mod.name);
 
-				trace("Loaded " + song + ' difficulties');
-	
 				songData.set(song, diffs);
 	
 				songs.push(meta);
@@ -369,7 +358,7 @@ class FreeplayState extends MusicBeatState
 				PlayState.storyWeek = songs[curSelected].week;
 				trace('CUR WEEK' + PlayState.storyWeek);
 				
-				LoadingState.loadAndSwitchState(new PlayState(songs[curSelected].mod.name));
+				(songs[curSelected].mod != null) ? LoadingState.loadAndSwitchState(new PlayState(songs[curSelected].mod.name)) : LoadingState.loadAndSwitchState(new PlayState());
 				
 				songData = [];
 				modSongs = [];

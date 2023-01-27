@@ -15,7 +15,7 @@ class Director extends MusicBeatState
 			switch(GameJoltAPI.getStatus())
 			{
 				case true:
-					FlxG.switchState(new ServerHandler()); //normal stuff
+					LoadingState.loadAndSwitchState(new ServerHandler()); //normal stuff
 				case false:
 					bg = new FlxSprite(-80).loadGraphic(Paths.image('multiplayerBG'));
 					bg.scrollFactor.x = 0;

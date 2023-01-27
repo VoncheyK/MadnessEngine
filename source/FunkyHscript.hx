@@ -10,25 +10,19 @@ class FunkyHscript {
 	public var vars:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public var fileName:String = "";
 
-	public function new(fileName:String) {
+	public function new(?fileName:String, ?fileData:String):Void {
 		try {
-			trace(fileName);
 			parser = new Parser();
 			interpreter = new Interp();
 
 			parser.allowJSON = true;
 			parser.allowTypes = true;
 			parser.allowMetadata = true;
-			var parsed = parser.parseString(sys.io.File.getContent(Paths.script(fileName)), fileName);
+			var parsed = parser.parseString((fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : ((fileData != null) ? fileData : null), fileName);
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
 			
-			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
-				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
-					return null;
-
-				return Type.resolveClass(name);
-			});
+			interpreter.variables.set("require", resolveRequire);
 
 			this.fileName = fileName;
 
@@ -36,7 +30,7 @@ class FunkyHscript {
 			
 			call("main", []);
 		} catch (e:haxe.Exception) {
-			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
+			windowAlertLmao(e);
 		}
 	}
 
@@ -51,7 +45,7 @@ class FunkyHscript {
 		try {
 			Reflect.callMethod(interpreter, interpreter.variables.get(Function), Arguments);
 		} catch (e:haxe.Exception) {
-			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
+			windowAlertLmao(e);
 		}
 	}
 
@@ -60,7 +54,7 @@ class FunkyHscript {
 			var parsed = parser.parseString(sys.io.File.getContent(Paths.script(fileName)), fileName);
 			var e = interpreter.execute(parsed);
 		} catch (e:haxe.Exception) {
-			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
+			windowAlertLmao(e);
 		}
 	}
 
@@ -71,6 +65,19 @@ class FunkyHscript {
 		interpreter.staticVariables = null;
 		interpreter = null;
 		vars = null;
+	}
+
+	private function windowAlertLmao(e:haxe.Exception){
+		Main.raiseWindowAlert("An error has occured with Hscript:\n
+		" + e.details() + "\nHscript line: " +
+		interpreter.posInfos().lineNumber + "\nMessage: " + e.message);
+	}
+
+	private function resolveRequire(name:String):Class<Dynamic>{
+		if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+			return null;
+
+		return Type.resolveClass(name);
 	}
 
 	public function wipeExceptVarsAndExecute(fileName:String, callable:Bool):Void {
@@ -92,12 +99,7 @@ class FunkyHscript {
 
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
-			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
-				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
-					return null;
-
-				return Type.resolveClass(name);
-			});
+			interpreter.variables.set("require", resolveRequire);
 
 			reExecute(fileName);
 			interpreter.publicVariables = publics;
@@ -107,7 +109,7 @@ class FunkyHscript {
 			
 			call("main", []);
 		} catch (e:haxe.Exception) {
-			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
+			windowAlertLmao(e);
 		}
 	}
 
@@ -119,12 +121,7 @@ class FunkyHscript {
 
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;
-			interpreter.variables.set("require", function(name:String):Class<Dynamic>{
-				if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
-					return null;
-
-				return Type.resolveClass(name);
-			});
+			interpreter.variables.set("require", resolveRequire);
 
 			parser.allowJSON = true;
 			parser.allowTypes = true;
@@ -133,7 +130,7 @@ class FunkyHscript {
 			reExecute(fileName);
 			call("main", []);
 		} catch (e:haxe.Exception) {
-			trace('Exception: ${e},\n Message: ${e.message},\n Details: ${e.details()},\n Stack: ${e.stack},\n HScript line: ${interpreter.posInfos().lineNumber}');
+			windowAlertLmao(e);
 		}
 	}
 }

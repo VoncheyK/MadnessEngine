@@ -260,8 +260,9 @@ class OptionsMenu extends MusicBeatState
 	{		
 		if (OptionsMenu.options.cameraZoom)
 			{
-				camera.shake(0.001, 0.05);
-				bg.scale.x = bg.scale.y = 1.02;
+				FlxTween.tween(FlxG.camera, {zoom: 1.1}, (Conductor.stepCrochet * 4) / 1000, {ease: FlxEase.cubeOut, onComplete: function(f:FlxTween){
+					FlxTween.tween(FlxG.camera, {zoom: 1.0}, (Conductor.stepCrochet *4) / 1000, {ease: FlxEase.cubeOut});
+				}});
 			}
 	
 			if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")

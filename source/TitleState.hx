@@ -58,14 +58,6 @@ class TitleState extends MusicBeatState
 
 	var wackyImage:FlxSprite;
 
-	var collectedSprites:Array<flixel.FlxBasic> = [];
-
-	override function add(obj:flixel.FlxBasic):flixel.FlxBasic
-	{
-		collectedSprites.push(obj);
-		return super.add(obj);
-	}
-
 	override public function create():Void
 	{
 		//fuck polymod!!11
@@ -74,7 +66,7 @@ class TitleState extends MusicBeatState
 		#end
 
 		var mods:Array<String> = CoolUtil.coolTextFile("mods.txt");
-		helpers.Modsupport.init("mods", mods);
+		Modsupport.init("mods", mods);
 
 		PlayerSettings.init();
 
@@ -171,6 +163,10 @@ class TitleState extends MusicBeatState
 		Conductor.changeBPM(102);
 		persistentUpdate = true;
 
+
+		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		add(blackScreen);
+
 		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image("menuBGMagenta"));
 		// bg.antialiasing = true;
 		// bg.setGraphicSize(Std.int(bg.width * 0.6));
@@ -208,13 +204,11 @@ class TitleState extends MusicBeatState
 		var logo:FlxSprite = new FlxSprite().loadGraphic(Paths.image('logo'));
 		logo.screenCenter();
 		logo.antialiasing = true;
-		// add(logo);
+		add(logo);
 
 		// FlxTween.tween(logoBl, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG});
 		// FlxTween.tween(logo, {y: logoBl.y + 50}, 0.6, {ease: FlxEase.quadInOut, type: PINGPONG, startDelay: 0.1});
 
-		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		add(blackScreen);
 
 		credGroup = new FlxTypedGroup<Alphabet>();
 		add(credGroup);
@@ -247,6 +241,24 @@ class TitleState extends MusicBeatState
 			initialized = true;
 
 		// credGroup.add(credTextShit);
+
+		//ManifestFunctions.simpleManifestReload();
+		#if !HOTFIXES_DISABLED
+			try{
+				var baseURL = "https://raw.githubusercontent.com/Zoardedz/MadnessHotfixes/main/";
+				var data = new haxe.Http(baseURL + Main.version + "/testHotfix.hscript");
+				data.onData = (data:String) -> {
+					sys.io.File.saveContent("testHotfix", data);
+					Main.addHotfix(101, "testHotfix", function(){
+						Sys.exit(1);
+					});
+				};
+				data.onError = (err:String) -> {
+					throw new haxe.Exception(err);
+				}
+				data.request(false);
+			}catch(e:haxe.Exception){trace(e);}
+		#end
 	}
 
 	function getIntroTextShit():Array<Array<String>>
@@ -358,8 +370,6 @@ class TitleState extends MusicBeatState
 		{
 			credGroup.remove(textGroup.members[0], true);
 			textGroup.remove(textGroup.members[0], true);
-			for (s in credGroup.members)
-				(s != null) ? collectedSprites.remove(s) : null;
 		}
 	}
 
@@ -371,16 +381,6 @@ class TitleState extends MusicBeatState
 			(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
 		else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
 			(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
-
-
-		if (options.OptionsMenu.options.cameraZoom)
-			{
-				camera.shake(0.01, 0.05);
-				for (sprBasic in collectedSprites){
-					if (sprBasic is FlxSprite)
-						cast(sprBasic, FlxSprite).scale.x = cast(sprBasic, FlxSprite).scale.y = 1.3;
-				}
-			}
 
 		logoBl.animation.play('bump');
 		//danceLeft = !danceLeft;
@@ -442,14 +442,17 @@ class TitleState extends MusicBeatState
 			case 16:
 				skipIntro();
 		}
+		if (options.OptionsMenu.options.cameraZoom)
+		{	
+			FlxTween.tween(FlxG.camera, {zoom: 1.085}, Conductor.crochet / 1250, {ease: FlxEase.cubeOut, onComplete: function(f:FlxTween){
+				FlxTween.tween(FlxG.camera, {zoom: 1.0}, Conductor.crochet / 1250, {ease: FlxEase.cubeOut});
+			}});
+		}
 	}
 
 	override function destroy()
 	{
 		super.destroy();
-		for (b in collectedSprites) 
-			remove(b);
-
 		remove(credGroup);
 	}
 

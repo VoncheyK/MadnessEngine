@@ -68,18 +68,18 @@ class MusicBeatState extends FlxUIState
 		}
 
 		for(script in hscripts){
-			if (callable) {script.call("keyDown", [event]);}
+			(callable) ? script.call("keyDown", [event]) : null;
 		}
 	}
 
 	private function keyUp(event:KeyboardEvent)
 	{
-		for(script in hscripts) { if(callable) {script.call("keyUp", [event]);}}
+		for(script in hscripts)  (callable) ? script.call("keyUp", [event]) : null;
 	}
 
 	override function update(elapsed:Float)
 	{
-		for (script in hscripts){ if (callable){script.call("update", [elapsed]);}}
+		for (script in hscripts) (callable) ? script.call("update", [elapsed]) : null;
 
 		//everyStep();
 		var oldStep:Int = curStep;
@@ -128,13 +128,13 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		for (script in hscripts){ if(callable) {script.call("stepHit", []);}}
+		for (script in hscripts) (callable) ? script.call("stepHit", []) : null;
 		try if (curStep % 4 == 0) beatHit();
 	}
 
 	public function beatHit():Void
 	{
-		for (script in hscripts){if(callable) {script.call("beatHit", []);}}
+		for (script in hscripts) (callable) ? script.call("beatHit", []) : null;
 	}
 
 }

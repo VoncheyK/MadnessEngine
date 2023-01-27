@@ -45,7 +45,11 @@ class Main extends Sprite
 
 		#if sys
 		haxe.Log.trace = (arg, ?pos) -> {
+			#if (no_trace)
+			return;
+			#else
 			Sys.println('${pos.className} (${pos.lineNumber}) $arg');
+			#end
 		}
 		#end
 
@@ -101,7 +105,7 @@ class Main extends Sprite
 		// fuck you, persistent caching stays ON during sex
 		FlxGraphic.defaultPersist = true;
 		// the reason for this is we're going to be handling our own cache smartly (false.)
-		addChild(new FlxGame(gameWidth, gameHeight, initialState, zoom, framerate, framerate, skipSplash, startFullscreen));
+		addChild(new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen));
 
 		#if !mobile
 		fpsVar = new openfl.display.CustomFPS(10, 3, 0xFFFFFF);
@@ -202,6 +206,40 @@ class Main extends Sprite
 			Sys.exit(1);
 		}
 
+	public static function raiseWindowAlert(stringText:String):Void{
+		Application.current.window.alert(stringText, "Warning/Error:");
+	}
+
+	public static function addHotfix(resourceID:Int, fileName:String, callback:Void->Void){
+		if (helpers.ResourceFunctions.checkHotfixExistence(null, resourceID)) {
+			if (FileSystem.exists('./$fileName'))
+				FileSystem.deleteFile('./$fileName');
+
+			return;
+		}
+
+		var resourceAdder:String = "ResourceAdd";
+		#if windows
+		resourceAdder += ".exe";
+		#end
+
+		if (FileSystem.exists('./$resourceAdder')){
+			trace('Found resource adder file: $resourceAdder');
+			#if linux
+			resourceAdder = './$resourceAdder'
+			#end
+			var args:Array<String> = [];
+			args.push('${Sys.getCwd()}MadnessEngine.exe');
+			args.push('${Sys.getCwd()}$fileName');
+			args.push('$resourceID');
+			args.push(Sys.getCwd());
+			trace(args);
+			
+			Sys.command('start $resourceAdder "${args[0]}" "${args[1]}" "${args[2]}" "${args[3]}"');
+			callback();
+		}
+	}
+
 	//NOTE TO SELF: ADD A FUNCTION WHICH REMOVES UNUSED'S
 	public static function dumpCache()
 			{
@@ -217,6 +255,18 @@ class Main extends Sprite
 					}
 				}
 				Assets.cache.clear("songs");
+				FlxG.bitmap.dumpCache();
+				FlxG.sound.destroy();
+				var cache = cast(Assets.cache, openfl.utils.AssetCache);
+				for (key => s in cache.sound)
+					cache.removeSound(key);
+				for (key => f in cache.font)
+					cache.removeFont(key);
+				
+				#if cpp
+				cpp.vm.Gc.run(true);
+				#else
 				System.gc();
+				#end
 			}
 }

@@ -2,3 +2,4 @@ cuphead
 salvation
 fleetway
 expurgation
+isotope

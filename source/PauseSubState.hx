@@ -142,10 +142,10 @@ class PauseSubState extends MusicBeatSubstate
 					MusicBeatState.switchState(new PlayState(PlayState.instance.fromMod));
 				case "Toggle Botplay":
 					OptionsMenu.options.botPlay = !OptionsMenu.options.botPlay;
-					PlayState.instance.botplayTxt.visible = OptionsMenu.options.botPlay;
-					PlayState.instance.botplayTxt.alpha = 1;
+					PlayState.instance.customHUDClass.botplayTxt.visible = OptionsMenu.options.botPlay;
+					PlayState.instance.customHUDClass.botplayTxt.alpha = 1;
 					PlayState.instance.botplaySine = 0;
-					PlayState.instance.scoreTxt.visible = false;
+					PlayState.instance.customHUDClass.scoreTxt.visible = false;
 				case "Exit to menu":
 					OptionsMenu.options.botPlay = false;
 					botText.visible = false;
