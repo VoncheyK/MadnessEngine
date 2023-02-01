@@ -648,10 +648,10 @@ class ServerHandler extends MusicBeatState
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
-					(!daNote.mustPress) ? daNote.visible = false : null;
+					(!daNote.mustPress) ? daNote.visible = true : null;
 
 					//LMFAOOOOOOOOOOO CRY ABOUT IT
-					daNote.y = daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+					daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
 
 					if (OptionsMenu.options.downScroll)
 					{
@@ -686,7 +686,7 @@ class ServerHandler extends MusicBeatState
 						daNote.clipRect = rect;
 					}
 
-					daNote.x = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].x;
+					daNote.x = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).x;
 
 					if (daNote.isSustainNote)
 					{
@@ -790,6 +790,7 @@ class ServerHandler extends MusicBeatState
 
 	override function beatHit()
 	{
+		if (areBothClientsLoaded){
 			if (generatedMusic)
 				notes.sort(FlxSort.byY, FlxSort.DESCENDING);
 	
@@ -799,16 +800,19 @@ class ServerHandler extends MusicBeatState
 				(getPropertyFromSection(checked, "changeBPM.active")) ? Conductor.changeBPM(getPropertyFromSection(checked, "changeBPM.bpm")) : null;
 				FlxG.log.add('CHANGED BPM! ' + getPropertyFromSection(checked, "changeBPM.bpm"));
 			}
-		
+			
 			super.beatHit();
+		}
 	}
 
 	override function stepHit()
 	{
-		
+		if (areBothClientsLoaded){
 			(Math.abs(FlxG.sound.music.time - Conductor.songPosition) > 15
 			|| (SONG.needsVoices && Math.abs(vocals.time - Conductor.songPosition) > 15)) ? resyncVocals() : null;
-			super.stepHit();		
+			super.stepHit();
+		}
+		
 	}
 
 	function goodNoteHit(note:Note):Void
