@@ -616,13 +616,13 @@ class ServerHandler extends MusicBeatState
 			
 		if (areBothClientsLoaded){
 			super.update(elapsed);
-			if (startingSong)
+			if (startingSong && enemyStrums != null && playerStrums != null)
 			{
 				Conductor.songPosition += FlxG.elapsed * 1000;
 				if (Conductor.songPosition >= 0)
 					startSong();
 			}
-			else
+			else if (!startingSong && enemyStrums != null && playerStrums != null)
 			{
 				// Conductor.songPosition = FlxG.sound.music.time;
 				Conductor.songPosition += FlxG.elapsed * 1000;
@@ -638,13 +638,13 @@ class ServerHandler extends MusicBeatState
 				}
 			}
 
-			if (unspawnNotes[0] != null)
+			if (unspawnNotes[0] != null && enemyStrums != null && playerStrums != null)
 			{
 				notes.add(unspawnNotes[0]);
 				unspawnNotes.splice(0, 1);
 			}
 
-			if (generatedMusic)
+			if (generatedMusic && enemyStrums != null && playerStrums != null)
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
@@ -718,19 +718,18 @@ class ServerHandler extends MusicBeatState
 				});
 			}
 
-			enemyStrums.forEach((spr:FlxSprite) -> {
-				if (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished)
-					spr.animation.play('static');
-
-				if (spr.animation.curAnim.name == 'confirm')
-					{
-						spr.centerOffsets();
-						spr.offset.x -= 13;
-						spr.offset.y -= 13;
-					}
-					else
-						spr.centerOffsets();
-			});
+			if (enemyStrums != null){	
+				enemyStrums.forEach((spr:FlxSprite) -> {
+					if (spr.animation.curAnim.name == 'confirm')
+						{
+							spr.centerOffsets();
+							spr.offset.x -= 13;
+							spr.offset.y -= 13;
+						}
+						else
+							spr.centerOffsets();
+				});
+			}
 
 			initialized ? keyShit() : null;
 

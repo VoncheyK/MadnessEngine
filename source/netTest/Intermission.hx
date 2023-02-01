@@ -121,7 +121,6 @@ class Intermission extends MusicBeatState
 			final actualEnemy:IntermissionClient = this.room.state.players.get(enemy);
 			if (plr != null && enemy != null && actualPlr.ready == true && actualEnemy.ready == true){
 				//shut down
-				this.room.send("killRoom", null);
 				this.room = null;
 				this.client = null;
 				this.textPerPlayer = null;
