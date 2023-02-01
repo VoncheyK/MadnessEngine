@@ -22,7 +22,6 @@ import flixel.FlxG;
 import netTest.schemaShit.Player;
 import netTest.schemaShit.ChatState;
 import flixel.FlxSubState;
-import ui.Prompt;
 import io.colyseus.Room;
 import netTest.schemaShit.BattleState;
 import netTest.schemaShit.Player;
@@ -45,7 +44,6 @@ class ServerHandler extends MusicBeatState
 	// put server location in the client thing
 	private var cliente = new Client(SpecialKeys.host);
 	private var room:Room<ChatState>;
-	var prompt:MultiPrompt;
 	var acceptsControls:Bool = true;
 	// String = name(key), Character = sprite and shit
 	#if (haxe >= "4.0.0")
@@ -146,8 +144,8 @@ class ServerHandler extends MusicBeatState
 
 	private function generateSong(songname:String)
 	{
+		trace(songname);
 		Conductor.changeBPM(SONG.bpm);
-
 		curSong = SONG.song;
 
 		if (SONG.needsVoices)
@@ -341,45 +339,6 @@ class ServerHandler extends MusicBeatState
 		cumHudlol.bgColor.alpha = 0;
 		FlxG.cameras.add(cumHudlol);
 
-		// handle server stuff
-		// init the j
-		var radminPath:String = "radmin/RvRvpnGui";
-		#if windows
-		radminPath += ".exe";
-		#end
-
-		if (FileSystem.exists("./" + radminPath))
-		{
-			#if linux
-			radminPath = "./" + radminPath;
-			#end
-			prompt = new MultiPrompt("\nRadmin VPN required\n for Multiplayer. Run it?", Yes_No);
-			acceptsControls = false;
-			prompt.back.alpha = 0.6;
-			prompt.onYes = function()
-			{
-				new Process('powershell', [".\\" + radminPath]);
-				prompt.setButtons(None);
-				acceptsControls = true;
-				prompt.exists = false;
-				prompt.close();
-			}
-			prompt.onNo = function()
-			{
-				FlxG.switchState(new MainMenuState());
-				prompt.setButtons(None);
-				acceptsControls = true;
-				prompt.exists = false;
-				prompt.close();
-			}
-			openSubState(prompt);
-		}
-		else
-		{
-			Application.current.window.alert(radminPath,
-				"Error! Could not locate Radmin VPN, you need this so people don't get your real ip from the serverlist!");
-		}
-
 		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('multiplayerBG'));
 		bg.scrollFactor.x = 0;
 		bg.scrollFactor.y = 0.18;
@@ -440,16 +399,22 @@ class ServerHandler extends MusicBeatState
 		{
 			if (err != null)
 			{
-				Main.raiseWindowAlert("An error has occured with multiplayer! " + err);
+				Main.raiseWindowAlert("An error has occured with multiplayer! " + err.message);
 				return;
 			}
 			this.room = room;
 
 			this.room.state.players.onAdd = function(player, key)
 			{
-				trace("PLAYER ADDED AT: ", key);
+				trace("onAdd is broken, I can't seem to trace the key. Hm.");
+				//But this somehow works?
 				strumAccordingToPlr.set(key, generateStaticArrows(key));
-				player.triggerAll();
+				var nullablePlayer:Null<String> = this.room.state.players.indexes.get(0);
+				var nullableEnemy:Null<String> = this.room.state.players.indexes.get(1);
+				trace(nullablePlayer);
+				trace(nullableEnemy);
+				(nullablePlayer != null) ? this.room.send("setPlayer", nullablePlayer) : null;
+				(nullableEnemy != null) ? this.room.send('setEnemy', nullableEnemy) : null;
 			}
 
 			this.room.state.players.onRemove = function(player, key)
@@ -488,7 +453,6 @@ class ServerHandler extends MusicBeatState
 						(message.goodHit) ? enemyStrums.members[message.notedata].animation.play("confirm") : 
 						enemyStrums.members[message.notedata].animation.play("pressed");
 						
-						
 						trace('${message.notedata} has been pressed');
 					}
 			});
@@ -503,13 +467,9 @@ class ServerHandler extends MusicBeatState
 					}
 			});
 
-			this.room.onMessage("returnedPlayer", (message) -> {
-				this.player = message;
-				trace(message);
-			});
-
-			this.room.onMessage("returnedEnemy", (message) -> {
-				this.enemy = message;
+			this.room.onMessage("playerAndEnemy", (message) -> {
+				this.player = message.player;
+				this.enemy = message.enemy;
 				trace(message);
 			});
 		});
@@ -518,14 +478,14 @@ class ServerHandler extends MusicBeatState
 		OptionsMenu.loadSettings();
 
 		SONG = Song.loadFromJson('chaos-hard', 'chaos');
-
+		
 		generateSong(SONG.song);
-
+		
 		startingSong = true;
-
+		
 		Conductor.mapBPMChanges(SONG);
 		Conductor.changeBPM(SONG.bpm);
-
+		
 		notes.cameras = [cumHudlol];
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -535,7 +495,10 @@ class ServerHandler extends MusicBeatState
 	override function destroy(){
 		super.destroy();
 		Main.dumpCache();
-		this.room.leave(true);
+		if (this.room != null)
+			this.room.leave(true);
+	
+		this.room = null;
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 	}
@@ -617,126 +580,126 @@ class ServerHandler extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		super.update(elapsed);
+			super.update(elapsed);
 
-		if (startingSong)
-		{
-			Conductor.songPosition += FlxG.elapsed * 1000;
-			if (Conductor.songPosition >= 0)
-				startSong();
-		}
-		else
-		{
-			// Conductor.songPosition = FlxG.sound.music.time;
-			Conductor.songPosition += FlxG.elapsed * 1000;
-
-			songTime += FlxG.game.ticks - previousFrameTime;
-			previousFrameTime = FlxG.game.ticks;
-
-			// Interpolation type beat
-			if (Conductor.lastSongPos != Conductor.songPosition)
+			if (startingSong)
 			{
-				songTime = (songTime + Conductor.songPosition) / 2;
-				Conductor.lastSongPos = Conductor.songPosition;
+				Conductor.songPosition += FlxG.elapsed * 1000;
+				if (Conductor.songPosition >= 0)
+					startSong();
 			}
-		}
-
-		if (unspawnNotes[0] != null)
-		{
-			notes.add(unspawnNotes[0]);
-			unspawnNotes.splice(0, 1);
-		}
-
-		if (generatedMusic)
-		{
-			notes.forEachAlive(function(daNote:Note)
+			else
 			{
-				(!daNote.mustPress) ? daNote.visible = false : null;
+				// Conductor.songPosition = FlxG.sound.music.time;
+				Conductor.songPosition += FlxG.elapsed * 1000;
 
-				daNote.y = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+				songTime += FlxG.game.ticks - previousFrameTime;
+				previousFrameTime = FlxG.game.ticks;
 
-				if (OptionsMenu.options.downScroll)
+				// Interpolation type beat
+				if (Conductor.lastSongPos != Conductor.songPosition)
 				{
+					songTime = (songTime + Conductor.songPosition) / 2;
+					Conductor.lastSongPos = Conductor.songPosition;
+				}
+			}
+
+			if (unspawnNotes[0] != null)
+			{
+				notes.add(unspawnNotes[0]);
+				unspawnNotes.splice(0, 1);
+			}
+
+			if (generatedMusic)
+			{
+				notes.forEachAlive(function(daNote:Note)
+				{
+					(!daNote.mustPress) ? daNote.visible = false : null;
+
+					daNote.y = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+
+					if (OptionsMenu.options.downScroll)
+					{
+						if (daNote.isSustainNote)
+						{
+							// crefits to psych because hold note positions are fucky
+							// and they look amazing on psych!!!!!
+							if (daNote.animation.curAnim.name.endsWith('end'))
+							{
+								daNote.y += 10.5 * (Conductor.crochet / 400) * 1.5 * SONG.speed + (46 * (SONG.speed - 1));
+								daNote.y -= 46 * (1 - (Conductor.crochet / 600)) * SONG.speed;
+								daNote.y -= 19;
+							}
+
+							if (!daNote.mustPress || daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit) 
+								&& (strumLine.y + Note.swagWidth / 2) >= daNote.y - daNote.offset.y * daNote.scale.y + daNote.height)
+								{
+									var rect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
+									rect.height = ((strumLine.y + Note.swagWidth / 2) - daNote.y) / daNote.scale.y;
+									rect.y = daNote.frameHeight - rect.height;
+									daNote.clipRect = rect;
+								}
+						}
+					}
+					else if (daNote.isSustainNote
+						&& (!daNote.mustPress || daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))
+						&& (strumLine.y + Note.swagWidth / 2) >= daNote.y + daNote.offset.y * daNote.scale.y)
+					{
+						var rect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
+						rect.y = ((strumLine.y + Note.swagWidth / 2) - daNote.y) / daNote.scale.y;
+						rect.height -= rect.y;
+						daNote.clipRect = rect;
+					}
+
+					daNote.x = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].x;
+
 					if (daNote.isSustainNote)
 					{
-						// crefits to psych because hold note positions are fucky
-						// and they look amazing on psych!!!!!
-						if (daNote.animation.curAnim.name.endsWith('end'))
-						{
-							daNote.y += 10.5 * (Conductor.crochet / 400) * 1.5 * SONG.speed + (46 * (SONG.speed - 1));
-							daNote.y -= 46 * (1 - (Conductor.crochet / 600)) * SONG.speed;
-							daNote.y -= 19;
-						}
-
-						if (!daNote.mustPress || daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit) 
-							&& (strumLine.y + Note.swagWidth / 2) >= daNote.y - daNote.offset.y * daNote.scale.y + daNote.height)
-							{
-								var rect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
-								rect.height = ((strumLine.y + Note.swagWidth / 2) - daNote.y) / daNote.scale.y;
-								rect.y = daNote.frameHeight - rect.height;
-								daNote.clipRect = rect;
-							}
+						daNote.x += daNote.width / 2 + 20;
 					}
-				}
-				else if (daNote.isSustainNote
-					&& (!daNote.mustPress || daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))
-					&& (strumLine.y + Note.swagWidth / 2) >= daNote.y + daNote.offset.y * daNote.scale.y)
-				{
-					var rect = new FlxRect(0, 0, daNote.width / daNote.scale.x, daNote.height / daNote.scale.y);
-					rect.y = ((strumLine.y + Note.swagWidth / 2) - daNote.y) / daNote.scale.y;
-					rect.height -= rect.y;
-					daNote.clipRect = rect;
-				}
 
-				daNote.x = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].x;
-
-				if (daNote.isSustainNote)
-				{
-					daNote.x += daNote.width / 2 + 20;
-				}
-
-				if (!daNote.mustPress && daNote.wasGoodHit)
-					opponentNoteHit(daNote);
+					if (!daNote.mustPress && daNote.wasGoodHit)
+						opponentNoteHit(daNote);
 
 
-				// (OptionsMenu.options.downScroll && daNote.y > camHUD.height + daNote.height) || (!OptionsMenu.options.downScroll && daNote.y < -camHUD.height - daNote.height)
-				if (daNote.tooLate && !daNote.wasGoodHit)
-				{
-					// misses++;
+					// (OptionsMenu.options.downScroll && daNote.y > camHUD.height + daNote.height) || (!OptionsMenu.options.downScroll && daNote.y < -camHUD.height - daNote.height)
+					if (daNote.tooLate && !daNote.wasGoodHit)
+					{
+						// misses++;
 
-					noteMiss(daNote.noteData);
-					vocals.volume = 0;
-					// health -= 0.04;
-					// songScore -= 10;
-					// updateAccuracy();
+						noteMiss(daNote.noteData);
+						vocals.volume = 0;
+						// health -= 0.04;
+						// songScore -= 10;
+						// updateAccuracy();
 
-					daNote.active = false;
-					daNote.visible = false;
+						daNote.active = false;
+						daNote.visible = false;
 
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
-				}
+						daNote.kill();
+						notes.remove(daNote, true);
+						daNote.destroy();
+					}
+				});
+			}
+
+			enemyStrums.forEach((spr:FlxSprite) -> {
+				if (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished)
+					spr.animation.play('static');
+
+				if (spr.animation.curAnim.name == 'confirm')
+					{
+						spr.centerOffsets();
+						spr.offset.x -= 13;
+						spr.offset.y -= 13;
+					}
+					else
+						spr.centerOffsets();
 			});
-		}
 
-		enemyStrums.forEach((spr:FlxSprite) -> {
-			if (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished)
-				spr.animation.play('static');
+			initialized ? keyShit() : null;
 
-			if (spr.animation.curAnim.name == 'confirm')
-				{
-					spr.centerOffsets();
-					spr.offset.x -= 13;
-					spr.offset.y -= 13;
-				}
-				else
-					spr.centerOffsets();
-		});
-
-		initialized ? keyShit() : null;
-
-		timeSinceLastUpdate = Lib.getTimer() / 1000;
+			timeSinceLastUpdate = Lib.getTimer() / 1000;
 	}
 
 	private function keyShit():Void
@@ -767,46 +730,49 @@ class ServerHandler extends MusicBeatState
 
 	function resyncVocals():Void
 	{
-		vocals.pause();
+		if (vocals != null){
+			vocals.pause();
 
-		FlxG.sound.music.play();
-		Conductor.songPosition = FlxG.sound.music.time;
-		vocals.time = Conductor.songPosition;
-		vocals.play();
+			FlxG.sound.music.play();
+			Conductor.songPosition = FlxG.sound.music.time;
+			vocals.time = Conductor.songPosition;
+			vocals.play();
+		}
 	}
 
 	private function checkSection():Null<Dynamic> {
-		var s:OneOfTwo<SwagSection, SwaggiestSection>;
-		try{
-			(SONG.chartVersion == "1.0") ? s = SONG.notes[Std.int(curStep / 16)] : s = SONG.sections[Std.int(curStep / 16)];
-			return s != null ? s : null;
-		}catch(e:Exception){
-			Main.raiseWindowAlert("An Error occured with section returning!");
-			trace(e.details());
-			return null;
-		}
+			var s:OneOfTwo<SwagSection, SwaggiestSection>;
+			try{
+				(SONG.chartVersion == "1.0") ? s = SONG.notes[Std.int(curStep / 16)] : s = SONG.sections[Std.int(curStep / 16)];
+				return s != null ? s : null;
+			}catch(e:Exception){
+				Main.raiseWindowAlert("An Error occured with section returning!");
+				trace(e.details());
+				return null;
+			}
 	}
 
 	override function beatHit()
 	{
-		if (generatedMusic)
-			notes.sort(FlxSort.byY, FlxSort.DESCENDING);
-
-		if (checkSection() != null)
-		{
-			var checked = checkSection();
-			(getPropertyFromSection(checked, "changeBPM.active")) ? Conductor.changeBPM(getPropertyFromSection(checked, "changeBPM.bpm")) : null;
-			FlxG.log.add('CHANGED BPM! ' + getPropertyFromSection(checked, "changeBPM.bpm"));
-		}
-		super.beatHit();
+			if (generatedMusic)
+				notes.sort(FlxSort.byY, FlxSort.DESCENDING);
+	
+			if (checkSection() != null)
+			{
+				var checked = checkSection();
+				(getPropertyFromSection(checked, "changeBPM.active")) ? Conductor.changeBPM(getPropertyFromSection(checked, "changeBPM.bpm")) : null;
+				FlxG.log.add('CHANGED BPM! ' + getPropertyFromSection(checked, "changeBPM.bpm"));
+			}
+		
+			super.beatHit();
 	}
 
 	override function stepHit()
 	{
-		super.stepHit();
-
-		(Math.abs(FlxG.sound.music.time - Conductor.songPosition) > 15
+		
+			(Math.abs(FlxG.sound.music.time - Conductor.songPosition) > 15
 			|| (SONG.needsVoices && Math.abs(vocals.time - Conductor.songPosition) > 15)) ? resyncVocals() : null;
+			super.stepHit();		
 	}
 
 	function goodNoteHit(note:Note):Void
@@ -1027,10 +993,9 @@ class ServerHandler extends MusicBeatState
 			strumLineNotes.add(babyArrow);
 			deez.add(babyArrow);
 		}
-		this.room.send("setPlayer", this.room.state.players.indexes.get(0));
 		//this.room.send("setEnemy", this.room.state.players.indexes.get(1));
 
-		this.room.send("getPlayer");
+		//this.room.send("getPlayer");
 		initialized = true;
 		return deez;
 	}

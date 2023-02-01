@@ -22,3 +22,12 @@ class Player extends Schema {
 	@:type("boolean")
 	public var down: Bool = false;
 }
+
+//define mini-player class here:
+class IntermissionClient extends Schema {
+	@:type("boolean")
+	public var ready: Bool = false;
+
+	@:type("string")
+	public var gjName: String = "default";
+}

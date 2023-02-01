@@ -1,6 +1,6 @@
 package;
 
-import netTest.Director;
+import netTest.Intermission;
 import options.OptionsMenu;
 import openfl.ui.Keyboard;
 import flixel.input.keyboard.FlxKey;
@@ -217,7 +217,7 @@ class MainMenuState extends MusicBeatState
 								case 'options':
 									FlxG.switchState(new OptionsMenu());
 								case 'donate':
-									FlxG.switchState(new Director());
+									FlxG.switchState(new Intermission());
 							}
 						});
 					}

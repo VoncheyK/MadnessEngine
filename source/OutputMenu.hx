@@ -5,15 +5,15 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import openfl.geom.Rectangle;
 import flixel.text.FlxText;
-import flixel.group.FlxGroup.FlxTypedGroup;
+import flixel.group.FlxSpriteGroup;
 import openfl.events.MouseEvent;
 import flixel.FlxSprite;
 import flixel.FlxBasic;
 import flixel.FlxG;
 
-class OutputMenu extends FlxBasic
+class OutputMenu extends FlxSpriteGroup
 {
-    private var sprites:FlxTypedGroup<FlxSprite>;
+    private var sprites:FlxSpriteGroup;
     private var appendedText:String = "";
     private var clickable = false;
     private var isConsoleShown:Bool = false;
@@ -25,9 +25,8 @@ class OutputMenu extends FlxBasic
             var formatted:String = 'Class: ${pos.className} Line: ${pos.lineNumber} $arg';
             appendedText += formatted;
 		}
-        sprites = new FlxTypedGroup<FlxSprite>();
-        var stateFlx:flixel.FlxState = FlxG.state;
-        stateFlx.add(sprites);
+        sprites = new FlxSpriteGroup();
+        add(sprites);
         //yeah thats basically it
         //add the place for the console out of bounds
         var blackOverlay:FlxSprite = new FlxSprite(0, -100).makeGraphic(500, 200, flixel.util.FlxColor.BLACK);
