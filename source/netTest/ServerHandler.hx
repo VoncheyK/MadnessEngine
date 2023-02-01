@@ -885,7 +885,7 @@ class ServerHandler extends MusicBeatState
 
 			pressed[notedata] = true;
 			this.room.send("notePress", {notedata: notedata, clientname: FlxG.save.data.gjUser, goodHit: false});
-			strumLineNotes.members[notedata].animation.play('pressed');
+			this.room.state.players.get(this.room.sessionId).members[notedata].animation.play('pressed');
 
 			// credits to EyeDaleHim#8508 for being smart
 			if (generatedMusic)
@@ -972,7 +972,7 @@ class ServerHandler extends MusicBeatState
 
 			pressed[notedata] = false;
 			this.room.send("noteRaised", {notedata: notedata, clientname: FlxG.save.data.gjUser});
-			strumLineNotes.members[notedata].animation.play('static');
+			this.room.state.players.get(this.room.sessionId).members[notedata].animation.play('static');
 			// noteRaised
 		}
 	}
