@@ -605,6 +605,15 @@ class ServerHandler extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		if (this.room != null && this.room.state != null && this.room.state.players != null && !areBothClientsLoaded){
+			var vecArr:haxe.ds.Vector<Bool> = new haxe.ds.Vector(1);
+			for (k in 0...this.room.state.players.length)
+				vecArr[k] = this.room.state.players.get(this.room.state.players.indexes.get(k)).loaded;
+			
+			if (vecArr[0] == vecArr[1] == true)
+				areBothClientsLoaded = true;
+		}
+			
 		if (areBothClientsLoaded){
 			super.update(elapsed);
 			if (startingSong)
@@ -639,7 +648,7 @@ class ServerHandler extends MusicBeatState
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
-					(!daNote.mustPress) ? daNote.visible = true : null;
+					(!daNote.mustPress) ? daNote.visible = false : null;
 
 					//LMFAOOOOOOOOOOO CRY ABOUT IT
 					daNote.y = daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
