@@ -12,5 +12,4 @@ import io.colyseus.serializer.schema.types.*;
 class ChatState extends Schema {
 	@:type("map", Player)
 	public var players: MapSchema<Player> = new MapSchema<Player>();
-
 }

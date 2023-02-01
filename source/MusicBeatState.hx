@@ -56,6 +56,11 @@ class MusicBeatState extends FlxUIState
 	public static function switchState(newState:FlxUIState, ?oldState:FlxUIState)
 	{
 		FlxG.switchState(newState);
+
+		//i figured that this gets called after onLoad in LoadingState.
+		if (newState is netTest.ServerHandler)
+			cast(newState, netTest.ServerHandler).loaded();
+
 		return oldState != null ? oldState : newState;
 	}
 

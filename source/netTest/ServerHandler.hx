@@ -30,6 +30,7 @@ import lime.app.Application;
 import sys.io.Process;
 import sys.FileSystem;
 import Sys;
+import sys.thread.Thread;
 #end
 import io.colyseus.Client;
 import flixel.FlxG;
@@ -95,6 +96,8 @@ class ServerHandler extends MusicBeatState
 	public var player:String = "";
 	public var enemy:String = "";
 
+	public var areBothClientsLoaded:Bool = false;
+
 	function startSong():Void
 	{
 		startingSong = false;
@@ -141,6 +144,28 @@ class ServerHandler extends MusicBeatState
 				return null;
 			}
 		}
+	
+	//shut up already
+	private function timerThing():Void {
+		//loop until room isnt null
+		if (this.room == null){
+			timerThing();
+			return;
+		}
+		this.room.send("playerHasLoaded", null);
+	}
+		
+	public function loaded():Void {
+		if (this.room != null)
+			this.room.send("playerHasLoaded", null);
+		else{
+			//wait until room isnt null or something
+			Thread.create(function() {
+				var timer = new haxe.Timer(3000);
+				timer.run = timerThing;
+			});
+		}
+	}
 
 	private function generateSong(songname:String)
 	{
@@ -478,7 +503,7 @@ class ServerHandler extends MusicBeatState
 		OptionsMenu.loadSettings();
 
 		SONG = Song.loadFromJson('chaos-hard', 'chaos');
-		
+
 		generateSong(SONG.song);
 		
 		startingSong = true;
@@ -580,8 +605,8 @@ class ServerHandler extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
+		if (areBothClientsLoaded){
 			super.update(elapsed);
-
 			if (startingSong)
 			{
 				Conductor.songPosition += FlxG.elapsed * 1000;
@@ -614,9 +639,10 @@ class ServerHandler extends MusicBeatState
 			{
 				notes.forEachAlive(function(daNote:Note)
 				{
-					(!daNote.mustPress) ? daNote.visible = false : null;
+					(!daNote.mustPress) ? daNote.visible = true : null;
 
-					daNote.y = strumAccordingToPlr.get(this.room.sessionId).members[daNote.noteData].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+					//LMFAOOOOOOOOOOO CRY ABOUT IT
+					daNote.y = daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
 
 					if (OptionsMenu.options.downScroll)
 					{
@@ -700,6 +726,7 @@ class ServerHandler extends MusicBeatState
 			initialized ? keyShit() : null;
 
 			timeSinceLastUpdate = Lib.getTimer() / 1000;
+		}
 	}
 
 	private function keyShit():Void
@@ -730,7 +757,7 @@ class ServerHandler extends MusicBeatState
 
 	function resyncVocals():Void
 	{
-		if (vocals != null){
+		if (vocals != null && areBothClientsLoaded){
 			vocals.pause();
 
 			FlxG.sound.music.play();
@@ -819,7 +846,7 @@ class ServerHandler extends MusicBeatState
 
 	private function onKeyDown(event:KeyboardEvent)
 	{
-		if (acceptsControls)
+		if (acceptsControls && areBothClientsLoaded)
 		{
 			final keyJustPressed = FlxKey.toStringMap.get(event.keyCode);
 			
@@ -912,7 +939,7 @@ class ServerHandler extends MusicBeatState
 
 	private function onKeyUp(event:KeyboardEvent)
 	{
-		if (acceptsControls)
+		if (acceptsControls && areBothClientsLoaded)
 		{
 			final keyJustPressed = FlxKey.toStringMap.get(event.keyCode);
 

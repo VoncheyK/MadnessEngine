@@ -21,6 +21,9 @@ class Player extends Schema {
 
 	@:type("boolean")
 	public var down: Bool = false;
+
+	@:type("boolean")
+	public var loaded: Bool = false;
 }
 
 //define mini-player class here:
