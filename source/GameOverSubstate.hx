@@ -39,7 +39,7 @@ class GameOverSubstate extends MusicBeatSubstate
 			bf = new Character(x, y, "die" + stageSuffix);
 			add(bf);
 		}
-		else {trace("epic fail wtf"); MusicBeatState.switchState(new StoryMenuState());}
+		else {trace("epic fail wtf"); FlxG.resetState();}
 
 		camFollow = new FlxObject(bf.getGraphicMidpoint().x, bf.getGraphicMidpoint().y, 1, 1);
 		add(camFollow);
@@ -98,13 +98,6 @@ class GameOverSubstate extends MusicBeatSubstate
 		}
 	}
 
-	override function beatHit()
-	{
-		super.beatHit();
-
-		FlxG.log.add('beat');
-	}
-
 	var isEnding:Bool = false;
 
 	function endBullshit():Void
@@ -121,7 +114,9 @@ class GameOverSubstate extends MusicBeatSubstate
 				{
 					remove(camFollow);
 					remove(bf);
-					LoadingState.loadAndSwitchState(new PlayState(PlayState.instance.fromMod), false);
+					PlayState.health = 1;
+					PlayState.instance.customHUDClass.resetShit();
+					LoadingState.loadAndSwitchState(new PlayState(), false);
 				});
 			});
 		}

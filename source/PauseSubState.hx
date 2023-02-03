@@ -139,7 +139,9 @@ class PauseSubState extends MusicBeatSubstate
 					close();
 					Conductor.songPosition = songPos;
 				case "Restart Song":
-					MusicBeatState.switchState(new PlayState(PlayState.instance.fromMod));
+					PlayState.health = 1;
+					PlayState.instance.customHUDClass.resetShit();
+					FlxG.resetState();
 				case "Toggle Botplay":
 					OptionsMenu.options.botPlay = !OptionsMenu.options.botPlay;
 					PlayState.instance.customHUDClass.botplayTxt.visible = OptionsMenu.options.botPlay;

@@ -356,9 +356,18 @@ class FreeplayState extends MusicBeatState
 				PlayState.storyDifficulty = curDifficulty;
 	
 				PlayState.storyWeek = songs[curSelected].week;
+				if (songs[curSelected].mod.name != null)
+					PlayState.fromMod = songs[curSelected].mod.name;
+				
 				trace('CUR WEEK' + PlayState.storyWeek);
 				
-				(songs[curSelected].mod != null) ? LoadingState.loadAndSwitchState(new PlayState(songs[curSelected].mod.name)) : LoadingState.loadAndSwitchState(new PlayState());
+				//some weird measure idk
+				//numbskull
+				if (PlayState.instance != null && PlayState.instance.customHUDClass != null)
+					PlayState.instance.customHUDClass.resetShit();
+				
+				PlayState.health = 1;
+				LoadingState.loadAndSwitchState(new PlayState());
 				
 				songData = [];
 				modSongs = [];

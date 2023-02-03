@@ -23,6 +23,10 @@ class CamHUD extends flixel.group.FlxSpriteGroup
     public var timeBar:FlxBar;
 
 	public var songPercent:Float = 0;
+
+	public function resetShit():Void
+		songPercent = 0;
+	
    
     public function new(){
         super();
@@ -56,32 +60,36 @@ class CamHUD extends flixel.group.FlxSpriteGroup
 
         var showTime:Bool = (OptionsMenu.options.showTimeBar);
 
-        timeTxt = new FlxText(0, OptionsMenu.options.middleScroll ? OptionsMenu.options.downScroll ? 30 : FlxG.height * 0.95 : healthBarBG.y + (OptionsMenu.options.downScroll ? 15 : -30));
+		timeTxt = new FlxText(0, OptionsMenu.options.middleScroll ? OptionsMenu.options.downScroll ? 30 : FlxG.height * 0.95 : healthBarBG.y + (OptionsMenu.options.downScroll ? 15 : -30));
 		timeTxt.setFormat(Paths.font("vcr.ttf"), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
-		
-		timeBarBG = new AttachedSprite('timeBar');
-        timeBarBG.screenCenter();
-        timeBarBG.x = timeTxt.x-44;
-        timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
-        timeBarBG.scrollFactor.set();
-        timeBarBG.alpha = 0;
-        timeBarBG.visible = showTime;
-        timeBarBG.color = FlxColor.BLACK;
-        timeBarBG.xAdd = -4;
-        timeBarBG.yAdd = -4;
 
-		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
-			'songPercent', 0, 1);
-		timeBar.scrollFactor.set();
-		timeBar.createFilledBar(FlxColor.BLACK, FlxColor.CYAN);
-		timeBar.numDivisions = 800;
-		timeBar.alpha = 0;
-		timeBar.visible = showTime;
-		add(timeBarBG);
-		add(timeBar);
-		add(timeTxt);
-		timeBarBG.sprTracker = timeBar;
+		if (showTime){
+			timeBarBG = new AttachedSprite('timeBar');
+			timeBarBG.screenCenter();
+			timeBarBG.x = timeTxt.x-44;
+			timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
+			timeBarBG.scrollFactor.set();
+			timeBarBG.alpha = 0;
+			timeBarBG.visible = showTime;
+			timeBarBG.color = FlxColor.BLACK;
+			timeBarBG.xAdd = -4;
+			timeBarBG.yAdd = -4;
+
+			timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
+				'songPercent', 0, 1);
+			timeBar.scrollFactor.set();
+			timeBar.createFilledBar(FlxColor.BLACK, FlxColor.CYAN);
+			timeBar.numDivisions = 800;
+			timeBar.alpha = 0;
+			timeBar.visible = showTime;
+			add(timeBarBG);
+			add(timeBar);
+			timeBarBG.sprTracker = timeBar;
+		}
+
+		if (OptionsMenu.options.showTimeTxt)
+			add(timeTxt);
 
         scoreTxt = new FlxText(0, OptionsMenu.options.downScroll ? FlxG.height - 35 : 35, FlxG.width, "", 20);
         scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -103,16 +111,7 @@ class CamHUD extends flixel.group.FlxSpriteGroup
 			iconP2.y = healthBar.y - (iconP2.height / 2);
 		add(iconP2);
 
-        botplayTxt = new FlxText(400, timeBarBG.y + 55, FlxG.width - 800, "BOTPLAY", 32);
-		if(OptionsMenu.options.downScroll)
-			botplayTxt.y = timeBarBG.y - 78;
-		if(OptionsMenu.options.middleScroll) {
-			if(OptionsMenu.options.downScroll)
-				botplayTxt.y = botplayTxt.y - 78;
-			else
-				botplayTxt.y = botplayTxt.y + 78;
-		}
-
+        botplayTxt = new FlxText(400, FlxG.width / 2, FlxG.width - 800, "BOTPLAY", 32);
 		botplayTxt.setFormat(Paths.font("vcr.ttf"), FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		botplayTxt.scrollFactor.set();
 		botplayTxt.size = 32;

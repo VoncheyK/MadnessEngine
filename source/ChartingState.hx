@@ -1,5 +1,6 @@
 package;
 
+import haxe.Exception;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
 import Song.SwagNote;
@@ -95,6 +96,75 @@ class ChartingState extends MusicBeatState
 
 	var leftIcon:HealthIcon;
 	var rightIcon:HealthIcon;
+
+	private function getPropertyFromSection(section:Any, property:String):Dynamic
+	{
+		try
+		{
+			switch (property)
+			{
+				case "mustHit":
+					(_song.chartVersion == "1.5") ? return Reflect.field(section, property) : return Reflect.field(section, "mustHitSection");
+				case "mustHitSection":
+					(_song.chartVersion == "1.5") ? return Reflect.field(section, "mustHit") : return Reflect.field(section, property);
+				case "changeBPM":
+					(property is Bool) ? (_song.chartVersion == "1.5") ? return Reflect.field(Reflect.field(section, "changeBPM"),
+						"active") : return Reflect.field(section, property) : return Reflect.field(section, property);
+				case "bpm":
+					(_song.chartVersion == "1.5") ? return Reflect.field(Reflect.field(section, "changeBPM"), "bpm") : return Reflect.field(section, property);
+				case "changeBPM.active":
+					(_song.chartVersion == "1.0") ? return Reflect.field(section,
+						"changeBPM") : return Reflect.field(Reflect.field(section, "changeBPM"), "active");
+				case "changeBPM.bpm":
+					(_song.chartVersion == "1.0") ? return Reflect.field(section, "bpm") : return Reflect.field(Reflect.field(section, "changeBPM"), "bpm");
+				default:
+					return Reflect.field(section, property);
+			}
+			return Reflect.field(section, property);
+		}
+		catch (e:Exception)
+		{
+			Main.raiseWindowAlert("An error has occured while returning a variable/property/field from a section! : " + property);
+			trace(e.details());
+			return null;
+		}
+	}
+
+	private function setPropertyFromSection(section:Any, property:String, newVariable:Dynamic):Void
+	{
+		try
+		{
+			switch (property)
+			{
+				case "mustHit":
+					(_song.chartVersion == "1.5") ? Reflect.setField(section, property, newVariable) : Reflect.setField(section, "mustHitSection", newVariable);
+				case "mustHitSection":
+					(_song.chartVersion == "1.5") ? Reflect.setField(section, "mustHit", newVariable) : Reflect.setField(section, property, newVariable);
+				case "changeBPM":
+					(property is Bool) ? (_song.chartVersion == "1.5") ? Reflect.setField(Reflect.field(section, "changeBPM"), "active",
+						newVariable) : Reflect.setField(section, property, newVariable) : Reflect.setField(section, property, newVariable);
+				case "bpm":
+					(_song.chartVersion == "1.5") ? Reflect.setField(Reflect.field(section, "changeBPM"), "bpm",
+						newVariable) : return Reflect.setField(section, property, newVariable);
+				case "changeBPM.active":
+					(_song.chartVersion == "1.0") ? Reflect.setField(section, "changeBPM",
+						newVariable) : Reflect.setField(Reflect.field(section, "changeBPM"), "active", newVariable);
+				case "changeBPM.bpm":
+					(_song.chartVersion == "1.0") ? Reflect.setField(section, "bpm",
+						newVariable) : Reflect.setField(Reflect.field(section, "changeBPM"), "bpm", newVariable);
+				default:
+					Reflect.setField(section, property, newVariable);
+			}
+		}
+		catch (e:Exception)
+		{
+			Main.raiseWindowAlert("An error has occured while setting a variable/property/field from a section! : "
+				+ property
+				+ " and the new variable is: "
+				+ newVariable);
+			trace(e.details());
+		}
+	}
 
 	override function create()
 	{
@@ -398,7 +468,7 @@ class ChartingState extends MusicBeatState
 
 		FlxG.sound.playMusic(Paths.inst(daSong), 0.6);
 
-		// WONT WORK FOR TUTORIAL OR TEST SONG!!! REDO LATER
+		// WONT WORK FOR TUTORIAL OR TEST _song!!! REDO LATER
 		vocals = new FlxSound().loadEmbedded(Paths.voices(daSong));
 		FlxG.sound.list.add(vocals);
 
@@ -442,15 +512,15 @@ class ChartingState extends MusicBeatState
 			switch (label)
 			{
 				case 'Must hit section':
-					PlayState.setPropertyFromSection(getSection(), "mustHit", check.checked);
+					setPropertyFromSection(getSection(), "mustHit", check.checked);
 
 					updateHeads();
 
 				case 'Change BPM':
-					PlayState.setPropertyFromSection(getSection(), "changeBPM.active", check.checked);
+					setPropertyFromSection(getSection(), "changeBPM.active", check.checked);
 					FlxG.log.add('changed bpm shit');
 				case "Alt Animation":
-					PlayState.setPropertyFromSection(getSection(), "altAnim", check.checked);
+					setPropertyFromSection(getSection(), "altAnim", check.checked);
 			}
 		}
 		else if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
@@ -480,7 +550,7 @@ class ChartingState extends MusicBeatState
 			}
 			else if (wname == 'section_bpm')
 			{
-				PlayState.setPropertyFromSection(getSection(), "changeBPM.bpm", Std.int(nums.value));
+				setPropertyFromSection(getSection(), "changeBPM.bpm", Std.int(nums.value));
 				updateGrid();
 			}
 		}
@@ -497,7 +567,9 @@ class ChartingState extends MusicBeatState
 				PlayState.SONG = _song;
 				FlxG.sound.music.stop();
 				vocals.stop();
-				FlxG.switchState(new PlayState(PlayState.instance.fromMod));
+				PlayState.health = 1;
+				PlayState.instance.customHUDClass.resetShit();
+				FlxG.switchState(new PlayState());
 			}
 		
 			if (event.keyCode == Keyboard.E)
@@ -621,9 +693,9 @@ class ChartingState extends MusicBeatState
 		for (i in 0...curSection)
 		{
 			//much easier way instead of having to flop around with ifs
-			if (PlayState.getPropertyFromSection(getSection(i), "changeBPM.active"))
+			if (getPropertyFromSection(getSection(i), "changeBPM.active"))
 			{
-				daBPM = PlayState.getPropertyFromSection(getSection(i), "changeBPM.bpm");
+				daBPM = getPropertyFromSection(getSection(i), "changeBPM.bpm");
 			}
 			daPos += 4 * (1000 * 60 / daBPM);
 		}
@@ -844,10 +916,10 @@ class ChartingState extends MusicBeatState
 		var sec = getSection();
 
 		stepperLength.value = sec.lengthInSteps;
-		check_mustHitSection.checked = PlayState.getPropertyFromSection(sec, "mustHit");
+		check_mustHitSection.checked = getPropertyFromSection(sec, "mustHit");
 		check_altAnim.checked = sec.altAnim;
-		check_changeBPM.checked = PlayState.getPropertyFromSection(sec, "changeBPM.active");
-		stepperSectionBPM.value = PlayState.getPropertyFromSection(sec, "changeBPM.bpm");
+		check_changeBPM.checked = getPropertyFromSection(sec, "changeBPM.active");
+		stepperSectionBPM.value = getPropertyFromSection(sec, "changeBPM.bpm");
 
 		updateHeads();
 	}
@@ -891,9 +963,9 @@ class ChartingState extends MusicBeatState
 		else if (_song.chartVersion == "1.0")
 			sectionInfo = _song.notes[curSection].sectionNotes;
 
-		if (PlayState.getPropertyFromSection(getSection(), "changeBPM.active") && PlayState.getPropertyFromSection(getSection(), "changeBPM.bpm") > 0)
+		if (getPropertyFromSection(getSection(), "changeBPM.active") && getPropertyFromSection(getSection(), "changeBPM.bpm") > 0)
 		{
-			Conductor.changeBPM(PlayState.getPropertyFromSection(getSection(), "changeBPM.bpm"));
+			Conductor.changeBPM(getPropertyFromSection(getSection(), "changeBPM.bpm"));
 			FlxG.log.add('CHANGED BPM!');
 		}
 		else
@@ -901,8 +973,8 @@ class ChartingState extends MusicBeatState
 			// get last bpm
 			var daBPM:Int = _song.bpm;
 			for (i in 0...curSection)
-				if (PlayState.getPropertyFromSection(getSection(i), "changeBPM.active"))
-					daBPM = PlayState.getPropertyFromSection(getSection(i), "changeBPM.bpm");
+				if (getPropertyFromSection(getSection(i), "changeBPM.active"))
+					daBPM = getPropertyFromSection(getSection(i), "changeBPM.bpm");
 			Conductor.changeBPM(daBPM);
 		}
 

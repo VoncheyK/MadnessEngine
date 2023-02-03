@@ -117,8 +117,6 @@ class PlayState extends MusicBeatState
 	public var preAcc:Float = 0;
 	public var accuracy:Float = 100;
 
-	public static var goodPos = 42;
-
 	private var generatedMusic:Bool = false;
 	private var startingSong:Bool = false;
 
@@ -191,13 +189,7 @@ class PlayState extends MusicBeatState
 
 	public var playstateCache:openfl.utils.IAssetCache = new openfl.utils.AssetCache();
 
-	public var fromMod:String = null;
-
-	public function new(?mod:String)
-	{
-		super();
-		this.fromMod = mod;
-	}
+	public static var fromMod:String = null;
 
 	override public function create()
 	{
@@ -249,7 +241,7 @@ class PlayState extends MusicBeatState
 			default:
 				//soft coded dialogue
 				var s:Null<Array<String>>;
-				if (fromMod != null)
+				if (PlayState.fromMod != null)
 					s = CoolUtil.coolTextFile(Paths.modtxt('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue'));
 				else
 					s = CoolUtil.coolTextFile(Paths.txt('${SONG.song.toLowerCase()}/${SONG.song.toLowerCase()}Dialogue'));
@@ -1163,13 +1155,16 @@ class PlayState extends MusicBeatState
 		lastReportedPlayheadPosition = 0;
 
 		if (!paused)
-			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, fromMod), 1, false);
+			FlxG.sound.playMusic(Paths.inst(PlayState.SONG.song, PlayState.fromMod), 1, false);
 		FlxG.sound.music.onComplete = endSong;
 		vocals.play();
 
 		songLength = FlxG.sound.music.length;
-		FlxTween.tween(customHUDClass.timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
-		FlxTween.tween(customHUDClass.timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		if (OptionsMenu.options.showTimeBar)
+			FlxTween.tween(customHUDClass.timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		if (OptionsMenu.options.showTimeTxt)
+			FlxTween.tween(customHUDClass.timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		
 
 		#if desktop
 		// Song duration in a float, useful for the time left feature
@@ -1190,7 +1185,7 @@ class PlayState extends MusicBeatState
 			curSong = SONG.song;
 	
 			if (SONG.needsVoices)
-				vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song, this.fromMod));
+				vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song, PlayState.fromMod));
 			else
 				vocals = new FlxSound();
 	
@@ -1688,7 +1683,8 @@ class PlayState extends MusicBeatState
 		var secondsTotal:Int = Math.floor(songCalc / 1000);
 		if(secondsTotal < 0) secondsTotal = 0;
 
-		customHUDClass.timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
+		if (OptionsMenu.options.showTimeTxt)
+			customHUDClass.timeTxt.text = '${curSong} | (${FlxStringUtil.formatTime(secondsTotal, false)})';
 
 		if (OptionsMenu.options.botPlay)
 		{
@@ -1870,7 +1866,7 @@ class PlayState extends MusicBeatState
 			vocals.stop();
 			FlxG.sound.music.stop();
 
-			//openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, this));
+			openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y, this));
 			// FlxG.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 			
 			#if desktop
@@ -2063,6 +2059,18 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	override function destroy()
+	{
+		customHUDClass.destroy();
+		PlayState.fromMod = null;
+		#if cpp
+		cpp.vm.Gc.run(true);
+		#else
+		openfl.system.System.gc();
+		#end
+		super.destroy();
+	}
+
 	private var curStorySong:Int = 0;
 
 	function endSong():Void
@@ -2133,7 +2141,10 @@ class PlayState extends MusicBeatState
 				PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
 				FlxG.sound.music.stop();
 
-				LoadingState.loadAndSwitchState(new PlayState(fromMod), false);
+				//another measure type of shit
+				PlayState.health = 1;
+				PlayState.instance.customHUDClass.resetShit();
+				LoadingState.loadAndSwitchState(new PlayState(), false);
 			}
 		}
 		else
