@@ -59,7 +59,7 @@
       "name": "away3d",
       "type": "haxelib",
       "version": null
-    }
+    },
     {
       "name": "discord_rpc",
       "type": "git",
