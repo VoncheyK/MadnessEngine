@@ -148,14 +148,19 @@ class Paths
 
 	inline static public function voices(song:String, ?mod:String)
 	{
-		var s1 = 'songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
-		return (FileSystem.exists(modFolders(s1)) ? modFolders(s1) : (FileSystem.exists(getPath(s1, SOUND, null)) ? getPath(s1, SOUND, null) : null));
+		//old code goooood
+		if(mod == null)
+			return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		else
+			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
 	}
 
 	inline static public function inst(song:String, ?mod:String)
 	{
-		var s1 = 'songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
-		return (FileSystem.exists(modFolders(s1)) ? modFolders(s1) : (FileSystem.exists(getPath(s1, SOUND, null)) ? getPath(s1, SOUND, null) : null));
+		if (mod == null)
+			return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		else
+			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
 	}
 
 	inline static public function image(key:String, ?library:String)

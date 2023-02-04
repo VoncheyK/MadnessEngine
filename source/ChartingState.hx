@@ -385,26 +385,12 @@ class ChartingState extends MusicBeatState
 
 		var swapSection:FlxButton = new FlxButton(10, 170, "Swap section", function()
 		{
-			if (_song.chartVersion == "1.5"){
-				var __song:SwaggiestSong = cast(_song);
-				for (i => note in __song.notes)
-					{
-						if (note.strumTime >= (Conductor.stepCrochet * getSection().lengthInSteps) * curSection  && note.strumTime <= (Conductor.stepCrochet * getSection().lengthInSteps) * (curSection + 1))
-						{
-							note.noteData = (note.noteData + 4) % 8;
-							_song.notes[i] = note;
-							updateGrid();
-						}	
-					}
-			}
-			else if (_song.chartVersion == "1.0"){
-				for (i in 0...getSection().sectionNotes.length)
-					{
-						var note = getSection().sectionNotes[i];
-						note[1] = (note[1] + 4) % 8;
-						getSection().sectionNotes[i] = note;
-						updateGrid();
-					}
+			for (i in 0...getSection().sectionNotes.length)
+			{
+				var note = getSection().sectionNotes[i];
+				note[1] = (note[1] + 4) % 8;
+				getSection().sectionNotes[i] = note;
+				updateGrid();
 			}
 		});
 
@@ -886,7 +872,7 @@ class ChartingState extends MusicBeatState
 		if (_song.chartVersion == "1.5")
 		{
 			var __song:SwaggiestSong = cast(_song);
-			for (note in __song.notes)
+			for (note in __song.sections[daSec - sectionNum].sectionNotes)
 			{
 				if (note.strumTime >= (Conductor.stepCrochet * _song.sections[curSection].lengthInSteps) * curSection  && note.strumTime <= (Conductor.stepCrochet * _song.sections[curSection].lengthInSteps) * (curSection + 1))
 				{
@@ -1060,7 +1046,8 @@ class ChartingState extends MusicBeatState
 				},
 				mustHit: true,
 				typeOfSection: 0,
-				altAnim: false
+				altAnim: false,
+				sectionNotes: []
 			};
 	
 			_song.sections.push(sec);
@@ -1072,7 +1059,7 @@ class ChartingState extends MusicBeatState
 				mustHitSection: true,
 				sectionNotes: [],
 				typeOfSection: 0,
-				altAnim: false
+				altAnim: false, 
 			};
 	
 			_song.notes.push(sec);
@@ -1086,7 +1073,7 @@ class ChartingState extends MusicBeatState
 		if (_song.chartVersion == "1.5")
 		{
 			var __song:SwaggiestSong = cast(_song);
-			for (i in __song.notes)
+			for (i in __song.sections[curSection].sectionNotes)
 				{
 					if (i.strumTime == note.strumTime && i.noteData == note.noteData)
 						curSelectedNote = i;
@@ -1116,7 +1103,7 @@ class ChartingState extends MusicBeatState
 	{
 		if (_song.chartVersion == "1.5"){
 			var __song:SwaggiestSong = cast(_song);
-			for (i in __song.notes)
+			for (i in __song.sections[curSection].sectionNotes)
 				{
 					if (i.strumTime == note.strumTime && i.noteData == note.noteData)
 						{
@@ -1144,9 +1131,7 @@ class ChartingState extends MusicBeatState
 		if (_song.chartVersion == "1.5")
 		{
 			var __song:SwaggiestSong = cast(_song);
-			for (note in __song.notes)
-				if (note.strumTime >= (Conductor.stepCrochet * _song.sections[curSection].lengthInSteps) * curSection  && note.strumTime <= (Conductor.stepCrochet * _song.sections[curSection].lengthInSteps) * (curSection + 1))
-					_song.notes.remove(note);
+			__song.sections[curSection].sectionNotes = [];
 		}
 		else if (_song.chartVersion == "1.0")
 			_song.notes[curSection].sectionNotes = [];
@@ -1158,8 +1143,8 @@ class ChartingState extends MusicBeatState
 	{
 		if (_song.chartVersion == "1.5"){
 			var __song:SwaggiestSong = cast(_song);
-			for (_ in __song.notes)
-				_song.notes = [];
+			for (section in __song.sections)
+				section.sectionNotes = [];
 		}
 		else if (_song.chartVersion == "1.0")
 		{
@@ -1179,7 +1164,7 @@ class ChartingState extends MusicBeatState
 		if (_song.chartVersion == "1.5"){
 			_song.notes.push({strumTime: time, noteData: data, sustainLength: susLen}); 
 			var __song:SwaggiestSong = cast(_song);
-			curSelectedNote = _song.notes[__song.notes.length - 1];
+			curSelectedNote = _song.notes[__song.sections[curSection].sectionNotes.length - 1];
 			if (FlxG.keys.pressed.CONTROL)
 			{
 				_song.notes.push({strumTime: time, noteData: (data + 4) % 8, sustainLength: susLen});
@@ -1284,7 +1269,7 @@ class ChartingState extends MusicBeatState
 		//translate
 		var songNew:SwaggiestSong = Song.translate(_song);
 		var json = {
-			"song": _song
+			"song": songNew
 		};
 
 		var data:String = Json.stringify(json, "\t");

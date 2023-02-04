@@ -199,7 +199,7 @@ class ServerHandler extends MusicBeatState
 			for (curSec => section in sex.sections)
 			{
 				// var it : { s:Array<SwagNote> } = SONG.notes;
-				for (songNotes in sex.notes)
+				for (songNotes in section.sectionNotes)
 				{
 					if (songNotes.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * curSec
 						|| songNotes.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * (curSec + 1))

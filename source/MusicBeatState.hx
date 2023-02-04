@@ -1,5 +1,6 @@
 package;
 
+import cpp.abi.Abi;
 import haxe.rtti.Meta;
 import openfl.ui.Keyboard;
 import openfl.events.KeyboardEvent;
@@ -17,8 +18,8 @@ class MusicBeatState extends FlxUIState
 	private var lastBeat:Float = 0;
 	private var lastStep:Float = 0;
 
-	public var curStep:Int = 0;
-	public var curBeat:Int = 0;
+	public var curStep(default, set):Int = 0;
+	public var curBeat(default, set):Int = 0;
 	
 	private var controls(get, never):Controls;
 
@@ -29,10 +30,17 @@ class MusicBeatState extends FlxUIState
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
 
+	//no update tomfoolery for events
+	private function set_curStep(newStep:Int):Int 
+		return curStep = newStep;
+	
+	private function set_curBeat(newBeat:Int):Int
+		return curBeat = newBeat;
+
 	override function create()
 	{
-		//var stateFlx:Dynamic = FlxG.state;
-		//var stateMusicBeat:MusicBeatState = stateFlx;
+		//Leaving this code here for when I need it.
+		//var stateMusicBeat:MusicBeatState = cast(FlxG.state, MusicBeatState);
 
 		for (script in hscripts)
 			script.call("create", []);

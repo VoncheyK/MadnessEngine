@@ -356,7 +356,7 @@ class FreeplayState extends MusicBeatState
 				PlayState.storyDifficulty = curDifficulty;
 	
 				PlayState.storyWeek = songs[curSelected].week;
-				if (songs[curSelected].mod.name != null)
+				if (songs[curSelected].mod != null && songs[curSelected].mod.name != null)
 					PlayState.fromMod = songs[curSelected].mod.name;
 				
 				trace('CUR WEEK' + PlayState.storyWeek);

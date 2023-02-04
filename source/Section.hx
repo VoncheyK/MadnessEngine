@@ -18,6 +18,8 @@ typedef SwaggiestSection =
 	var typeOfSection:Int;
 	var changeBPM:{active:Bool,bpm:Int}; //this will most likely change later
 	var altAnim:Bool; 
+	//maybe sectionizing notes can fix them being so stupid??
+	var sectionNotes:Array<Song.SwagNote>;
 }
 
 class Section

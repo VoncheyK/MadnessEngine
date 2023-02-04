@@ -24,6 +24,8 @@ typedef SwagSong =
 	var validScore:Bool;
 	var chartVersion:String;
 	var stage:Null<String>;
+
+	var events:Array<EventNote>;
 }
 
 typedef SwaggiestSong =
@@ -36,10 +38,12 @@ typedef SwaggiestSong =
 	var player2:String;
 	var validScore:Bool;
 
-	var notes:Array<SwagNote>;
+	//var notes:Array<SwagNote>;
 	var sections:Array<SwaggiestSection>;
 	var chartVersion:String;
 	var stage:Null<String>;
+
+	var events:Array<EventNote>;
 }
 
 typedef SwagNote =
@@ -50,6 +54,9 @@ typedef SwagNote =
 	// var mustHit:Bool;
 }
 
+typedef EventNote = {
+	var eventData:{step:Int, event:String};
+}
 class Song
 {
 	public var song:String;
@@ -106,8 +113,16 @@ class Song
 		// the only thing that really changes are how notes and sections work
 		var swagNotes:Array<SwagNote> = [];
 		var swagSections:Array<SwaggiestSection> = [];
+
 		for (sec in song.notes)
 		{
+			for (note in sec.sectionNotes)
+				swagNotes.push({
+					noteData: note[1],
+					sustainLength: note[2],
+					strumTime: note[0]
+				});
+
 			swagSections.push({
 				mustHit: sec.mustHitSection,
 				lengthInSteps: sec.lengthInSteps,
@@ -116,15 +131,10 @@ class Song
 					active: sec.changeBPM,
 					bpm: sec.bpm
 				},
-				altAnim: sec.altAnim
+				altAnim: sec.altAnim,
+				//perhaps
+				sectionNotes: swagNotes
 			});
-
-			for (note in sec.sectionNotes)
-				swagNotes.push({
-					noteData: note[1],
-					sustainLength: note[2],
-					strumTime: note[0]
-				});
 		}
 
 		return {
@@ -136,10 +146,11 @@ class Song
 			player1: song.player1,
 			player2: song.player2,
 
-			notes: swagNotes,
+			//notes: swagNotes,
 			sections: swagSections,
 			chartVersion: "1.5",
-			stage: 'stage'
+			stage: 'stage',
+			events: song.events
 		}
 	}
 }

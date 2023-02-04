@@ -168,6 +168,8 @@ class PlayState extends MusicBeatState
 	var dadStrumTimes:Array<Int> = [];
 	var bfStrumTimes:Array<Int> = [];
 
+	var loadedEvents:Array<Event> = [];
+
 	public var customHUDClass:CamHUD;
 
 	#if desktop
@@ -784,6 +786,17 @@ class PlayState extends MusicBeatState
 		// startCountdown();
 
 		generateSong(SONG.song);
+		//start pushing in events
+		if (SONG.events != null){
+			var events:Array<Song.EventNote> = cast(SONG.events);
+			for (event in events)
+			{
+				//event.step = step where the event gets ran, event.event is the event name/string
+				var eventClass:Event = new Event(event.eventData.step, event.eventData.event);
+				loadedEvents.push(eventClass);
+			}
+		}
+
 		//memory check quickly
 		openfl.system.System.gc();
 
@@ -1175,6 +1188,25 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
+	//event shit
+	override function set_curStep(newStep:Int):Int
+	{
+		//goofy ass
+		for(event in loadedEvents){
+			if (event.isDead){
+				loadedEvents.remove(event);
+				event.destroy();
+				event = null;
+				return super.set_curStep(newStep);
+			}
+
+			if (newStep == event.step)
+				event.invokeEvent();
+		}
+		
+		return super.set_curStep(newStep);
+	}
+
 	var debugNum:Int = 0;
 
 	private function generateSong(dataPath:String):Void
@@ -1208,7 +1240,7 @@ class PlayState extends MusicBeatState
 				var sex:SwaggiestSong = cast(SONG);
 				for (curSec => section in sex.sections)
 				{
-					for (songNotes in sex.notes)
+					for (songNotes in section.sectionNotes)
 					{	
 						if (songNotes.strumTime <= (Conductor.stepCrochet * section.lengthInSteps) * curSec || songNotes.strumTime >= (Conductor.stepCrochet * section.lengthInSteps) * (curSec + 1)) continue;
 		
