@@ -1,0 +1,108 @@
+{
+  "dependencies": [
+    {
+      "name": "lime",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "openfl",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flixel",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flixel-addons",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flixel-tools",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flixel-ui",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hxcpp",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "tjson",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hxjsonast",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hxCodec",
+      "type": "haxelib",
+      "version": "2.5.1"
+    },
+    {
+      "name": "hscript",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "hxcpp-debug-server",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "discord_rpc",
+      "type": "git",
+      "dir": null,
+      "ref": "master",
+      "url": "https://github.com/Aidan63/linc_discord-rpc"
+    },
+    {
+      "name": "hscript-improved",
+      "type": "git",
+      "dir": null,
+      "ref": "88c2e28dbc96c027165a77cbfe37a57896714d93",
+      "url": "https://github.com/YoshiCrafter29/hscript-improved/tree/88c2e28dbc96c027165a77cbfe37a57896714d93"
+    },
+    {
+      "name": "colyseus",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "colyseus-websocket",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "tentools",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "systools",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flxanimate",
+      "type": "haxelib",
+      "version": null
+    },
+    {
+      "name": "flixel-studio",
+      "type": "haxelib",
+      "version": null
+    }
+  ]
+}
