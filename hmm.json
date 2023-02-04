@@ -46,11 +46,6 @@
       "version": null
     },
     {
-      "name": "hxCodec",
-      "type": "haxelib",
-      "version": "2.5.1"
-    },
-    {
       "name": "hscript",
       "type": "haxelib",
       "version": null
@@ -72,7 +67,7 @@
       "type": "git",
       "dir": null,
       "ref": "88c2e28dbc96c027165a77cbfe37a57896714d93",
-      "url": "https://github.com/YoshiCrafter29/hscript-improved/tree/88c2e28dbc96c027165a77cbfe37a57896714d93"
+      "url": "https://github.com/YoshiCrafter29/hscript-improved/"
     },
     {
       "name": "colyseus",
