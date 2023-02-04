@@ -81,8 +81,10 @@
     },
     {
       "name": "tentools",
-      "type": "haxelib",
-      "version": null
+      "type": "git",
+      "dir": null,
+      "ref": "main",
+      "url": "https://github.com/TentaRJ/tentools"
     },
     {
       "name": "systools",
