@@ -46,11 +46,6 @@
       "version": null
     },
     {
-      "name": "hxCodec",
-      "type": "haxelib",
-      "version": "2.5.1"
-    },
-    {
       "name": "hscript",
       "type": "haxelib",
       "version": null
