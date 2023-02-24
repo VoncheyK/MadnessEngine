@@ -486,13 +486,7 @@ class ServerHandler extends MusicBeatState
 				for (plr in strumAccordingToPlr.keys()){
 					if (this.room.sessionId != plr)
 						opponentNoteHit(false, message.notedata);
-				}
-					/*if (this.room.sessionId != plr)
-						enemyStrums.members[message.notedata].animation.play("static");
-					else
-						playerStrums.members[message.notedata].animation.play("static");*/
-					
-					
+				}				
 			});
 
 			this.room.onMessage("playerAndEnemy", (message) -> {
@@ -782,13 +776,13 @@ class ServerHandler extends MusicBeatState
 
 			// boyfriend.playAnim("sing" + direction[note.noteData], true);
 
-			/*strumAccordingToPlr.get(this.room.sessionId).forEach(function(spr:FlxSprite)
+			strumAccordingToPlr.get(this.room.sessionId).forEach(function(spr:FlxSprite)
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
 					//spr.animation.play('confirm');
 				}
-			});*/
+			});
 
 			// updateAccuracy();
 
