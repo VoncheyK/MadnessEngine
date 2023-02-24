@@ -2,8 +2,9 @@ package;
 
 import lime.utils.Assets;
 import haxe.ds.Map;
-import haxe.macro.Context;
-import haxe.macro.Expr;
+#if sys
+import sys.io.File;
+#end
 
 using StringTools;
 using Lambda;
@@ -60,7 +61,7 @@ class CoolUtil
 	public static function coolTextFile(path:String):Null<Array<String>>
 	{
 		if (sys.FileSystem.exists(path)){
-			var daList:Array<String> = Assets.getText(path).trim().split('\n');
+			var daList:Array<String> = File.getContent(path).trim().split('\n');
 			if (daList != null){
 				for (i in 0...daList.length)
 				{

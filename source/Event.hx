@@ -9,12 +9,15 @@ class Event
     public var step:Null<Int>;
     public var event:String;
     public var isDead:Null<Bool> = false;
+    public var param1:String;
+    public var param2:String;
+    public var characterKey:String = null;
 
-    public function new(step:Int, event:String){
-        this.step = step; this.event = event;
+    public function new(step:Int, event:String, param1:String, param2:String, ?characterKey:String){
+        this.step = step; this.event = event; this.param1 = param1; this.param2 = param2; this.characterKey = characterKey;
     }
 
-    public function invokeEvent():Void {
+    public function invoke():Void {
         try{
             Reflect.callMethod(this, convertNameToFunction(event), []);
             isDead = true;
@@ -43,10 +46,10 @@ class Event
         }
         return null;
     }
-        
+
     //make it callable from reflect
     @:keep private function changeCharacter():Void
     {
-        trace("called");
+        
     }
 }

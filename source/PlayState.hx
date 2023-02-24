@@ -49,8 +49,8 @@ import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
 import FunkyHscript;
 import helpers.Vector3;
-import VCRDistortionShader;
 import flxanimate.FlxAnimate;
+import openfl.display.BitmapData;
 
 using StringTools;
 
@@ -179,6 +179,8 @@ class PlayState extends MusicBeatState
 	public var detailsText:String = "";
 	public var detailsPausedText:String = "";
 	#end
+
+	public var cachedCharacters:Map<String, String> = new Map<String, String>();
 
 	// Ratings
 	public var sicks:Int = 0;
@@ -788,11 +790,53 @@ class PlayState extends MusicBeatState
 		generateSong(SONG.song);
 		//start pushing in events
 		if (SONG.events != null){
-			var events:Array<Song.EventNote> = cast(SONG.events);
+			final events:Array<Song.EventNote> = cast(SONG.events);
 			for (event in events)
 			{
-				//event.step = step where the event gets ran, event.event is the event name/string
-				var eventClass:Event = new Event(event.eventData.step, event.eventData.event);
+				//step = step where the event gets ran, event is the event name/string
+				final data:{step:Int, event:String, param1:String, param2:String} = event.eventData;
+
+				if (data.event == "Change Character" && data.param2 != null){
+					//precache char
+					final characterReplacement:String = data.param2;
+					//if its something in a folder like weeb/boyfriend idfk
+					var characterName:String = data.param2;
+					
+					function getTheFuckOut(daString:String):String {
+						final daRet:String = daString.substr(daString.indexOf("/") + 1, daString.length);
+						if (daRet.indexOf("/") != -1)
+							return getTheFuckOut(daRet);
+						return daRet;
+					}
+					
+					//folder digging if its not -1 
+					if (characterReplacement.indexOf("/") != -1)
+						//trollololo
+						characterName = getTheFuckOut(characterReplacement);
+
+					if (cachedCharacters.get(data.param2) != '${data.step}*${data.param2}*Cache'){
+						final charCache:FlxSprite = new FlxSprite();
+						charCache.frames = Paths.getSparrowAtlas(characterReplacement);
+						Character.initializeAnimsFromJSONToSprite(characterName, charCache);
+						playstateCache.setBitmapData('${data.step}*${data.param2}*Cache', charCache.graphic.bitmap);
+						cachedCharacters.set(data.param2, '${data.step}*${data.param2}*Cache');
+					}
+					else{
+						//duplicate
+						final bitmapData:BitmapData = playstateCache.getBitmapData(cachedCharacters.get(data.param2));
+						playstateCache.removeBitmapData(cachedCharacters.get(data.param2));
+						playstateCache.setBitmapData('${data.step}*${data.param2}*Cache', bitmapData);
+					}
+						
+				}
+				
+				var eventClass:Event = null;
+
+				if (data.event == "Change Character")
+					eventClass = new Event(data.step, data.event, data.param1, data.param2, '${data.step}*${data.param2}*Cache');
+				else 
+					eventClass = new Event(data.step, data.event, data.param1, data.param2);
+
 				loadedEvents.push(eventClass);
 			}
 		}
@@ -899,11 +943,13 @@ class PlayState extends MusicBeatState
 
 		if (sys.FileSystem.isDirectory("assets/scripts"))
 		{
-			for (i in 0...sys.FileSystem.readDirectory("assets/scripts").length){
-				var trueFile = sys.FileSystem.readDirectory("assets/scripts")[i];
-				trace(trueFile);
+			var dir = sys.FileSystem.readDirectory("assets/scripts/");
+			for (i in 0...dir.length){
+
+				var trueFile = dir[i];
 				if (sys.FileSystem.exists('assets/scripts/$trueFile') && trueFile.contains(".hscript"))
 					hscripts.push(new FunkyHscript(trueFile));
+				//trace(Reflect.field(helpers.Current, "cur"));
 			}
 		}
 
@@ -1201,7 +1247,7 @@ class PlayState extends MusicBeatState
 			}
 
 			if (newStep == event.step)
-				event.invokeEvent();
+				event.invoke();
 		}
 		
 		return super.set_curStep(newStep);
@@ -1984,7 +2030,7 @@ class PlayState extends MusicBeatState
 				{
 					misses++;	
 
-					noteMiss(daNote.noteData);
+					noteMiss(daNote.noteData, daNote);
 					vocals.volume = 0;
 					health -= 0.04;
 					songScore -= 10;
@@ -2129,7 +2175,7 @@ class PlayState extends MusicBeatState
 				transOut = FlxTransitionableState.defaultTransOut;
 
 				FlxG.switchState(new StoryMenuState());
-
+				callOnHscripts("endSong", [true]);
 				// if ()
 				//StoryMenuState.weekUnlocked[Std.int(Math.min(storyWeek + 1, StoryMenuState.weekUnlocked.length - 1))] = true;
 
@@ -2152,6 +2198,9 @@ class PlayState extends MusicBeatState
 
 				trace('LOADING NEXT SONG');
 				trace(PlayState.storyPlaylist[0].toLowerCase() + difficulty);
+
+				//false means that you can see the next song and shit.
+				callOnHscripts("endSong", [false, PlayState.storyPlaylist[0].toLowerCase(), difficulty]);
 
 				curStorySong++;
 
@@ -2183,6 +2232,8 @@ class PlayState extends MusicBeatState
 		{
 			trace('WENT BACK TO FREEPLAY??');
 			//should clear the cache in freeplay.
+			//true means that playstate is over.
+			callOnHscripts("endSong", [true]);
 			FlxG.switchState(new FreeplayState());
 		}
 	}
@@ -2498,7 +2549,7 @@ class PlayState extends MusicBeatState
 			}
 			else if (!OptionsMenu.options.ghostTapping)
 			{
-				noteMiss(keyData);
+				noteMiss(keyData, null);
 				misses++;
 				health -= 0.04;
 				songScore -= 10;
@@ -2577,7 +2628,7 @@ class PlayState extends MusicBeatState
 
 	var direction:Array<String> = ["LEFT", "DOWN", "UP", "RIGHT"];
 
-	function noteMiss(direction:Int = 1):Void
+	function noteMiss(direction:Int = 1, note:Note):Void
 	{
 		if (!boyfriend.stunned)
 		{
@@ -2601,55 +2652,13 @@ class PlayState extends MusicBeatState
 			});
 
 			boyfriend.playAnim('sing' + this.direction[direction] + 'miss', true);
+
+			if (note != null) //its null if its a stupid ghosttapping off miss
+				callOnHscripts("noteMiss", [direction, note]);
+			else
+				callOnHscripts("noteMiss", [direction]);
 		}
 	}
-
-	function badNoteCheck()
-	{
-		// HOLY SHIT REDONE THE SYSTEM!?!?!!?
-		var upP = pressed[2];
-		var rightP = pressed[3];
-		var downP = pressed[1];
-		var leftP = pressed[0];
-
-		if (leftP)
-			noteMiss(0);
-		if (downP)
-			noteMiss(1);
-		if (upP)
-			noteMiss(2);
-		if (rightP)
-			noteMiss(3);
-	}
-
-	function badNoteHit()
-		{
-			// just double pasting this shit cuz fuk u
-			// HOLY SHIT REDONE THE SYSTEM?!?!
-			var upP = pressed[2];
-			var rightP = pressed[3];
-			var downP = pressed[1];
-			var leftP = pressed[0];
-	
-			if (leftP)
-				noteMiss(0);
-			if (downP)
-				noteMiss(1);
-			if (upP)
-				noteMiss(2);
-			if (rightP)
-				noteMiss(3);
-		}
-
-	/*function noteCheck(keyP:Bool, note:Note):Void
-	{
-		if (keyP)
-			goodNoteHit(note);
-		else
-		{
-			badNoteCheck();
-		}
-	}*/
 
 	function goodNoteHit(note:Note):Void
 	{
@@ -2690,9 +2699,7 @@ class PlayState extends MusicBeatState
 				remove(note);
 				note.destroy();
 			}
-
-			var isSus:Bool = note.isSustainNote;
-			var leData:Int = Math.round(Math.abs(note.noteData));
+			callOnHscripts("goodNoteHit", [note]);
 		}
 	}
 	
@@ -2821,7 +2828,7 @@ class PlayState extends MusicBeatState
 		{
 			if (daNote.tooLate || !daNote.wasGoodHit)
 			{
-				noteMiss(daNote.noteData);
+				noteMiss(daNote.noteData, daNote);
 				misses++;
 				health -= 0.04;
 				totalNotesHit++;

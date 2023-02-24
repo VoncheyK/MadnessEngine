@@ -31,19 +31,25 @@ class MusicBeatState extends FlxUIState
 		return PlayerSettings.player1.controls;
 
 	//no update tomfoolery for events
-	private function set_curStep(newStep:Int):Int 
+	private function set_curStep(newStep:Int):Int {
+		callOnHscripts("updateCurStep", [newStep]);
 		return curStep = newStep;
+	}
 	
-	private function set_curBeat(newBeat:Int):Int
+	private function set_curBeat(newBeat:Int):Int {
+		callOnHscripts("updateCurBeat", [newBeat]);
 		return curBeat = newBeat;
+	}
+
+	private inline function callOnHscripts(functionName:String, args:Null<Array<Dynamic>>)
+		for (script in hscripts) callable ? script.call(functionName, args) : trace("Hscript uncallable!");
 
 	override function create()
 	{
 		//Leaving this code here for when I need it.
 		//var stateMusicBeat:MusicBeatState = cast(FlxG.state, MusicBeatState);
 
-		for (script in hscripts)
-			script.call("create", []);
+		callOnHscripts("create", []);
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -53,8 +59,7 @@ class MusicBeatState extends FlxUIState
 
 	override function destroy()
 	{
-		for(script in hscripts)
-			script.call("destroy", []);
+		callOnHscripts("destroy", []);
 
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -80,19 +85,16 @@ class MusicBeatState extends FlxUIState
 				hscript.wipeExceptVarsAndExecute(hscript.fileName, callable);
 		}
 
-		for(script in hscripts){
-			(callable) ? script.call("keyDown", [event]) : null;
-		}
+		callOnHscripts("keyDown", [event]);
 	}
 
 	private function keyUp(event:KeyboardEvent)
-	{
-		for(script in hscripts)  (callable) ? script.call("keyUp", [event]) : null;
-	}
+		callOnHscripts("keyUp", [event]);
+	
 
 	override function update(elapsed:Float)
 	{
-		for (script in hscripts) (callable) ? script.call("update", [elapsed]) : null;
+		callOnHscripts("update", [elapsed]);
 
 		//everyStep();
 		var oldStep:Int = curStep;
@@ -129,25 +131,22 @@ class MusicBeatState extends FlxUIState
 
 	override function onFocus()
 	{
-		for (script in hscripts) script.call("onFocus", []);
+		callOnHscripts("onFocus", []);
 		super.onFocus();
 	}
 
 	override function onFocusLost()
 	{
-		for (script in hscripts) script.call("onFocusLost", []);
+		callOnHscripts("onFocusLost", []);
 		super.onFocusLost();
 	}
 
 	public function stepHit():Void
 	{
-		for (script in hscripts) (callable) ? script.call("stepHit", []) : null;
+		callOnHscripts("stepHit", [curStep]);
 		try if (curStep % 4 == 0) beatHit();
 	}
 
 	public function beatHit():Void
-	{
-		for (script in hscripts) (callable) ? script.call("beatHit", []) : null;
-	}
-
+		callOnHscripts("beatHit", [curBeat]);
 }

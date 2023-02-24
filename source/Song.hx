@@ -55,7 +55,7 @@ typedef SwagNote =
 }
 
 typedef EventNote = {
-	var eventData:{step:Int, event:String};
+	var eventData:{step:Int, event:String, param1:String, param2:String};
 }
 class Song
 {
@@ -136,6 +136,9 @@ class Song
 				sectionNotes: swagNotes
 			});
 		}
+
+		if (song.events == null)
+			song.events = [];
 
 		return {
 			song: song.song,

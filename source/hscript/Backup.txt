@@ -1,0 +1,190 @@
+package;
+
+#if sys
+import sys.FileSystem;
+#end
+#if desktop
+import Sys;
+#end
+import hscript.Expr.ModuleDecl;
+import haxe.ds.IntMap;
+import hscript.Interp;
+import hscript.Parser;
+import hscript.ParserEx;
+import helpers.HscriptHelper;
+import haxe.macro.Expr;
+import haxe.macro.Context;
+
+using haxe.macro.ExprTools;
+
+class FunkyHscript {
+	public var parser:Parser = null;
+	public var interpreter:Interp = null;
+	public var vars:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public var fileName:String = "";
+	public static var isFinalBuild:Bool = true;
+
+	public function new(isModule:Bool, ?fileName:String, ?fileData:String):Void {
+		try {
+			switch(isModule){
+				case false:
+					parser = new Parser();
+					interpreter = new Interp();
+
+					parser.allowJSON = true;
+					parser.allowTypes = true;
+					parser.allowMetadata = true;
+					//var parsed = parser.parseString((fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : ((fileData != null) ? fileData : null), fileName);
+					interpreter.allowPublicVariables = true;
+					interpreter.allowStaticVariables = true;
+					
+					interpreter.variables.set("require", resolveRequire);
+
+					this.fileName = fileName;
+
+					//interpreter.execute(parsed);
+					
+					call("main", []);
+				case true:
+					//we dont need parser, just instantiate it for no absolute reason :devious:
+					parser = new Parser();
+
+					var instance:Dynamic = null;
+					this.fileName = fileName;
+
+					instance = load("CThing.hscript");
+					trace(instance);
+					if (instance != null)
+						instance.main();
+				}
+		} catch (e:haxe.Exception) {
+			windowAlertLmao(e);
+		}
+	}
+
+	public function call(Function:String, Arguments:Array<Dynamic>) {
+		if (interpreter == null || parser == null) {
+			//trace("Interpreter is: " + interpreter + " parser is: " + parser);
+			return;
+		}
+		if (!interpreter.variables.exists(Function))
+			return;
+			
+		try {
+			Reflect.callMethod(interpreter, interpreter.variables.get(Function), Arguments);
+		} catch (e:haxe.Exception) {
+			windowAlertLmao(e);
+		}
+	}
+
+	public function reExecute(fileName:String):Void {
+		try {
+			//var parsed = parser.parseString(sys.io.File.getContent(Paths.script(fileName)), fileName);
+			//interpreter.execute(parsed);
+		} catch (e:haxe.Exception) {
+			windowAlertLmao(e);
+		}
+	}
+
+	public static function load(fileName:String):Dynamic{
+		final pos:Expr = macro haxe.macro.Context.currentPos();
+		//DEVIOUS HACK
+		final parser = new ParserEx(pos.pos);
+
+		function doShit():Dynamic {
+			final modules:Array<ModuleDecl> = parser.parseModule(sys.io.File.getContent('assets/scripts/classes/$fileName'));
+			for (module in modules)
+			{
+				trace(module);
+				final type:TypeDefinition = HscriptHelper.constructClass(module, pos.pos);
+				macro haxe.macro.Context.defineType(type);
+				final path = parser.makeTypePath({
+					sub: null,
+					pack: [],
+					name: type.name,
+					params: null
+				});
+				return macro new $path();
+			}
+			return null;
+		}
+
+		return doShit(); 
+	}
+
+	public function wipeData():Void {
+		parser = null;
+		interpreter.variables = null;
+		interpreter.publicVariables = null;
+		interpreter.staticVariables = null;
+		interpreter = null;
+		vars = null;
+	}
+
+	private function windowAlertLmao(e:haxe.Exception){
+		//Main.raiseWindowAlert("An error has occured with Hscript:\n
+		//" + e.details() + "\nHscript line: " +
+		//interpreter.posInfos().lineNumber + "\nMessage: " + e.message);
+	}
+
+	private function resolveRequire(name:String):Class<Dynamic>{
+		if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+			return null;
+
+		return Type.resolveClass(name);
+	}
+
+	public function wipeExceptVarsAndExecute(fileName:String, callable:Bool):Void {
+		try {
+			var publics:Dynamic = interpreter.publicVariables;
+			var statics:Dynamic = interpreter.staticVariables;
+
+			parser = null;
+			interpreter.variables = null;
+			interpreter = null;
+			vars = null;
+
+			parser = new Parser();
+			interpreter = new Interp();
+
+			parser.allowJSON = true;
+			parser.allowTypes = true;
+			parser.allowMetadata = true;
+
+			interpreter.allowPublicVariables = true;
+			interpreter.allowStaticVariables = true;
+			interpreter.variables.set("require", resolveRequire);
+
+			reExecute(fileName);
+			interpreter.publicVariables = publics;
+			interpreter.staticVariables = statics;
+
+			callable = true;
+			
+			call("main", []);
+		} catch (e:haxe.Exception) {
+			windowAlertLmao(e);
+		}
+	}
+
+	public function wipeAndExecute(fileName:String):Void {
+		try {
+			wipeData();
+			parser = new Parser();
+			interpreter = new Interp();
+
+			interpreter.allowPublicVariables = true;
+			interpreter.allowStaticVariables = true;
+			interpreter.variables.set("require", resolveRequire);
+
+			parser.allowJSON = true;
+			parser.allowTypes = true;
+			parser.allowMetadata = true;
+
+			reExecute(fileName);
+			call("main", []);
+		} catch (e:haxe.Exception) {
+			windowAlertLmao(e);
+		}
+	}
+}

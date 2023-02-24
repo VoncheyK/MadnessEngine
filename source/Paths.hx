@@ -1,5 +1,6 @@
 package;
 
+import openfl.media.Sound;
 import openfl.display.BitmapData;
 import sys.io.File;
 import helpers.Modsupport;
@@ -146,22 +147,23 @@ class Paths
 		return getPath('music/$key.$SOUND_EXT', MUSIC, library);
 	}
 
-	inline static public function voices(song:String, ?mod:String)
-	{
-		//old code goooood
-		if(mod == null)
-			return 'songs:assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
-		else
-			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+	inline static public function voicePath(song:String, ?mod:String){
+		var path:String;
+		(mod == null) ? path = 'assets/songs/${song.toLowerCase()}/Voices.$SOUND_EXT' : path = 'mods/${mod}/songs/${song.toLowerCase()}/Voices.$SOUND_EXT';
+		return path;
 	}
 
-	inline static public function inst(song:String, ?mod:String)
-	{
-		if (mod == null)
-			return 'songs:assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
-		else
-			return 'mods:assets/mods/${mod}/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+	inline static public function instPath(song:String, ?mod:String){
+		var path:String;
+		(mod == null) ? path = 'assets/songs/${song.toLowerCase()}/Inst.$SOUND_EXT' : path = 'mods/${mod}/songs/${song.toLowerCase()}/Inst.$SOUND_EXT';
+		return path;
 	}
+
+	inline static public function voices(song:String, ?mod:String)
+		return Sound.fromFile('./' + voicePath(song, mod));
+
+	inline static public function inst(song:String, ?mod:String)
+		return Sound.fromFile('./' + instPath(song, mod));
 
 	inline static public function image(key:String, ?library:String)
 	{

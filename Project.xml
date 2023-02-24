@@ -136,11 +136,12 @@
 	<haxelib name="colyseus-websocket" />
 	<haxelib name="tentools" />
 	<haxelib name="systools" />
-	<haxelib name="HxShaders" if="desktop"/>
 	<ndll name="systools" haxelib="systools" />
 	<haxelib name="flxanimate"/>
 	<haxelib name="flixel-studio"/>
 
+
+	<!--<haxeflag name="--macro" value="FunkyHscript.load()"/>-->
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
 

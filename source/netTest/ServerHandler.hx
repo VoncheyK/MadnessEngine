@@ -478,7 +478,12 @@ class ServerHandler extends MusicBeatState
 						(message.goodHit) ? enemyStrums.members[message.notedata].animation.play("confirm") : 
 						enemyStrums.members[message.notedata].animation.play("pressed");
 						
-						trace('${message.notedata} has been pressed');
+						//trace('${message.notedata} has been pressed');
+					}
+					else {
+						//current plr holy shit
+						(message.goodHit) ? playerStrums.members[message.notedata].animation.play("confirm") :
+						playerStrums.members[message.notedata].animation.play("pressed");
 					}
 			});
 
@@ -489,6 +494,9 @@ class ServerHandler extends MusicBeatState
 					{
 						enemyStrums.members[message.notedata].animation.play("static");
 						trace('${message.notedata} has been unpressed');
+					}
+					else{
+						playerStrums.members[message.notedata].animation.play("static");
 					}
 			});
 
@@ -747,10 +755,10 @@ class ServerHandler extends MusicBeatState
 
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
-			if(pressed[spr.ID] && spr.animation.curAnim.name != 'confirm' && spr.animation.curAnim.name != 'pressed')
-				spr.animation.play('pressed');
-			if ((!pressed[spr.ID]) || (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished))
-				spr.animation.play('static');
+			//if(pressed[spr.ID] && spr.animation.curAnim.name != 'confirm' && spr.animation.curAnim.name != 'pressed')
+			//	spr.animation.play('pressed');
+			//if ((!pressed[spr.ID]) || (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished))
+			//	spr.animation.play('static');
 
 			if (spr.animation.curAnim.name == 'confirm')
 			{
@@ -825,13 +833,13 @@ class ServerHandler extends MusicBeatState
 
 			// boyfriend.playAnim("sing" + direction[note.noteData], true);
 
-			strumAccordingToPlr.get(this.room.sessionId).forEach(function(spr:FlxSprite)
+			/*strumAccordingToPlr.get(this.room.sessionId).forEach(function(spr:FlxSprite)
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
-					spr.animation.play('confirm');
+					//spr.animation.play('confirm');
 				}
-			});
+			});*/
 
 			// updateAccuracy();
 
@@ -884,7 +892,7 @@ class ServerHandler extends MusicBeatState
 
 			pressed[notedata] = true;
 			this.room.send("notePress", {notedata: notedata, clientname: FlxG.save.data.gjUser, goodHit: false});
-			strumAccordingToPlr.get(this.room.sessionId).members[notedata].animation.play('pressed');
+			//strumAccordingToPlr.get(this.room.sessionId).members[notedata].animation.play('pressed');
 
 			// credits to EyeDaleHim#8508 for being smart
 			if (generatedMusic)
@@ -971,7 +979,7 @@ class ServerHandler extends MusicBeatState
 
 			pressed[notedata] = false;
 			this.room.send("noteRaised", {notedata: notedata, clientname: FlxG.save.data.gjUser});
-			strumAccordingToPlr.get(this.room.sessionId).members[notedata].animation.play('static');
+			//strumAccordingToPlr.get(this.room.sessionId).members[notedata].animation.play('static');
 			// noteRaised
 		}
 	}
