@@ -44,7 +44,7 @@
 	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="web"/>
 	
 	<!-- just so it doesnt annoy me -->
-	<define name="HOTFIXES_DISABLED" if="release"/>
+	<define name="HOTFIXES_DISABLED"/>
 	
 	<!-- <define name="PRELOAD_ALL" /> -->
 	<define name="PRELOAD_ALL" unless="web" />

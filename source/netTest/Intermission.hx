@@ -60,6 +60,7 @@ class Intermission extends MusicBeatState
     }
 
     override function create(){
+		FlxG.autoPause = false;
 		var radminPath:String = "radmin/RvRvpnGui";
 		#if windows
 		radminPath += ".exe";

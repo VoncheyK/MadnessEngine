@@ -359,6 +359,7 @@ class ServerHandler extends MusicBeatState
 	override function create()
 	{
 		FlxG.mouse.visible = true;
+		FlxG.autoPause = false;
 
 		cumHudlol = new FlxCamera();
 		cumHudlol.bgColor.alpha = 0;
@@ -475,8 +476,13 @@ class ServerHandler extends MusicBeatState
 				for (plr in strumAccordingToPlr.keys())
 					if (this.room.sessionId != plr)
 					{
-						(message.goodHit) ? enemyStrums.members[message.notedata].animation.play("confirm") : 
-						enemyStrums.members[message.notedata].animation.play("pressed");
+						if (message.goodHit)
+						{
+							opponentNoteHit();
+							enemyStrums.members[message.notedata].animation.play("confirm");
+						}
+						else
+							enemyStrums.members[message.notedata].animation.play("pressed");
 						
 						//trace('${message.notedata} has been pressed');
 					}
@@ -491,19 +497,16 @@ class ServerHandler extends MusicBeatState
 			{
 				for (plr in strumAccordingToPlr.keys())
 					if (this.room.sessionId != plr)
-					{
 						enemyStrums.members[message.notedata].animation.play("static");
-						trace('${message.notedata} has been unpressed');
-					}
-					else{
+					else
 						playerStrums.members[message.notedata].animation.play("static");
-					}
+					
 			});
 
 			this.room.onMessage("playerAndEnemy", (message) -> {
-				this.player = message.player;
-				this.enemy = message.enemy;
-				trace(message);
+				//this.player = message.player;
+				//this.enemy = message.enemy;
+				//trace(message);
 			});
 		});
 
@@ -543,70 +546,9 @@ class ServerHandler extends MusicBeatState
 		//trace('lmao bozo you MISSED');
 	}
 
-	function opponentNoteHit(daNote:Note)
+	function opponentNoteHit()
 	{
-		if (daNote.y > FlxG.height)
-		{
-			daNote.active = false;
-			daNote.visible = false;
-		}
-		else
-		{
-			daNote.visible = true;
-			daNote.active = true;
-		}
-
-		daNote.y = (strumLine.y - (Conductor.songPosition - daNote.strumTime) * (0.45 * FlxMath.roundDecimal(SONG.speed, 2)));
-
-		// i am so fucking sorry for this if condition
-		// holy fucking shit
-		if (daNote.isSustainNote
-			&& daNote.y + daNote.offset.y <= strumLine.y + Note.swagWidth / 2
-			&& (!daNote.mustPress || (daNote.wasGoodHit || (daNote.prevNote.wasGoodHit && !daNote.canBeHit))))
-		{
-			var swagRect = new FlxRect(0, strumLine.y + Note.swagWidth / 2 - daNote.y, daNote.width * 2, daNote.height * 2);
-			swagRect.y /= daNote.scale.y;
-			swagRect.height -= swagRect.y;
-
-			daNote.clipRect = swagRect;
-		}
-
-		if (!daNote.mustPress && daNote.wasGoodHit)
-		{
-			var altAnim:String = "";
-			if (checkSection() != null)
-			{
-				if (getPropertyFromSection(checkSection(), "altAnim"))
-					altAnim = '-alt';
-			}
-
-			if (SONG.needsVoices)
-				vocals.volume = 1;
-
-			daNote.kill();
-			notes.remove(daNote, true);
-			daNote.destroy();
-		}
-
-		if (daNote.y < -daNote.height)
-		{
-			if (daNote.tooLate || !daNote.wasGoodHit)
-			{
-				noteMiss(daNote.noteData);
-				// misses++;
-				// health -= 0.04;
-				// totalNotesHit++;
-				// songScore -= 10;
-				vocals.volume = 0;
-			}
-
-			daNote.active = false;
-			daNote.visible = false;
-
-			daNote.kill();
-			notes.remove(daNote, true);
-			daNote.destroy();
-		}
+		//null
 	}
 
 	var timeSinceLastUpdate:Float = 0.0;
@@ -659,7 +601,13 @@ class ServerHandler extends MusicBeatState
 					(!daNote.mustPress) ? daNote.visible = true : null;
 
 					//LMFAOOOOOOOOOOO CRY ABOUT IT
-					daNote.y = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
+					var strum:FlxTypedGroup<FlxSprite>;
+					if (daNote.mustPress)
+						strum = playerStrums;
+					else
+						strum = enemyStrums;
+
+					daNote.y = strum.members[daNote.noteData].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(SONG.speed, 2);
 
 					if (OptionsMenu.options.downScroll)
 					{
@@ -694,15 +642,15 @@ class ServerHandler extends MusicBeatState
 						daNote.clipRect = rect;
 					}
 
-					daNote.x = (daNote.mustPress ? playerStrums.members[daNote.noteData] : enemyStrums.members[daNote.noteData]).x;
+					daNote.x = strum.members[daNote.noteData].x;
 
 					if (daNote.isSustainNote)
 					{
 						daNote.x += daNote.width / 2 + 20;
 					}
 
-					if (!daNote.mustPress && daNote.wasGoodHit)
-						opponentNoteHit(daNote);
+					//if (!daNote.mustPress && daNote.wasGoodHit)
+					//	opponentNoteHit(daNote);
 
 
 					// (OptionsMenu.options.downScroll && daNote.y > camHUD.height + daNote.height) || (!OptionsMenu.options.downScroll && daNote.y < -camHUD.height - daNote.height)
