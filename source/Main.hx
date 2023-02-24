@@ -226,7 +226,7 @@ class Main extends Sprite
 		if (FileSystem.exists('./$resourceAdder')){
 			trace('Found resource adder file: $resourceAdder');
 			#if linux
-			resourceAdder = './$resourceAdder'
+			resourceAdder = './$resourceAdder';
 			#end
 			var args:Array<String> = [];
 			args.push('${Sys.getCwd()}MadnessEngine.exe');
