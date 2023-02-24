@@ -477,29 +477,21 @@ class ServerHandler extends MusicBeatState
 					if (this.room.sessionId != plr)
 					{
 						if (message.goodHit)
-						{
-							opponentNoteHit();
-							enemyStrums.members[message.notedata].animation.play("confirm");
-						}
-						else
-							enemyStrums.members[message.notedata].animation.play("pressed");
-						
-						//trace('${message.notedata} has been pressed');
-					}
-					else {
-						//current plr holy shit
-						(message.goodHit) ? playerStrums.members[message.notedata].animation.play("confirm") :
-						playerStrums.members[message.notedata].animation.play("pressed");
+							opponentNoteHit(message.goodHit, message.notedata);
 					}
 			});
 
 			this.room.onMessage("noteRaised", (message) ->
 			{
-				for (plr in strumAccordingToPlr.keys())
+				for (plr in strumAccordingToPlr.keys()){
 					if (this.room.sessionId != plr)
+						opponentNoteHit(false, message.notedata);
+				}
+					/*if (this.room.sessionId != plr)
 						enemyStrums.members[message.notedata].animation.play("static");
 					else
-						playerStrums.members[message.notedata].animation.play("static");
+						playerStrums.members[message.notedata].animation.play("static");*/
+					
 					
 			});
 
@@ -546,9 +538,12 @@ class ServerHandler extends MusicBeatState
 		//trace('lmao bozo you MISSED');
 	}
 
-	function opponentNoteHit()
+	function opponentNoteHit(goodHit:Bool, data:Int)
 	{
-		//null
+		if (goodHit)
+			enemyStrums.members[data].animation.play("confirm");
+		else
+			enemyStrums.members[data].animation.play("static");
 	}
 
 	var timeSinceLastUpdate:Float = 0.0;
@@ -703,10 +698,10 @@ class ServerHandler extends MusicBeatState
 
 		playerStrums.forEach(function(spr:FlxSprite)
 		{
-			//if(pressed[spr.ID] && spr.animation.curAnim.name != 'confirm' && spr.animation.curAnim.name != 'pressed')
-			//	spr.animation.play('pressed');
-			//if ((!pressed[spr.ID]) || (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished))
-			//	spr.animation.play('static');
+			if(pressed[spr.ID] && spr.animation.curAnim.name != 'confirm' && spr.animation.curAnim.name != 'pressed')
+				spr.animation.play('pressed');
+			if ((!pressed[spr.ID]) || (spr.animation.curAnim.name == "confirm" && spr.animation.curAnim.finished))
+				spr.animation.play('static');
 
 			if (spr.animation.curAnim.name == 'confirm')
 			{
