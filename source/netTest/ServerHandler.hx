@@ -780,7 +780,7 @@ class ServerHandler extends MusicBeatState
 			{
 				if (Math.abs(note.noteData) == spr.ID)
 				{
-					//spr.animation.play('confirm');
+					spr.animation.play('confirm');
 				}
 			});
 
