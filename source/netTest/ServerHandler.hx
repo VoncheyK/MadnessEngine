@@ -19,7 +19,7 @@ import flixel.tweens.FlxTween;
 import netTest.schemaShit.ChatState;
 import io.colyseus.Room;
 import flixel.text.FlxText;
-import flixel.utils.FlxColor;
+import flixel.util.FlxColor;
 #if desktop
 import sys.thread.Thread;
 #end
