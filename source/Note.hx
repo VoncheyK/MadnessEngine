@@ -173,7 +173,7 @@ class Note extends FlxSprite
 						prevNote.animation.play('redhold');
 				}
 
-				var song:Dynamic;
+				var song:Dynamic = null;
 
 				if (FlxG.state is PlayState)
 					song = PlayState.SONG;

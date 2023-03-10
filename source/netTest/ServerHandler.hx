@@ -3,7 +3,6 @@ package netTest;
 import flixel.util.typeLimit.OneOfTwo;
 import haxe.Exception;
 import openfl.Lib;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxRect;
 import flixel.math.FlxMath;
 import flixel.tweens.FlxEase;
@@ -14,29 +13,20 @@ import flixel.system.FlxSound;
 import options.OptionsMenu;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
-import hxcpp.StaticRegexp;
 import flixel.FlxCamera;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.tweens.FlxTween;
-import flixel.FlxG;
-import netTest.schemaShit.Player;
 import netTest.schemaShit.ChatState;
-import flixel.FlxSubState;
 import io.colyseus.Room;
-import netTest.schemaShit.BattleState;
-import netTest.schemaShit.Player;
-import lime.app.Application;
+import flixel.text.FlxText;
+import flixel.utils.FlxColor;
 #if desktop
-import sys.io.Process;
-import sys.FileSystem;
-import Sys;
 import sys.thread.Thread;
 #end
 import io.colyseus.Client;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import SpecialKeys;
-import GameJolt;
 
 using StringTools;
 
@@ -63,13 +53,11 @@ class ServerHandler extends MusicBeatState
 	var playerStrums:FlxTypedGroup<FlxSprite>;
 	var enemyStrums:FlxTypedGroup<FlxSprite>;
 
-	#if (haxe >= "4.0.0")
-	var strumAccordingToPlr:Map<String, FlxTypedGroup<FlxSprite>> = [];
-	var charAccordingToPlr:Map<String, Character> = [];
-	#else
 	var strumAccordingToPlr:Map<String, FlxTypedGroup<FlxSprite>> = new Map<String, FlxTypedGroup<FlxSprite>>();
 	var charAccordingToPlr:Map<String, Character> = new Map<String, Character>();
-	#end
+	var scoreAccordingToPlr:Map<String, Int> = new Map<String, Int>();
+	var plrScoreText:FlxText;
+	var enemyScoreText:FlxText;
 
 	private var cumHudlol:FlxCamera;
 
@@ -95,6 +83,11 @@ class ServerHandler extends MusicBeatState
 	//these are playerIds
 	public var player:String = "";
 	public var enemy:String = "";
+	//0 = plr, 1 = enemy
+	public var playerIds:haxe.ds.Vector<String>;
+
+	public var boyfriend:Boyfriend;
+	public var dad:Character;
 
 	public var areBothClientsLoaded:Bool = false;
 
@@ -390,12 +383,14 @@ class ServerHandler extends MusicBeatState
 		playerStrums = new FlxTypedGroup<FlxSprite>();
 		add(playerStrums);
 
+
+
 		enemyStrums.cameras = [cumHudlol];
 		strumLine.cameras = [cumHudlol];
 		strumLineNotes.cameras = [cumHudlol];
 		playerStrums.cameras = [cumHudlol];
 
-		haxe.Timer.delay(function()
+		/*haxe.Timer.delay(function()
 		{
 			this.cliente.getAvailableRooms("chat", function(err, rooms)
 			{
@@ -413,7 +408,9 @@ class ServerHandler extends MusicBeatState
 					trace("metadata: " + room.metadata);
 				}
 			});
-		}, 3000);
+		}, 3000);*/
+
+		playerIds = new haxe.ds.Vector<String>(1);
 
 		this.cliente.joinOrCreate("chat", [
 			"name" => FlxG.save.data.gjUser,
@@ -437,10 +434,12 @@ class ServerHandler extends MusicBeatState
 				strumAccordingToPlr.set(key, generateStaticArrows(key));
 				var nullablePlayer:Null<String> = this.room.state.players.indexes.get(0);
 				var nullableEnemy:Null<String> = this.room.state.players.indexes.get(1);
-				trace(nullablePlayer);
-				trace(nullableEnemy);
+				//should save this data to server aswell, too lazy to do that
+				playerIds[0] = nullablePlayer;
+				playerIds[1] = nullableEnemy;
 				(nullablePlayer != null) ? this.room.send("setPlayer", nullablePlayer) : null;
 				(nullableEnemy != null) ? this.room.send('setEnemy', nullableEnemy) : null;
+				setupCharacter(key);
 			}
 
 			this.room.state.players.onRemove = function(player, key)
@@ -471,14 +470,27 @@ class ServerHandler extends MusicBeatState
 				trace("onMessage: 'message' => " + message);
 			});
 
+			this.room.onMessage("syncScores", (message) -> {
+				this.scoreAccordingToPlr.set(player, message.plrScore);
+				this.scoreAccordingToPlr.set(enemy, message.enemyScore);
+				if (plrScoreText != null && enemyScoreText != null){
+					plrScoreText.text = "Score: " + this.scoreAccordingToPlr.get(player);
+					enemyScoreText.text = "Score: " + this.scoreAccordingToPlr.get(enemy);
+				}
+			});
+
 			this.room.onMessage("notePress", (message) ->
 			{
 				for (plr in strumAccordingToPlr.keys())
+					//leaving this here for now
 					if (this.room.sessionId != plr)
 					{
 						if (message.goodHit)
 							opponentNoteHit(message.goodHit, message.notedata);
+						enemyScoreText.text = "Score: " + message.newScore;
 					}
+					else if (this.room.sessionId == plr)
+						plrScoreText.text = "Score: " + message.newScore;
 			});
 
 			this.room.onMessage("noteRaised", (message) ->
@@ -486,7 +498,7 @@ class ServerHandler extends MusicBeatState
 				for (plr in strumAccordingToPlr.keys()){
 					if (this.room.sessionId != plr)
 						opponentNoteHit(false, message.notedata);
-				}				
+				}		
 			});
 
 			this.room.onMessage("playerAndEnemy", (message) -> {
@@ -789,7 +801,17 @@ class ServerHandler extends MusicBeatState
 			note.wasGoodHit = true;
 			vocals.volume = 1;
 
-			this.room.send("notePress", {notedata: note.noteData, clientname: FlxG.save.data.gjUser, goodHit: true});
+			//handling this here to reduce message count
+			var noteDiff:Float = Math.abs(note.strumTime - Conductor.songPosition); //how late the note was (in ms)
+
+			if (noteDiff < PlayState.hitTimings['sick'])
+				this.room.send("notePress", {notedata: note.noteData, clientname: FlxG.save.data.gjUser, goodHit: true, rating: 'sick'});
+			else if (noteDiff < PlayState.hitTimings['good'])
+				this.room.send("notePress", {notedata: note.noteData, clientname: FlxG.save.data.gjUser, goodHit: true, rating: 'good'});
+			else if (noteDiff < PlayState.hitTimings['bad'])
+				this.room.send("notePress", {notedata: note.noteData, clientname: FlxG.save.data.gjUser, goodHit: true, rating: 'bad'});
+			else if (noteDiff < PlayState.hitTimings['shit'])
+				this.room.send("notePress", {notedata: note.noteData, clientname: FlxG.save.data.gjUser, goodHit: true, rating: 'shit'});
 
 			if (!note.isSustainNote)
 			{
@@ -927,6 +949,25 @@ class ServerHandler extends MusicBeatState
 		}
 	}
 
+	private function setupCharacter(plrId:String):Void {
+		if (plrId == playerIds[0]){
+			//boyfry
+			boyfriend = new Boyfriend(770, 450, "bf");
+			charAccordingToPlr.set(plrId, boyfriend);
+			add(boyfriend);
+			plrScoreText = new FlxText(800, 700, 0, "Score: ", 15);
+			plrScoreText.color = FlxColor.BLUE;
+			add(plrScoreText);
+		}else if (plrId == playerIds[1]){
+			dad = new Character(100, 100, "bf", true);
+			charAccordingToPlr.set(plrId, dad);
+			add(dad);
+			enemyScoreText = new FlxText(100, 700, 0, "Score: ", 15);
+			enemyScoreText.color = FlxColor.BLUE;
+			add(enemyScoreText);
+		}
+	}
+
 	/*lmao copying strum line code from playstate cuz lazy*/
 	private function generateStaticArrows(playerId:String):FlxTypedGroup<FlxSprite>
 	{
@@ -974,11 +1015,11 @@ class ServerHandler extends MusicBeatState
 
 			babyArrow.ID = i;
 
-			(playerId == this.room.sessionId) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
+			(playerId == this.playerIds[0]) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 100;
-			babyArrow.x += (OptionsMenu.options.middleScroll ? FlxG.width / 4 : (FlxG.width / 2) * ((playerId == this.room.sessionId) ? 1 : 0));
+			babyArrow.x += (OptionsMenu.options.middleScroll ? FlxG.width / 4 : (FlxG.width / 2) * ((playerId == this.playerIds[0]) ? 1 : 0));
 
 			strumLineNotes.add(babyArrow);
 			deez.add(babyArrow);

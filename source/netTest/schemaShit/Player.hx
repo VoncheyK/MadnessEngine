@@ -24,6 +24,9 @@ class Player extends Schema {
 
 	@:type("boolean")
 	public var loaded: Bool = false;
+
+	@:type("int")
+	public var score:Int = 0;
 }
 
 //define mini-player class here:
