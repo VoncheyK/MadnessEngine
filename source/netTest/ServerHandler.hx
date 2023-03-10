@@ -383,14 +383,12 @@ class ServerHandler extends MusicBeatState
 		playerStrums = new FlxTypedGroup<FlxSprite>();
 		add(playerStrums);
 
-
-
 		enemyStrums.cameras = [cumHudlol];
 		strumLine.cameras = [cumHudlol];
 		strumLineNotes.cameras = [cumHudlol];
 		playerStrums.cameras = [cumHudlol];
 
-		/*haxe.Timer.delay(function()
+		haxe.Timer.delay(function()
 		{
 			this.cliente.getAvailableRooms("chat", function(err, rooms)
 			{
@@ -408,10 +406,10 @@ class ServerHandler extends MusicBeatState
 					trace("metadata: " + room.metadata);
 				}
 			});
-		}, 3000);*/
+		}, 3000);
 
 		playerIds = new haxe.ds.Vector<String>(1);
-
+			
 		this.cliente.joinOrCreate("chat", [
 			"name" => FlxG.save.data.gjUser,
 			"accessToken" => FlxG.save.data.gjToken,
@@ -420,6 +418,7 @@ class ServerHandler extends MusicBeatState
 			"password" => ""
 		], ChatState, function(err, room)
 		{
+			trace("error");
 			if (err != null)
 			{
 				Main.raiseWindowAlert("An error has occured with multiplayer! " + err.message);
@@ -502,8 +501,10 @@ class ServerHandler extends MusicBeatState
 			});
 
 			this.room.onMessage("playerAndEnemy", (message) -> {
-				//this.player = message.player;
-				//this.enemy = message.enemy;
+				this.player = message.player;
+				this.enemy = message.enemy;
+				this.playerIds[0] = message.player;
+				this.playerIds[1] = message.enemy;
 				//trace(message);
 			});
 		});
@@ -1015,7 +1016,7 @@ class ServerHandler extends MusicBeatState
 
 			babyArrow.ID = i;
 
-			(playerId == this.playerIds[0]) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
+		    (playerId == this.playerIds[0]) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 100;
