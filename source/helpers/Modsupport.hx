@@ -25,7 +25,6 @@ class Modsupport
         {
             var modDir:String = Paths.mods(mod);
 
-            //trace('Mod init. Name: $mod, Directory: $modDir');
             trace('Path should be: ${'mods/$mod/data/freeplaySonglist.txt'}');
 
             //register mod
@@ -41,13 +40,7 @@ class Modsupport
             ));
 
             addToLibrary(mod, modDir);
-
-            for(file in FileSystem.readDirectory(modDir))
-            {
-                trace(file);
-            }
         }
-        trace(modMeta);
     }
 
     public static function addToLibrary(name:String, modDir:String)
@@ -71,7 +64,6 @@ class Modsupport
 
         for (song in modByMeta.songs)
             FreeplayState.pushSong(song, modByMeta);
-        trace(modByMeta);
     }      
     
 }

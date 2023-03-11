@@ -618,7 +618,10 @@ class Character extends FlxSprite
 	{
 		var characterPath:String = 'characters/' + character + '.json';
 
-		var path:String = Paths.getPreloadPath(characterPath);
+		var path:String = Paths.modFolders(characterPath);
+		if (!FileSystem.exists(path))
+			path = Paths.getPreloadPath(characterPath);
+
 		var rawJson = File.getContent(path);
 		var json:CharacterFile = cast Json.parse(rawJson);
 
@@ -665,7 +668,10 @@ class Character extends FlxSprite
 	{
 		var characterPath:String = 'characters/' + character + '.json';
 
-		var path:String = Paths.getPreloadPath(characterPath);
+		var path:String = Paths.modFolders(characterPath);
+		if (!FileSystem.exists(path))
+			path = Paths.getPreloadPath(characterPath);
+
 		var rawJson = File.getContent(path);
 		var json:CharacterFile = cast Json.parse(rawJson);
 
@@ -786,7 +792,6 @@ class Character extends FlxSprite
 				if(json.healthbar_colors != null && json.healthbar_colors.length > 2)
 					iconColor = json.healthbar_colors;
 
-				antialiasing = !noAntialiasing;
 				antialiasing = FlxG.save.data.antialiasing;
 
 				animationsArray = json.animations;

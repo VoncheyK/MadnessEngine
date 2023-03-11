@@ -418,7 +418,6 @@ class ServerHandler extends MusicBeatState
 			"password" => ""
 		], ChatState, function(err, room)
 		{
-			trace("error");
 			if (err != null)
 			{
 				Main.raiseWindowAlert("An error has occured with multiplayer! " + err.message);
@@ -452,6 +451,10 @@ class ServerHandler extends MusicBeatState
 			this.room.onStateChange += function(state:ChatState)
 			{
 				// trace("STATE CHANGE: " + Std.string(state));
+				if (plrScoreText != null && enemyScoreText != null){
+					plrScoreText.text = 'Score: ${this.room.state.players.get(this.room.state.players.indexes.get(0)).score}';
+					enemyScoreText.text = 'Score: ${this.room.state.players.get(this.room.state.players.indexes.get(1)).score}';
+				}
 			}
 
 			this.room.onError += function(code:Int, message:String)
@@ -469,13 +472,9 @@ class ServerHandler extends MusicBeatState
 				trace("onMessage: 'message' => " + message);
 			});
 
-			this.room.onMessage("syncScores", (message) -> {
+			this.room.onMessage("syncScore", (message) -> {
 				this.scoreAccordingToPlr.set(player, message.plrScore);
 				this.scoreAccordingToPlr.set(enemy, message.enemyScore);
-				if (plrScoreText != null && enemyScoreText != null){
-					plrScoreText.text = "Score: " + this.scoreAccordingToPlr.get(player);
-					enemyScoreText.text = "Score: " + this.scoreAccordingToPlr.get(enemy);
-				}
 			});
 
 			this.room.onMessage("notePress", (message) ->
@@ -486,10 +485,8 @@ class ServerHandler extends MusicBeatState
 					{
 						if (message.goodHit)
 							opponentNoteHit(message.goodHit, message.notedata);
-						enemyScoreText.text = "Score: " + message.newScore;
 					}
-					else if (this.room.sessionId == plr)
-						plrScoreText.text = "Score: " + message.newScore;
+						
 			});
 
 			this.room.onMessage("noteRaised", (message) ->
@@ -679,7 +676,7 @@ class ServerHandler extends MusicBeatState
 					});
 				}
 
-				if (enemyStrums != null){	
+				if (enemyStrums != null){
 					enemyStrums.forEach((spr:FlxSprite) -> {
 						if (spr.animation.curAnim.name == 'confirm')
 							{
@@ -697,7 +694,7 @@ class ServerHandler extends MusicBeatState
 				timeSinceLastUpdate = Lib.getTimer() / 1000;
 			}
 		}catch(e:Exception){
-			trace(e);
+			trace(e.message);
 		}
 	}
 
@@ -1016,11 +1013,11 @@ class ServerHandler extends MusicBeatState
 
 			babyArrow.ID = i;
 
-		    (playerId == this.playerIds[0]) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
+		    (playerId == this.room.sessionId) ? playerStrums.add(babyArrow) : enemyStrums.add(babyArrow);
 
 			babyArrow.animation.play('static');
 			babyArrow.x += 100;
-			babyArrow.x += (OptionsMenu.options.middleScroll ? FlxG.width / 4 : (FlxG.width / 2) * ((playerId == this.playerIds[0]) ? 1 : 0));
+			babyArrow.x += (OptionsMenu.options.middleScroll ? FlxG.width / 4 : (FlxG.width / 2) * ((playerId == this.room.sessionId) ? 1 : 0));
 
 			strumLineNotes.add(babyArrow);
 			deez.add(babyArrow);

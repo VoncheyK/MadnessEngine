@@ -2140,7 +2140,6 @@ class PlayState extends MusicBeatState
 	override function destroy()
 	{
 		customHUDClass.destroy();
-		PlayState.fromMod = null;
 		#if cpp
 		cpp.vm.Gc.run(true);
 		#else

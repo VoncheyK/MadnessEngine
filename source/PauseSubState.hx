@@ -141,6 +141,7 @@ class PauseSubState extends MusicBeatSubstate
 				case "Restart Song":
 					PlayState.health = 1;
 					PlayState.instance.customHUDClass.resetShit();
+					var mod = PlayState.fromMod;
 					FlxG.resetState();
 				case "Toggle Botplay":
 					OptionsMenu.options.botPlay = !OptionsMenu.options.botPlay;
