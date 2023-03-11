@@ -9,6 +9,10 @@ class FunkyHscript {
 	public var interpreter:Interp = null;
 	public var vars:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public var fileName:String = "";
+	//fullreload means that it restarts the script (allows use of update again)
+	public var fullReload:Bool = false;
+
+	public var scriptSprites:Map<String, flixel.FlxSprite> = [];
 
 	public function new(?fileName:String, ?fileData:String):Void {
 		try {
@@ -27,7 +31,27 @@ class FunkyHscript {
 			this.fileName = fileName;
 
 			interpreter.execute(parsed);
+
+			var publics:Map<String, Dynamic> = interpreter.publicVariables;
+			var statics:Map<String, Dynamic> = interpreter.staticVariables;
 			
+			for (name => val in publics){
+				vars.set(name, val);
+
+				if (val is flixel.FlxSprite)
+					scriptSprites.set(name, val);
+			}
+			
+			for (name => val in statics){
+				vars.set(name, val);
+
+				if (val is flixel.FlxSprite)
+					scriptSprites.set(name, val);
+			}
+
+			if (vars.get("fullReload") != null)
+				fullReload = vars.get("fullReload");
+
 			call("main", []);
 		} catch (e:haxe.Exception) {
 			windowAlertLmao(e);
@@ -74,7 +98,7 @@ class FunkyHscript {
 	}
 
 	private function resolveRequire(name:String):Class<Dynamic>{
-		if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+		if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Intermission" || name == "netTest.ServerSendGet" || name == "netTest.schemaShit.IntermissionState" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
 			return null;
 
 		return Type.resolveClass(name);
@@ -82,9 +106,9 @@ class FunkyHscript {
 
 	public function wipeExceptVarsAndExecute(fileName:String, callable:Bool):Void {
 		try {
-			var publics:Dynamic = interpreter.publicVariables;
-			var statics:Dynamic = interpreter.staticVariables;
-
+			var publics:Map<String, Dynamic> = interpreter.publicVariables;
+			var statics:Map<String, Dynamic> = interpreter.staticVariables;
+			
 			parser = null;
 			interpreter.variables = null;
 			interpreter = null;
@@ -108,6 +132,20 @@ class FunkyHscript {
 			callable = true;
 			
 			call("main", []);
+			if (fullReload){
+				call("create", []);
+				for (key in scriptSprites.keys()){
+					vars.remove(key);
+
+					if (interpreter.publicVariables.exists(key))
+						interpreter.publicVariables.remove(key);
+
+					if (interpreter.staticVariables.exists(key))
+						interpreter.staticVariables.remove(key);
+
+					scriptSprites.remove(key);
+				}
+			}
 		} catch (e:haxe.Exception) {
 			windowAlertLmao(e);
 		}

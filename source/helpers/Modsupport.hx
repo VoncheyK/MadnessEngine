@@ -16,12 +16,13 @@ class Modsupport
 
     public static var modz:Array<String> = [];
     public static var modMeta:Array<ModMetadata> = [];
+    public static var modsByName:Map<String, ModMetadata> = [];
 
     public static function init(modRoot:String, mods:Array<String>)
     {
         modz = mods;
         trace(mods);
-        for(mod in mods)
+        for(iteration => mod in mods)
         {
             var modDir:String = Paths.mods(mod);
 
@@ -36,10 +37,12 @@ class Modsupport
                 FileSystem.readDirectory('mods/$mod/data/'),
                 FileSystem.readDirectory('mods/$mod/images/'),
                 FileSystem.readDirectory('mods/$mod/sounds/'),
-                'mods/$mod/'
+                'mods/$mod/',
+                FileSystem.readDirectory('mods/$mod/scripts/')
             ));
 
             addToLibrary(mod, modDir);
+            modsByName.set(mod, modMeta[iteration]);
         }
     }
 
@@ -66,6 +69,8 @@ class Modsupport
             FreeplayState.pushSong(song, modByMeta);
     }      
     
+    inline public static function getMetadataByName(name:String):ModMetadata
+        return Modsupport.modsByName.get(name);
 }
 
 class ModMetadata
@@ -78,9 +83,10 @@ class ModMetadata
     public var songJsons:Array<String>;
     public var sounds:Array<String>;
     public var directory:String;
+    public var scripts:Array<String>;
 
     public function new(name:String, weeks:Array<String>, characters:Array<String>, 
-        songs:Array<String>, songJsons:Array<String>, images:Array<String>, sounds:Array<String>, directory:String)
+        songs:Array<String>, songJsons:Array<String>, images:Array<String>, sounds:Array<String>, directory:String, scripts:Array<String>)
         {this.name = name; this.weeks = weeks; this.characters = characters; this.songs = songs;
-            this.songJsons = songJsons; this.images = images; this.sounds = sounds; this.directory = directory;}
+            this.songJsons = songJsons; this.images = images; this.sounds = sounds; this.directory = directory; this.scripts = scripts;}
 }

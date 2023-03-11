@@ -949,7 +949,17 @@ class PlayState extends MusicBeatState
 				var trueFile = dir[i];
 				if (sys.FileSystem.exists('assets/scripts/$trueFile') && trueFile.contains(".hscript"))
 					hscripts.push(new FunkyHscript(trueFile));
-				//trace(Reflect.field(helpers.Current, "cur"));
+			}
+		}
+
+		if (PlayState.fromMod != null){
+			if (sys.FileSystem.isDirectory('mods/${PlayState.fromMod}/scripts')){
+				var meta = helpers.Modsupport.getMetadataByName(PlayState.fromMod);
+				for (i in 0...meta.scripts.length){
+					var trueFile = meta.scripts[i];
+					if (sys.FileSystem.exists('mods/${PlayState.fromMod}/scripts/$trueFile') && trueFile.contains(".hscript"))
+						hscripts.push(new FunkyHscript(trueFile));
+				}
 			}
 		}
 
@@ -2173,6 +2183,7 @@ class PlayState extends MusicBeatState
 				transIn = FlxTransitionableState.defaultTransIn;
 				transOut = FlxTransitionableState.defaultTransOut;
 
+				PlayState.fromMod = null;
 				FlxG.switchState(new StoryMenuState());
 				callOnHscripts("endSong", [true]);
 				// if ()
@@ -2233,6 +2244,7 @@ class PlayState extends MusicBeatState
 			//should clear the cache in freeplay.
 			//true means that playstate is over.
 			callOnHscripts("endSong", [true]);
+			PlayState.fromMod = null;
 			FlxG.switchState(new FreeplayState());
 		}
 	}
