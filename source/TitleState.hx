@@ -1,5 +1,6 @@
 package;
 
+import helpers.Waveform.TestState;
 import options.OptionsData;
 import sys.io.File;
 import helpers.Vector3;
@@ -60,6 +61,8 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
+		//FlxG.switchState(new TestState("chaos", "fleetway"));
+
 		//fuck polymod!!11
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['testMod']});

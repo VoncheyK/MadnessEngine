@@ -64,7 +64,7 @@ class PlayState extends MusicBeatState
 	public static var instance:PlayState;
 
 	public static var curStage:String = '';
-	public static var SONG:Dynamic;
+	public static var SONG(default, set):Dynamic;
 
 	public static var isStoryMode:Bool = false;
 	public static var storyWeek:Int = 0;
@@ -194,6 +194,18 @@ class PlayState extends MusicBeatState
 	public var playstateCache:openfl.utils.IAssetCache = new openfl.utils.AssetCache();
 
 	public static var fromMod:String = null;
+
+	public static var stats:sys.FileStat;
+
+	private static function set_SONG(song:Dynamic):Dynamic {
+		SONG = song;
+
+		final songLowercase:String = Paths.formatToSongPath(SONG.song).toLowerCase();
+
+		stats = sys.FileSystem.stat(Paths.json('$songLowercase/${Highscore.formatSong(songLowercase, storyDifficulty)}', null));
+
+		return SONG;
+	}
 
 	override public function create()
 	{
@@ -954,9 +966,9 @@ class PlayState extends MusicBeatState
 
 		if (PlayState.fromMod != null){
 			if (sys.FileSystem.isDirectory('mods/${PlayState.fromMod}/scripts')){
-				var meta = helpers.Modsupport.getMetadataByName(PlayState.fromMod);
-				for (i in 0...meta.scripts.length){
-					var trueFile = meta.scripts[i];
+				var meta = sys.FileSystem.readDirectory('mods/${PlayState.fromMod}/scripts');
+				for (i in 0...meta.length){
+					var trueFile = meta[i];
 					if (sys.FileSystem.exists('mods/${PlayState.fromMod}/scripts/$trueFile') && trueFile.contains(".hscript"))
 						hscripts.push(new FunkyHscript(trueFile));
 				}

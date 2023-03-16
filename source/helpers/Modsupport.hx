@@ -37,8 +37,7 @@ class Modsupport
                 FileSystem.readDirectory('mods/$mod/data/'),
                 FileSystem.readDirectory('mods/$mod/images/'),
                 FileSystem.readDirectory('mods/$mod/sounds/'),
-                'mods/$mod/',
-                FileSystem.readDirectory('mods/$mod/scripts/')
+                'mods/$mod/'
             ));
 
             addToLibrary(mod, modDir);
@@ -83,10 +82,9 @@ class ModMetadata
     public var songJsons:Array<String>;
     public var sounds:Array<String>;
     public var directory:String;
-    public var scripts:Array<String>;
 
     public function new(name:String, weeks:Array<String>, characters:Array<String>, 
-        songs:Array<String>, songJsons:Array<String>, images:Array<String>, sounds:Array<String>, directory:String, scripts:Array<String>)
+        songs:Array<String>, songJsons:Array<String>, images:Array<String>, sounds:Array<String>, directory:String)
         {this.name = name; this.weeks = weeks; this.characters = characters; this.songs = songs;
-            this.songJsons = songJsons; this.images = images; this.sounds = sounds; this.directory = directory; this.scripts = scripts;}
+            this.songJsons = songJsons; this.images = images; this.sounds = sounds; this.directory = directory;}
 }

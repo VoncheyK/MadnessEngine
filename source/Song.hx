@@ -1,11 +1,13 @@
 package;
 
+import sys.FileStat;
 import flixel.util.typeLimit.OneOfTwo;
 import Section.SwaggiestSection;
 import Section.SwagSection;
 import haxe.Json;
 import haxe.format.JsonParser;
 import sys.io.File;
+import sys.FileSystem;
 import lime.utils.Assets;
 
 using StringTools;
@@ -70,6 +72,7 @@ class Song
 	public var player2:String = 'dad';
 
 	public var stage:Null<String> = null;
+	public var stats:FileStat = null;
 
 	public function new(song, sections, notes, bpm)
 	{

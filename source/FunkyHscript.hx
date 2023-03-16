@@ -12,6 +12,7 @@ class FunkyHscript {
 	//fullreload means that it restarts the script (allows use of update again)
 	public var fullReload:Bool = false;
 
+	//PLEASE HAVE THEM PUBLIC OR STATIC SO THEY ARE ACCESSIBLE IF YOU HAVE FULLRELOAD ON
 	public var scriptSprites:Map<String, flixel.FlxSprite> = [];
 
 	public function new(?fileName:String, ?fileData:String):Void {
