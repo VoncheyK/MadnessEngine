@@ -42,7 +42,6 @@ class Main extends Sprite
 
 	public static function main():Void
 	{
-		new helpers.Current();
 		#if sys
 		haxe.Log.trace = (arg, ?pos) -> {
 			#if (no_trace)

@@ -141,13 +141,11 @@ class PauseSubState extends MusicBeatSubstate
 				case "Restart Song":
 					PlayState.health = 1;
 					PlayState.instance.customHUDClass.resetShit();
-
-					final songLowercase:String = Paths.formatToSongPath(PlayState.SONG.song).toLowerCase();
 					
-					var stat = sys.FileSystem.stat(Paths.json('$songLowercase/${Highscore.formatSong(songLowercase, PlayState.storyDifficulty)}', null));
+					var stat = sys.FileSystem.stat(Paths.json(PlayState.SONG.song.toLowerCase()));
 
 					if (stat.mtime.toString() != PlayState.stats.mtime.toString())
-						PlayState.SONG = Song.loadFromJson(Paths.json('$songLowercase/${Highscore.formatSong(songLowercase, PlayState.storyDifficulty)}', null));
+						PlayState.SONG = Song.loadFromJson(Highscore.formatSong(Paths.formatToSongPath(PlayState.SONG.song).toLowerCase(), PlayState.storyDifficulty), PlayState.SONG.song.toLowerCase());
 
 					stat = null;
 

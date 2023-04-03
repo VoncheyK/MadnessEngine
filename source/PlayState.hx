@@ -200,9 +200,7 @@ class PlayState extends MusicBeatState
 	private static function set_SONG(song:Dynamic):Dynamic {
 		SONG = song;
 
-		final songLowercase:String = Paths.formatToSongPath(SONG.song).toLowerCase();
-
-		stats = sys.FileSystem.stat(Paths.json('$songLowercase/${Highscore.formatSong(songLowercase, storyDifficulty)}', null));
+		stats = sys.FileSystem.stat(Paths.json(song.song.toLowerCase()));
 
 		return SONG;
 	}
@@ -2892,15 +2890,17 @@ class PlayState extends MusicBeatState
 		super.beatHit();
 
 		if (generatedMusic)
-		{
 			notes.sort(FlxSort.byY, FlxSort.DESCENDING);
-		}
+		
+
 		var checked = checkSection();
+
 		if (checked != null)
 		{
 			(getPropertyFromSection(checked, "changeBPM.active")) ? Conductor.changeBPM(getPropertyFromSection(checked, "changeBPM.bpm")) : null;
 			FlxG.log.add('CHANGED BPM! ' + getPropertyFromSection(checked, "changeBPM.bpm"));
 		}
+
 		wiggleShit.update(Conductor.crochet);
 
 		if (dad.animation.curAnim != null && !dad.animation.curAnim.name.startsWith("sing"))
@@ -2926,19 +2926,13 @@ class PlayState extends MusicBeatState
 				customHUDClass.iconP2.scale.set(1.24, 1.24);
 			
 			if (curBeat % gfSpeed == 0)
-			{
 				gf.dance();
-			}
 	
 			if (!boyfriend.animation.curAnim.name.startsWith("sing"))
-			{
 				boyfriend.dance();
-			}
 	
 			if (curBeat % 8 == 7 && curSong == 'Bopeebo')
-			{
 				boyfriend.playAnim('hey', true);
-			}
 	
 			if (curBeat % 16 == 15 && SONG.song == 'Tutorial' && dad.curCharacter == 'gf' && curBeat > 16 && curBeat < 48)
 			{

@@ -1,37 +1,83 @@
 package;
 
-import haxe.ds.IntMap;
-import hscript.Interp;
-import hscript.Parser;
+import hscript.AbstractHolder;
+import hscript.InterpEx;
+import hscript.ParserEx;
+
+using StringTools;
+
+enum ScriptTypes{
+	HBasic;
+	HClass;
+}
 
 class FunkyHscript {
-	public var parser:Parser = null;
-	public var interpreter:Interp = null;
+	public var parser:ParserEx = null;
+	public var interpreter:InterpEx = null;
 	public var vars:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public var fileName:String = "";
 	//fullreload means that it restarts the script (allows use of update again)
 	public var fullReload:Bool = false;
+	public var scriptType:ScriptTypes;
+
+	public var class_instance:AbstractHolder;
 
 	//PLEASE HAVE THEM PUBLIC OR STATIC SO THEY ARE ACCESSIBLE IF YOU HAVE FULLRELOAD ON
 	public var scriptSprites:Map<String, flixel.FlxSprite> = [];
 
-	public function new(?fileName:String, ?fileData:String):Void {
+	private function determineScriptType(fileData:String):Void {
+		if (fileData.contains("script_type")){
+			final l = fileData.split("\n");
+			for (splitLine in 0...l.length){
+				if (l[splitLine].contains("=") && l[splitLine].contains("script_type")){
+					final theTimeHasCome:Array<String> = l[splitLine].split("=");
+					if (theTimeHasCome[1].contains("HBasic"))
+						scriptType = ScriptTypes.HBasic;
+					else if (theTimeHasCome[1].contains("HClass"))
+						scriptType = ScriptTypes.HClass;
+					return;
+				}
+			}
+		}
+
+		if (fileData.contains("class"))
+			scriptType = ScriptTypes.HClass;
+		else
+			scriptType = ScriptTypes.HBasic;
+	}
+
+	//NOTE TO SELF: ARGUMENTS ARE TO BE DETERMINED IN A JSON/TXT FILE OR TO BE AUTOMATICALLY READ AND PARSED THROUGH THE METHOD ABOVE
+	//ARGUMENTS VALUES ARE TO BE DETERMINED BY THAT FILE AS THE CODE WONT AUTOMATICALLY CUM VALUES INTO IT AND EXPECT IT TO WORK
+	public function new(?fileName:String, ?fileData:String, ?args:Array<Dynamic>):Void {
 		try {
-			parser = new Parser();
-			interpreter = new Interp();
+			parser = new ParserEx();
+			interpreter = new InterpEx();
 
-			parser.allowJSON = true;
-			parser.allowTypes = true;
-			parser.allowMetadata = true;
-			var parsed = parser.parseString((fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : ((fileData != null) ? fileData : null), fileName);
-			interpreter.allowPublicVariables = true;
-			interpreter.allowStaticVariables = true;
-			
-			interpreter.variables.set("require", resolveRequire);
+			if (fileName != null)
+				determineScriptType(sys.io.File.getContent(Paths.script(fileName)));
+			else
+				determineScriptType(fileData);
 
-			this.fileName = fileName;
+			if (scriptType == ScriptTypes.HBasic){
+				parser.allowJSON = true;
+				parser.allowTypes = true;
+				parser.allowMetadata = true;
+				var parsed = parser.parseString((fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : ((fileData != null) ? fileData : null), fileName);
+				interpreter.allowPublicVariables = true;
+				interpreter.allowStaticVariables = true;
+				
+				interpreter.variables.set("require", resolveRequire);
 
-			interpreter.execute(parsed);
+				this.fileName = fileName;
+
+				interpreter.execute(parsed);
+			} else if (scriptType == ScriptTypes.HClass){
+				final dat = (fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : fileData;
+
+				interpreter.addModule(dat);
+
+				class_instance = interpreter.createScriptClassInstance(this.fileName, args);
+			}
 
 			var publics:Map<String, Dynamic> = interpreter.publicVariables;
 			var statics:Map<String, Dynamic> = interpreter.staticVariables;
@@ -115,8 +161,8 @@ class FunkyHscript {
 			interpreter = null;
 			vars = null;
 
-			parser = new Parser();
-			interpreter = new Interp();
+			parser = new ParserEx();
+			interpreter = new InterpEx();
 
 			parser.allowJSON = true;
 			parser.allowTypes = true;
@@ -155,8 +201,8 @@ class FunkyHscript {
 	public function wipeAndExecute(fileName:String):Void {
 		try {
 			wipeData();
-			parser = new Parser();
-			interpreter = new Interp();
+			parser = new ParserEx();
+			interpreter = new InterpEx();
 
 			interpreter.allowPublicVariables = true;
 			interpreter.allowStaticVariables = true;

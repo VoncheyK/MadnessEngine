@@ -11,10 +11,16 @@ class ParserEx extends Parser {
     private var macroo:hscript.Macro;
 
     //instantiate
-    public function new(p:Position){
+    public function new(){
         super();
-        this.p = p; 
+		final t = macro(haxe.macro.Context.currentPos());
+        p = t.pos;
         this.macroo = new Macro(p);
+    }
+
+	public override function parseModule( content : String, ?origin : String = "hscript" ) {
+        var decls = super.parseModule(content, origin);
+        return decls;
     }
 
     private function convertMetadata(meta:hscript.Expr.Metadata):Metadata {
