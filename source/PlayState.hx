@@ -193,6 +193,8 @@ class PlayState extends MusicBeatState
 
 	public var playstateCache:openfl.utils.IAssetCache = new openfl.utils.AssetCache();
 
+	public var loadedClasses:Array<FunkyHscript> = [];
+
 	public static var fromMod:String = null;
 
 	public static var stats:sys.FileStat;
@@ -951,26 +953,35 @@ class PlayState extends MusicBeatState
 			playerStrums.forEach(spr->spr.visible=true);
 		}
 
-		if (sys.FileSystem.isDirectory("assets/scripts"))
-		{
-			var dir = sys.FileSystem.readDirectory("assets/scripts/");
-			for (i in 0...dir.length){
+		function parseHscripts(directory:String, isClass:Bool){
+			if (sys.FileSystem.isDirectory(directory)){
+				final dir:Array<String> = sys.FileSystem.readDirectory(directory);
 
-				var trueFile = dir[i];
-				if (sys.FileSystem.exists('assets/scripts/$trueFile') && trueFile.contains(".hscript"))
-					hscripts.push(new FunkyHscript(trueFile));
+				for (i in 0...dir.length){
+					final trueFile:String = dir[i];
+
+					if (sys.FileSystem.exists('$directory/$trueFile') && trueFile.contains('.hscript')){
+						final h:FunkyHscript = new FunkyHscript(trueFile.replace(".hscript", ""), '$directory/$trueFile');
+						if (isClass){
+							loadedClasses.push(h);
+							return;
+						}
+
+						hscripts.push(h);
+					}
+						
+				}
 			}
 		}
 
+		parseHscripts("assets/scripts/", false);
+
+		parseHscripts("assets/scripts/classes", true);
+
+
 		if (PlayState.fromMod != null){
-			if (sys.FileSystem.isDirectory('mods/${PlayState.fromMod}/scripts')){
-				var meta = sys.FileSystem.readDirectory('mods/${PlayState.fromMod}/scripts');
-				for (i in 0...meta.length){
-					var trueFile = meta[i];
-					if (sys.FileSystem.exists('mods/${PlayState.fromMod}/scripts/$trueFile') && trueFile.contains(".hscript"))
-						hscripts.push(new FunkyHscript(trueFile));
-				}
-			}
+			parseHscripts('mods/$fromMod/scripts', false);
+			parseHscripts('mods/$fromMod/scripts/classes', true);
 		}
 
 		#if !HOTFIXES_DISABLED
@@ -1017,6 +1028,9 @@ class PlayState extends MusicBeatState
 		}
 	  return deez1;
 	}
+
+	public function retClasses():Array<FunkyHscript>
+		return loadedClasses;
 
 	private static function areSame(arr:Array<Bool>):Bool
 	{

@@ -1,5 +1,6 @@
 package hscript;
 
+import haxe.PosInfos;
 import hscript.Interp;
 import hscript.ClassHolder.ClassDeclEx;
 import hscript.Expr;
@@ -16,6 +17,14 @@ class InterpEx extends Interp {
         variables.set("Type", Type);
         variables.set("Math", Math);
         variables.set("Std", Std);
+
+        variables.set("trace", Reflect.makeVarArgs(function(el) {
+			var inf = posInfos();
+			var v = el.shift();
+			if (el.length > 0)
+				inf.customParams = el;
+			haxe.Log.trace(Std.string(v), inf);
+		}));
     }
 
     override function fcall( o:Dynamic, f:String, args:Array<Dynamic> ):Dynamic {
@@ -31,6 +40,7 @@ class InterpEx extends Interp {
     
     private static function registerScriptClass(c:ClassDeclEx) {
         var name = c.name;
+
         if (c.pkg != null) {
             name = c.pkg.join(".") + "." + name;
         }
@@ -167,6 +177,7 @@ class InterpEx extends Interp {
     public function addModule(moduleContents:String) {
         var parser = new hscript.ParserEx();
         var decls = parser.parseModule(moduleContents);
+
         registerModule(decls);
     }
     
@@ -176,6 +187,14 @@ class InterpEx extends Interp {
         }
         var r:AbstractHolder = cnew(className, args);
         return r;
+    }
+
+    override function posInfos():PosInfos{
+        #if hscriptPos
+		if (curExpr != null)
+			return cast {fileName: curExpr.origin, lineNumber: curExpr.line};
+		#end
+		return cast {fileName: "hscript", lineNumber: 0};
     }
 
     public function registerModule(module:Array<ModuleDecl>) {
@@ -200,6 +219,7 @@ class InterpEx extends Interp {
                             }
                         }
                     }
+
                     var classDecl:ClassDeclEx = {
                         imports: imports,
                         pkg: pkg,

@@ -1,6 +1,5 @@
 package hscript;
 
-import io.colyseus.state_listener.StateContainer.DataChange;
 import hscript.Expr;
 
 typedef ClassDeclEx = {> ClassDecl,
@@ -12,7 +11,7 @@ typedef ClassDeclEx = {> ClassDecl,
 class ClassHolder {
     public var cachedFunctions:Map<String, FunctionDecl> = [];
     public var cachedVariables:Map<String, VarDecl> = [];
-    public var cachedFields:Map<String, FieldDecl> = null;
+    public var cachedFields:Map<String, FieldDecl> = [];
     public var classInfo:ClassDeclEx;
     public var _interp:InterpEx;
     public var superClass:Dynamic = null;
@@ -34,12 +33,29 @@ class ClassHolder {
        
     public static function getClassByName(name:String):ClassHolder
         return hscriptClasses.get(name);
-    
+
+    public static function instantiate(declaration:ClassDeclEx, args:Array<Dynamic>):ClassHolder
+        return new ClassHolder(declaration, args);
+
     public function new(declaration:ClassDeclEx, args:Array<Dynamic>) {
         _interp = new InterpEx();
-        //yanni suggested me enumParameters
-        classInfo = declaration;//cast(Type.enumParameters(decl)[0]);
-        cacheClass();
+        
+        classInfo = declaration;
+
+        for (field in classInfo.fields){
+            cachedFields.set(field.name, field);
+            switch(field.kind){
+                case FieldKind.KFunction(fun):
+                    if(cachedFunctions.get(field.name) == null)
+                        cachedFunctions.set(field.name, fun);
+                case FieldKind.KVar(varman):
+                    if (cachedVariables.get(field.name) == null)
+                        cachedVariables.set(field.name, varman);
+                    //https://tenor.com/view/breaking-bad-walter-white-yo-gif-26891796
+                    if (varman.expr != null) 
+                        this._interp.variables.set(field.name, this._interp.expr(varman.expr));
+            }
+        }
 
         //then find if new exists
         final leThing = findFunction("new");
@@ -157,22 +173,5 @@ class ClassHolder {
 
         trace("WARNING: FINDFIELD RETURN WITH NULL FOR FIELD: " + name);
         return null;
-    }
-
-    private function cacheClass():Void {
-        for (field in classInfo.fields){
-            cachedFields.set(field.name, field);
-            switch(field.kind){
-                case FieldKind.KFunction(fun):
-                    if(cachedFunctions.get(field.name) == null)
-                        cachedFunctions.set(field.name, fun);
-                case FieldKind.KVar(varman):
-                    if (cachedVariables.get(field.name) == null)
-                        cachedVariables.set(field.name, varman);
-                    //https://tenor.com/view/breaking-bad-walter-white-yo-gif-26891796
-                    if (varman.expr != null) 
-                        this._interp.variables.set(field.name, this._interp.expr(varman.expr));
-            }
-        }
     }
 }

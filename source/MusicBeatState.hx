@@ -41,7 +41,7 @@ class MusicBeatState extends FlxUIState
 	}
 
 	private inline function callOnHscripts(functionName:String, args:Null<Array<Dynamic>>)
-		for (script in hscripts) callable ? script.call(functionName, args) : trace("Hscript uncallable!");
+		for (script in hscripts) callable ? script.call(functionName, args) : null;
 
 	override function create()
 	{

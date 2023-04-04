@@ -38,23 +38,20 @@ class FunkyHscript {
 					return;
 				}
 			}
-		}
-
-		if (fileData.contains("class"))
-			scriptType = ScriptTypes.HClass;
-		else
+		}else
 			scriptType = ScriptTypes.HBasic;
 	}
 
 	//NOTE TO SELF: ARGUMENTS ARE TO BE DETERMINED IN A JSON/TXT FILE OR TO BE AUTOMATICALLY READ AND PARSED THROUGH THE METHOD ABOVE
 	//ARGUMENTS VALUES ARE TO BE DETERMINED BY THAT FILE AS THE CODE WONT AUTOMATICALLY CUM VALUES INTO IT AND EXPECT IT TO WORK
-	public function new(?fileName:String, ?fileData:String, ?args:Array<Dynamic>):Void {
+	public function new(fileName:String, ?fileDir:String, ?fileData:String, ?args:Array<Dynamic>) {
 		try {
 			parser = new ParserEx();
 			interpreter = new InterpEx();
+			this.fileName = fileName;
 
-			if (fileName != null)
-				determineScriptType(sys.io.File.getContent(Paths.script(fileName)));
+			if (fileDir != null)
+				determineScriptType(sys.io.File.getContent(fileDir));
 			else
 				determineScriptType(fileData);
 
@@ -62,21 +59,21 @@ class FunkyHscript {
 				parser.allowJSON = true;
 				parser.allowTypes = true;
 				parser.allowMetadata = true;
-				var parsed = parser.parseString((fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : ((fileData != null) ? fileData : null), fileName);
+				var parsed = parser.parseString((fileDir != null) ? sys.io.File.getContent(fileDir) : ((fileData != null) ? fileData : null), fileDir);
 				interpreter.allowPublicVariables = true;
 				interpreter.allowStaticVariables = true;
 				
 				interpreter.variables.set("require", resolveRequire);
 
-				this.fileName = fileName;
-
 				interpreter.execute(parsed);
 			} else if (scriptType == ScriptTypes.HClass){
-				final dat = (fileName != null) ? sys.io.File.getContent(Paths.script(fileName)) : fileData;
+				final dat = (fileDir != null) ? sys.io.File.getContent(fileDir) : fileData;
 
 				interpreter.addModule(dat);
 
 				class_instance = interpreter.createScriptClassInstance(this.fileName, args);
+
+				interpreter.variables.set("super", class_instance.superClass);
 			}
 
 			var publics:Map<String, Dynamic> = interpreter.publicVariables;

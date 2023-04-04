@@ -42,15 +42,15 @@ class Main extends Sprite
 
 	public static function main():Void
 	{
-		#if sys
-		haxe.Log.trace = (arg, ?pos) -> {
+		//#if sys
+		/*haxe.Log.trace = (arg, ?pos) -> {
 			#if (no_trace)
 			return;
 			#else
 			Sys.println('${pos.className} (${pos.lineNumber}) $arg');
 			#end
 		}
-		#end
+		#end*/
 
 		Lib.current.addChild(new Main());
 	}
