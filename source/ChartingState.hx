@@ -1,4 +1,4 @@
-package;
+/*package;
 
 import haxe.Exception;
 import openfl.ui.Keyboard;
@@ -59,7 +59,7 @@ class ChartingState extends MusicBeatState
 	/**
 	 * Array of notes showing when each section STARTS in STEPS
 	 * Usually rounded up??
-	 */
+	 
 	var curSection:Int = 0;
 
 	public static var lastSection:Int = 0;
@@ -87,7 +87,7 @@ class ChartingState extends MusicBeatState
 	var typingShit:FlxInputText;
 	/*
 	 * WILL BE THE CURRENT / LAST PLACED NOTE
-	**/
+	
 	var curSelectedNote:SwagNote;
 
 	var tempBpm:Int = 0;
@@ -486,7 +486,7 @@ class ChartingState extends MusicBeatState
 			loopCheck.checked = curNoteSelected.doesLoop;
 			tooltips.add(loopCheck, {title: 'Section looping', body: "Whether or not it's a simon says style section", style: tooltipType});
 			bullshitUI.add(loopCheck);
-		 */
+		 
 	}
 
 	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>)
@@ -853,7 +853,7 @@ class ChartingState extends MusicBeatState
 					{
 						daLength += lengthBpmBullshit();
 						daNum++;
-				}*/
+				}
 
 				FlxG.sound.music.time = sectionStartTime();
 				vocals.time = FlxG.sound.music.time;
@@ -976,7 +976,7 @@ class ChartingState extends MusicBeatState
 					}
 				}
 			}
-		 */
+		 
 		if (_song.chartVersion == "1.0"){
 
 			for (i in sectionInfo)
@@ -1218,7 +1218,7 @@ class ChartingState extends MusicBeatState
 				}
 			}
 			return daLength;
-	}*/
+	}
 	private var daSpacing:Float = 0.3;
 
 	function loadLevel():Void
@@ -1295,7 +1295,7 @@ class ChartingState extends MusicBeatState
 
 	/**
 	 * Called when the save file dialog is cancelled.
-	 */
+	 
 	function onSaveCancel(_):Void
 	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
@@ -1306,7 +1306,7 @@ class ChartingState extends MusicBeatState
 
 	/**
 	 * Called if there is an error while saving the gameplay recording.
-	 */
+	 
 	function onSaveError(_):Void
 	{
 		_file.removeEventListener(Event.COMPLETE, onSaveComplete);
@@ -1315,4 +1315,4 @@ class ChartingState extends MusicBeatState
 		_file = null;
 		FlxG.log.error("Problem saving Level data");
 	}
-}
+}*/

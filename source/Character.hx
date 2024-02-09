@@ -66,7 +66,8 @@ class Character extends FlxSprite
 	public var cameraPosition:Array<Float> = [0, 0];
 	public var healthIcon:String = 'face';
 
-	public var holdTimer:Float = 0;
+	//4 as default.
+	public var holdTimer:Float = 4;
 
 	public var iconColor:Array<Int> = [255,0,0];
 
@@ -322,45 +323,6 @@ class Character extends FlxSprite
 
 					flipX = true;
 
-				/*case 'bf':
-					var tex = Paths.getSparrowAtlas('BOYFRIEND');
-					frames = tex;
-					animation.addByPrefix('idle', 'BF idle dance', 24, false);
-					animation.addByPrefix('singUP', 'BF NOTE UP0', 24, false);
-					animation.addByPrefix('singLEFT', 'BF NOTE LEFT0', 24, false);
-					animation.addByPrefix('singRIGHT', 'BF NOTE RIGHT0', 24, false);
-					animation.addByPrefix('singDOWN', 'BF NOTE DOWN0', 24, false);
-					animation.addByPrefix('singUPmiss', 'BF NOTE UP MISS', 24, false);
-					animation.addByPrefix('singLEFTmiss', 'BF NOTE LEFT MISS', 24, false);
-					animation.addByPrefix('singRIGHTmiss', 'BF NOTE RIGHT MISS', 24, false);
-					animation.addByPrefix('singDOWNmiss', 'BF NOTE DOWN MISS', 24, false);
-					animation.addByPrefix('hey', 'BF HEY', 24, false);
-
-					animation.addByPrefix('firstDeath', "BF dies", 24, false);
-					animation.addByPrefix('deathLoop', "BF Dead Loop", 24, true);
-					animation.addByPrefix('deathConfirm', "BF Dead confirm", 24, false);
-
-					animation.addByPrefix('scared', 'BF idle shaking', 24);
-
-					addOffset('idle', -5);
-					addOffset("singUP", -29, 27);
-					addOffset("singRIGHT", -38, -7);
-					addOffset("singLEFT", 12, -6);
-					addOffset("singDOWN", -10, -50);
-					addOffset("singUPmiss", -29, 27);
-					addOffset("singRIGHTmiss", -30, 21);
-					addOffset("singLEFTmiss", 12, 24);
-					addOffset("singDOWNmiss", -11, -19);
-					addOffset("hey", 7, 4);
-					addOffset('firstDeath', 37, 11);
-					addOffset('deathLoop', 37, 5);
-					addOffset('deathConfirm', 37, 69);
-					addOffset('scared', -4);
-
-					playAnim('idle');
-
-					flipX = true;*/
-
 				case 'bf-christmas':
 					var tex = Paths.getSparrowAtlas('christmas/bfChristmas');
 					frames = tex;
@@ -448,23 +410,6 @@ class Character extends FlxSprite
 					antialiasing = false;
 
 					flipX = true;
-				/*case 'bf-pixel-dead':
-					frames = Paths.getSparrowAtlas('weeb/bfPixelsDEAD');
-					animation.addByPrefix('singUP', "BF Dies pixel", 24, false);
-					animation.addByPrefix('firstDeath', "BF Dies pixel", 24, false);
-					animation.addByPrefix('deathLoop', "Retry Loop", 24, true);
-					animation.addByPrefix('deathConfirm', "RETRY CONFIRM", 24, false);
-					animation.play('firstDeath');
-
-					addOffset('firstDeath');
-					addOffset('deathLoop', -37);
-					addOffset('deathConfirm', -37);
-					playAnim('firstDeath');
-					// pixel bullshit
-					setGraphicSize(Std.int(width * 6));
-					updateHitbox();
-					antialiasing = false;
-					flipX = true;*/
 
 				case 'senpai':
 					frames = Paths.getSparrowAtlas('weeb/senpai');
@@ -725,98 +670,105 @@ class Character extends FlxSprite
 
 	private function initializeFromJSON(character:String)
 	{
-				//kms
-				var characterPath:String = 'characters/' + character + '.json';
+		var characterPath:String = 'characters/' + character + '.json';
 
-				var path:String = Paths.getPreloadPath(characterPath);
-			
-				(!FileSystem.exists(path)) ? path = Paths.modFolders(characterPath) : null;
+		var path:String = Paths.modFolders(characterPath);
+		if (!FileSystem.exists(path))
+			path = Paths.getPreloadPath(characterPath);
 
-				!Assets.exists(path) ? path = Paths.getPreloadPath('characters/' + DEFAULT_CHARACTER + '.json') : null; //If a character couldn't be found, change him to BF just to prevent a crash
-				var rawJson = File.getContent(path);
-				var json:CharacterFile = cast Json.parse(rawJson);
-				var spriteType = "sparrow";
-				/*you have three options:
-				>sparrow atlas
-				>packer atlas
-				>texture atlas (spritemaps, approved by ziad)
-				*/
-				var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT, null);
-				(!FileSystem.exists(txtToFind)) ? Paths.modtxt('${json.image}.txt') : null;
-				if (FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
-					spriteType = "packer";
+		if (!FileSystem.exists(path))
+			Paths.getPreloadPath('characters/$DEFAULT_CHARACTER.json');
 
-				//if the thingy exists.
-				/*
-					var modAnimToFind:String = Paths.modFolders('images/' + json.image + '/Animation.json');
-					var animToFind:String = Paths.getPath('images/' + json.image + '/Animation.json', TEXT);
-				*/
-				var modAnimToFind:String = Paths.modFolders('images/${json.image}/Animation.json');
-				var animToFind:String = Paths.getAtlas(json.image + '/Animation.json');
-				
-				if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
-					spriteType = "texture";
+		var rawJson = File.getContent(path);
+		var json:CharacterFile = cast Json.parse(rawJson);
+		var spriteType = "sparrow";
+		/*you have three options:
+			>sparrow atlas
+			>packer atlas
+			>texture atlas (spritemaps, approved by ziad)
+		 */
+		var txtToFind:String = Paths.getPath('images/' + json.image + '.txt', TEXT, null);
+		(!FileSystem.exists(txtToFind)) ? Paths.modtxt('${json.image}.txt') : null;
+		if (FileSystem.exists(txtToFind) || Assets.exists(txtToFind))
+			spriteType = "packer";
 
-				switch (spriteType){
-					
-					case "packer":
-						frames = Paths.getPackerAtlas(json.image);
-					
-					case "sparrow":
-						frames = Paths.getSparrowAtlas(json.image);
-					
-					case "texture":
-						frames = AtlasFrameMaker.construct(json.image);
+		// if the thingy exists.
+		var modAnimToFind:String = Paths.modFolders('images/${json.image}/Animation.json');
+		var animToFind:String = Paths.getAtlas(json.image + '/Animation.json');
+
+		if (FileSystem.exists(modAnimToFind) || FileSystem.exists(animToFind) || Assets.exists(animToFind))
+			spriteType = "texture";
+
+		switch (spriteType)
+		{
+			case "packer":
+				frames = Paths.getPackerAtlas(json.image);
+
+			case "sparrow":
+				frames = Paths.getSparrowAtlas(json.image);
+
+			case "texture":
+				frames = AtlasFrameMaker.construct(json.image);
+		}
+		imageFile = json.image;
+
+		if (json.scale != 1)
+		{
+			jsonScale = json.scale;
+			setGraphicSize(Std.int(width * jsonScale));
+			updateHitbox();
+		}
+
+		positionArray = json.position;
+		cameraPosition = json.camera_position;
+
+		flipX = !!json.flip_x;
+
+		if (json.no_antialiasing)
+		{
+			antialiasing = false;
+			noAntialiasing = true;
+		}
+
+		// healthIcon = json.healthicon;
+		healthIcon = json.healthicon;
+
+		if (json.healthbar_colors != null && json.healthbar_colors.length > 2)
+			iconColor = json.healthbar_colors;
+
+		antialiasing = FlxG.save.data.antialiasing;
+
+		animationsArray = json.animations;
+
+		if (animationsArray != null && animationsArray.length > 0)
+		{
+			for (anim in animationsArray)
+			{
+				var animAnim:String = '' + anim.anim;
+				var animName:String = '' + anim.name;
+				var animFps:Int = anim.fps;
+				var animLoop:Bool = !!anim.loop; // Bruh
+				var animIndices:Array<Int> = anim.indices;
+				if (animIndices != null && animIndices.length > 0)
+				{
+					animation.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
 				}
-				imageFile = json.image;
-
-				if(json.scale != 1) {
-					jsonScale = json.scale;
-					setGraphicSize(Std.int(width * jsonScale));
-					updateHitbox();
+				else
+				{
+					animation.addByPrefix(animAnim, animName, animFps, animLoop);
 				}
 
-				positionArray = json.position;
-				cameraPosition = json.camera_position;
-				
-				flipX = !!json.flip_x;
-
-				if(json.no_antialiasing) {
-					antialiasing = false;
-					noAntialiasing = true;
+				if (anim.offsets != null && anim.offsets.length > 1)
+				{
+					addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
 				}
-
-				//healthIcon = json.healthicon;
-				healthIcon = json.healthicon;
-
-				if(json.healthbar_colors != null && json.healthbar_colors.length > 2)
-					iconColor = json.healthbar_colors;
-
-				antialiasing = FlxG.save.data.antialiasing;
-
-				animationsArray = json.animations;
-
-				if(animationsArray != null && animationsArray.length > 0) {
-					for (anim in animationsArray) {
-						var animAnim:String = '' + anim.anim;
-						var animName:String = '' + anim.name;
-						var animFps:Int = anim.fps;
-						var animLoop:Bool = !!anim.loop; //Bruh
-						var animIndices:Array<Int> = anim.indices;
-						if(animIndices != null && animIndices.length > 0) {
-							animation.addByIndices(animAnim, animName, animIndices, "", animFps, animLoop);
-						} else {
-							animation.addByPrefix(animAnim, animName, animFps, animLoop);
-						}
-
-						if(anim.offsets != null && anim.offsets.length > 1) {
-							addOffset(anim.anim, anim.offsets[0], anim.offsets[1]);
-						}
-					}
-				} else {
-					animation.addByPrefix('idle', 'BF idle dance', 24, false);
-				}
-				trace('Loaded file to character ' + curCharacter);
+			}
+		}
+		else
+		{
+			animation.addByPrefix('idle', 'BF idle dance', 24, false);
+		}
+		trace('Loaded file to character ' + curCharacter);
 	}
 
 	public function loadOffsetFile(character:String)
@@ -874,6 +826,30 @@ class Character extends FlxSprite
 		}
 
 		super.update(elapsed);
+	}
+	
+	public function flipRightLeftAnims():Void {
+		final animations:Array<Array<String>> = [['singLEFT', 'singRIGHT'], ['singLEFTmiss', 'singRIGHTmiss']];
+		
+		for (pair in animations) {
+			if (animation.getByName(pair[0]) != null 
+			 && animation.getByName(pair[1]) != null) {
+				var firstAnim = animation.getByName(pair[0]).frames;
+				var secondAnim = animation.getByName(pair[1]).frames;
+				animation.getByName(pair[0]).frames = secondAnim;
+				animation.getByName(pair[1]).frames = firstAnim;	
+
+				if (animOffsets.exists(pair[0]) 
+				 && animOffsets.exists(pair[1])) {
+					var firstAnimOffset = animOffsets[pair[0]];
+					var secondAnimOffset = animOffsets[pair[1]];
+					animOffsets[pair[0]] = firstAnimOffset;
+					animOffsets[pair[1]] = secondAnimOffset;
+				}
+			}
+		}
+
+		flipX = !flipX;
 	}
 
 	private var danced:Bool = false;

@@ -13,6 +13,7 @@ import openfl.utils.Assets;
 import lime.utils.Assets as LimeAssets;
 import lime.utils.AssetLibrary;
 import lime.utils.AssetManifest;
+import haxe.ds.Either;
 
 import haxe.io.Path;
 
@@ -61,6 +62,7 @@ class LoadingState extends MusicBeatState
 				callbacks = new MultiCallback(onLoad);
 				var introComplete = callbacks.add("introComplete");
 				checkLoadSong(getSongPath());
+
 				if (PlayState.SONG.needsVoices)
 					checkLoadSong(getVocalPath());
 				checkLibrary("shared");
@@ -136,14 +138,10 @@ class LoadingState extends MusicBeatState
 	}
 	
 	static function getSongPath()
-	{
 		return Paths.instPath(PlayState.SONG.song, PlayState.fromMod);
-	}
 	
 	static function getVocalPath()
-	{
 		return Paths.voicePath(PlayState.SONG.song, PlayState.fromMod);
-	}
 	
 	inline static public function loadAndSwitchState(target:FlxUIState, stopMusic = false)
 	{
@@ -155,7 +153,7 @@ class LoadingState extends MusicBeatState
 		Paths.setCurrentLevel("week" + PlayState.storyWeek);
 		#if NO_PRELOAD_ALL
 		var loaded = isSoundLoaded(getSongPath())
-			&& (!PlayState.SONG.needsVoices || isSoundLoaded(getVocalPath()))
+			&& (!PlayState.SONG.song || isSoundLoaded(getVocalPath()))
 			&& isLibraryLoaded("shared");
 		
 		if (!loaded)

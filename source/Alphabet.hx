@@ -9,7 +9,7 @@ import flixel.system.FlxSound;
 import flixel.util.FlxTimer;
 import options.OptionsMenu;
 
-//uhhhh AT made this class so yeah credits to at from denpa engine
+//uhhhh AT made this class so yeah credits to AT from denpa engine
 using StringTools;
 /**
  * Class used for `Alphabet` text in menus.
@@ -438,7 +438,7 @@ class AlphaCharacter extends FlxSprite
 		{
 			//elaborate offsets
 
-			//at i swear this feels like gaster shit or something
+			//AT, i swear this feels like gaster shit or something
 			case "~": y -= 18.5 * textSize;
 			case "*": y -= 34.2 * textSize;
 			case "^": y -= 35.7 * textSize;

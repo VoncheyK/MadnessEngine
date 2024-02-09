@@ -2,7 +2,7 @@ package;
 
 import options.OptionsMenu;
 import flixel.input.keyboard.FlxKey;
-import flixel.util.typeLimit.OneOfTwo;
+import helpers.OneOfTwo;
 import Song;
 import Section.SwagSection;
 import Song.SwagSong;
@@ -24,6 +24,7 @@ import openfl.ui.Keyboard;
 import lime.utils.Assets;
 import helpers.Modsupport;
 import Sys.sleep;
+import haxe.ds.Either;
 
 using StringTools;
 
@@ -47,7 +48,7 @@ class FreeplayState extends MusicBeatState
 	private var scoreBG:FlxSprite;
 	private var bg:FlxSprite;
 
-	public static var songData:Map<String, Array<OneOfTwo<SwagSong, SwaggiestSong>>> = [];
+	public static var songData:Map<String, Array<UnifiedSongDef>> = [];
 
 	public var possibleDiffs:Map<String, Array<String>> = [];
 
@@ -85,8 +86,8 @@ class FreeplayState extends MusicBeatState
 			var data = initSonglist[i].split(":");
 			var meta = new SongMetadata(data[0], Std.parseInt(data[1]), data[2]);
 
-			var diffs = [];
-			var diffsThatExist = ["Easy","Normal","Hard"];
+			var diffs:Array<UnifiedSongDef> = [];
+			var diffsThatExist:Array<String> = ["Easy","Normal","Hard"];
 
 			if (diffsThatExist.contains("Easy"))
 				FreeplayState.loadDiff(0, meta.songName, diffs);
@@ -108,8 +109,8 @@ class FreeplayState extends MusicBeatState
 	
 				var meta = new SongMetadata(k, null, null, v);
 
-				var diffs = [];
-				var diffsThatExist = [];
+				var diffs:Array<UnifiedSongDef> = [];
+				var diffsThatExist:Array<String> = [];
 
 				for (folder in meta.mod.songJsons)
 					{
@@ -121,8 +122,8 @@ class FreeplayState extends MusicBeatState
 								{
 									file.contains('-hard') ? diffsThatExist.push('Hard') : null;
 									file.contains('-easy') ? diffsThatExist.push('Easy') : null;
-									final deez = '$folder.json';
-									file == deez ? diffsThatExist.push('Normal') : null;
+									final jsonFile = '$folder.json';
+									file == jsonFile ? diffsThatExist.push('Normal') : null;
 								}
 							}
 						}
@@ -285,8 +286,7 @@ class FreeplayState extends MusicBeatState
 	
 					var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 					PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
-					
-	
+
 					if (PlayState.SONG.needsVoices)
 						vocals = new FlxSound().loadEmbedded(Paths.voices(PlayState.SONG.song, songs[curSelected].mod.name));
 					else
@@ -528,13 +528,11 @@ class FreeplayState extends MusicBeatState
 			if (OptionsMenu.options.cameraZoom)
 				bg.scale.x = bg.scale.y = zoomShit;
 	
-			if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
-				(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
-			else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
-				(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+			if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM)
+				Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].newBPM);
 		}
 
-	public static function loadDiff(diff:Int, songName:String, array:Array<OneOfTwo<SwagSong, SwaggiestSong>>, ?mod:String)
+	public static function loadDiff(diff:Int, songName:String, array:Array<UnifiedSongDef>, ?mod:String)
 	{
 		try {
 			array.push(Song.loadFromJson(Highscore.formatSong(songName, diff), songName));

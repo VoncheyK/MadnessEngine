@@ -6,9 +6,7 @@ import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
-#if polymod
-import polymod.format.ParseRules.TargetSignatureElement;
-#end
+import haxe.ds.Either;
 
 using StringTools;
 
@@ -180,8 +178,7 @@ class Note extends FlxSprite
 				else if (FlxG.state is netTest.ServerHandler)
 					song = netTest.ServerHandler.SONG;
 
-				if (song != null)
-					prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * song.speed;
+				prevNote.scale.y *= Conductor.stepCrochet / 100 * 1.5 * song.speed;
 
 				prevNote.updateHitbox();
 				// prevNote.setGraphicSize();

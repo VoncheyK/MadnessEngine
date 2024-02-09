@@ -19,7 +19,7 @@ class Event
 
     public function invoke():Void {
         try{
-            Reflect.callMethod(this, convertNameToFunction(event), []);
+            convertNameToFunction(event)();
             isDead = true;
         }catch(e:Exception){
             Main.raiseWindowAlert('An error has occured while invoking an event!\n Exception data: ${e.details()}\n Event: $event\n Step: $step\n');
@@ -35,7 +35,7 @@ class Event
         try{
             switch(rawEventName){
                 case 'Change Character':
-                    return Reflect.field(this, "changeCharacter");
+                    return changeCharacter;//Reflect.field(this, "changeCharacter");
                 default:
                     throw new Exception("This event name does not exist in function form!");
                     return null;
@@ -47,8 +47,7 @@ class Event
         return null;
     }
 
-    //make it callable from reflect
-    @:keep private function changeCharacter():Void
+    private function changeCharacter():Void
     {
         
     }

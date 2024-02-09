@@ -34,6 +34,7 @@ import openfl.Assets;
 import GameJolt.GameJoltAPI;
 import GameJolt;
 import options.OptionsMenu;
+import haxe.ds.Either;
 
 using StringTools;
 
@@ -104,7 +105,7 @@ class TitleState extends MusicBeatState
 		#if FREEPLAY
 		FlxG.switchState(new FreeplayState());
 		#elseif CHARTING
-		FlxG.switchState(new ChartingState());
+		//FlxG.switchState(new ChartingState());
 		#else
 		new FlxTimer().start(1, function(tmr:FlxTimer)
 		{
@@ -380,10 +381,8 @@ class TitleState extends MusicBeatState
 	{
 		super.beatHit();
 
-		if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
-			(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
-		else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
-			(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+		if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].newBPM);
 
 		logoBl.animation.play('bump');
 		//danceLeft = !danceLeft;

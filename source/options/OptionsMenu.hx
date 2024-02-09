@@ -10,6 +10,7 @@ import flixel.util.FlxColor;
 import flixel.FlxG;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.FlxSprite;
+import haxe.ds.Either;
 
 typedef Options =
 {
@@ -257,18 +258,20 @@ class OptionsMenu extends MusicBeatState
 	}
 
 	override function beatHit()
-	{		
+	{
 		if (OptionsMenu.options.cameraZoom)
-			{
-				FlxTween.tween(FlxG.camera, {zoom: 1.1}, (Conductor.stepCrochet * 4) / 1000, {ease: FlxEase.cubeOut, onComplete: function(f:FlxTween){
-					FlxTween.tween(FlxG.camera, {zoom: 1.0}, (Conductor.stepCrochet *4) / 1000, {ease: FlxEase.cubeOut});
-				}});
-			}
-	
-			if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
-				(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
-			else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
-				(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+		{
+			FlxTween.tween(FlxG.camera, {zoom: 1.1}, (Conductor.stepCrochet * 4) / 1000, {
+				ease: FlxEase.cubeOut,
+				onComplete: function(f:FlxTween)
+				{
+					FlxTween.tween(FlxG.camera, {zoom: 1.0}, (Conductor.stepCrochet * 4) / 1000, {ease: FlxEase.cubeOut});
+				}
+			});
+		}
+
+		if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].newBPM);
 	}
 
 	public static function loadSettings()

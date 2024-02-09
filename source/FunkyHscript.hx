@@ -3,6 +3,7 @@ package;
 import hscript.AbstractHolder;
 import hscript.InterpEx;
 import hscript.ParserEx;
+import hscript.Expr;
 
 using StringTools;
 
@@ -24,6 +25,8 @@ class FunkyHscript {
 
 	//PLEASE HAVE THEM PUBLIC OR STATIC SO THEY ARE ACCESSIBLE IF YOU HAVE FULLRELOAD ON
 	public var scriptSprites:Map<String, flixel.FlxSprite> = [];
+	
+	private var blocked:Array<String> = ['SpecialKeys', 'GJKeys', 'GameJolt', 'netTest.ServerHandler', 'netTest.Intermission', "netTest.ServerSendGet", "netTest.schemaShit.IntermissionState", "netTest.Director", "netTest.schemaShit.BattleState", "netTest.schemaShit.ChatState", "netTest.schemaShit.Player", "netTest.schemaShit.Player.IntermissionClient", "netTest.*", "netTest.schemaShit.*"];
 
 	private function determineScriptType(fileData:String):Void {
 		if (fileData.contains("script_type")){
@@ -44,11 +47,18 @@ class FunkyHscript {
 
 	//NOTE TO SELF: ARGUMENTS ARE TO BE DETERMINED IN A JSON/TXT FILE OR TO BE AUTOMATICALLY READ AND PARSED THROUGH THE METHOD ABOVE
 	//ARGUMENTS VALUES ARE TO BE DETERMINED BY THAT FILE AS THE CODE WONT AUTOMATICALLY CUM VALUES INTO IT AND EXPECT IT TO WORK
-	public function new(fileName:String, ?fileDir:String, ?fileData:String, ?args:Array<Dynamic>) {
+	public function new(fileName:String, errorCallback:haxe.Exception->Int->Void, successCallback:FunkyHscript->Void, ?fileDir:String, ?fileData:String, ?args:Array<Dynamic>) {
 		try {
 			parser = new ParserEx();
 			interpreter = new InterpEx();
 			this.fileName = fileName;
+			
+			parser.allowJSON = true;
+			parser.allowTypes = true;
+			parser.allowMetadata = true;
+			
+			interpreter.allowPublicVariables = true;
+			interpreter.allowStaticVariables = true;
 
 			if (fileDir != null)
 				determineScriptType(sys.io.File.getContent(fileDir));
@@ -56,24 +66,42 @@ class FunkyHscript {
 				determineScriptType(fileData);
 
 			if (scriptType == ScriptTypes.HBasic){
-				parser.allowJSON = true;
-				parser.allowTypes = true;
-				parser.allowMetadata = true;
 				var parsed = parser.parseString((fileDir != null) ? sys.io.File.getContent(fileDir) : ((fileData != null) ? fileData : null), fileDir);
-				interpreter.allowPublicVariables = true;
-				interpreter.allowStaticVariables = true;
+
+				interpreter.importEnabled = false;
 				
 				interpreter.variables.set("require", resolveRequire);
 
 				interpreter.execute(parsed);
 			} else if (scriptType == ScriptTypes.HClass){
-				final dat = (fileDir != null) ? sys.io.File.getContent(fileDir) : fileData;
+				var dat = (fileDir != null) ? sys.io.File.getContent(fileDir) : fileData;
+
+				function hasOneOrMoreClasses(realString:String):Bool
+				{
+					var thisdudehasmultipleclasses:Bool = false;
+					if (realString.contains("class")){
+						if (realString.split("class").length > 1)
+							thisdudehasmultipleclasses = true;
+					}
+					return thisdudehasmultipleclasses;
+				}
+
+				//detailed search
+				if (hasOneOrMoreClasses(dat)){
+					//split file into two strings
+				}
 
 				interpreter.addModule(dat);
 
 				class_instance = interpreter.createScriptClassInstance(this.fileName, args);
 
-				interpreter.variables.set("super", class_instance.superClass);
+				//class_instance.cachedFunctions.set("require", f);
+
+				//cry abt it
+				if (class_instance.superClass != null){
+					@:privateAccess
+					interpreter.setVar("super", class_instance.superClass);
+				}
 			}
 
 			var publics:Map<String, Dynamic> = interpreter.publicVariables;
@@ -97,8 +125,11 @@ class FunkyHscript {
 				fullReload = vars.get("fullReload");
 
 			call("main", []);
+
+			successCallback(this);
 		} catch (e:haxe.Exception) {
-			windowAlertLmao(e);
+			errorCallback(e, interpreter.posInfos().lineNumber);
+			wipeData();
 		}
 	}
 
@@ -142,7 +173,7 @@ class FunkyHscript {
 	}
 
 	private function resolveRequire(name:String):Class<Dynamic>{
-		if (name == "SpecialKeys" || name == "GJKeys" || name == "GameJolt" || name == "netTest.ServerHandler" || name == "netTest.Intermission" || name == "netTest.ServerSendGet" || name == "netTest.schemaShit.IntermissionState" || name == "netTest.Director" || name == "netTest.schemaShit.BattleState" || name == "netTest.schemaShit.ChatState" || name == "netTest.schemaShit.Player")
+		if (blocked.contains(name))
 			return null;
 
 		return Type.resolveClass(name);

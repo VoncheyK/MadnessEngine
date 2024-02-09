@@ -31,24 +31,20 @@ class MusicBeatState extends FlxUIState
 
 	//no update tomfoolery for events
 	private function set_curStep(newStep:Int):Int {
-		callOnHscripts("updateCurStep", [newStep]);
 		return curStep = newStep;
 	}
 	
 	private function set_curBeat(newBeat:Int):Int {
-		callOnHscripts("updateCurBeat", [newBeat]);
 		return curBeat = newBeat;
 	}
 
-	private inline function callOnHscripts(functionName:String, args:Null<Array<Dynamic>>)
-		for (script in hscripts) callable ? script.call(functionName, args) : null;
+	private inline function callOnHscripts(functionName:String, ?args:Null<Array<Dynamic>>)
+		for (script in hscripts) callable ? script.call(functionName, (args == null ? [] : args)) : null;
 
 	override function create()
 	{
 		//Leaving this code here for when I need it.
 		//var stateMusicBeat:MusicBeatState = cast(FlxG.state, MusicBeatState);
-
-		callOnHscripts("create", []);
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -142,10 +138,10 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		callOnHscripts("stepHit", [curStep]);
+		callOnHscripts("onStep", [curStep]);
 		try if (curStep % 4 == 0) beatHit();
 	}
 
 	public function beatHit():Void
-		callOnHscripts("beatHit", [curBeat]);
+		callOnHscripts("onBeat", [curBeat]);
 }

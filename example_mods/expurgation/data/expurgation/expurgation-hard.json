@@ -1,15 +1,5 @@
 {
 	"song": {
-		"events":[
-		{
-			"eventData":{
-				"step":10,
-				"event":"Change Character",
-				"param1": null,
-				"param2": null
-			}
-		}
-		],
 		"player1": "bf",
 		"sectionLengths": [],
 		"player2": "exTricky",

@@ -21,6 +21,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
+import haxe.ds.Either;
 
 using StringTools;
 
@@ -438,9 +439,7 @@ class StoryMenuState extends MusicBeatState
 		grpWeekCharacters.members[1].dance();
 		grpWeekCharacters.members[2].dance();
 
-		if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.5")
-			(PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.active) ? Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM.bpm) : null;
-		else if (PlayState.SONG != null && PlayState.SONG.chartVersion == "1.0")
-			(PlayState.SONG.notes[Math.floor(curStep / 16)] != null && PlayState.SONG.notes[Math.floor(curStep / 16)].changeBPM) ? Conductor.changeBPM(PlayState.SONG.notes[Math.floor(curStep / 16)].bpm) : null;
+		if (PlayState.SONG != null && PlayState.SONG.sections[Math.floor(curStep / 16)] != null && PlayState.SONG.sections[Math.floor(curStep / 16)].changeBPM)
+			Conductor.changeBPM(PlayState.SONG.sections[Math.floor(curStep / 16)].newBPM);
 	}
 }

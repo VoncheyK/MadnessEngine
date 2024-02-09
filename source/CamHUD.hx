@@ -7,6 +7,7 @@ import options.OptionsMenu;
 import flixel.ui.FlxBar;
 import flixel.text.FlxText;
 import flixel.FlxSprite;
+import haxe.ds.Either;
 
 class CamHUD extends flixel.group.FlxSpriteGroup
 {

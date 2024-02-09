@@ -1,0 +1,61 @@
+var FlxSprite = require("flixel.FlxSprite");
+var Paths = require("Paths");
+var Std = require("Std");
+var PlayState = require("PlayState");
+
+var girlTits:FlxSprite;
+
+var bg:FlxSprite;
+
+function main() {
+	PlayState.instance.defaultCamZoom = 0.7;
+	bg = new FlxSprite(-1400, -725);
+	bg.loadGraphic(Paths.image('glitch_City'));
+	bg.setGraphicSize(Std.int(bg.width * 0.625));
+	bg.antialiasing = true;
+	bg.scrollFactor.set(0.8, 0.8);
+	bg.active = false;
+	PlayState.instance.add(bg);
+
+	var tiles:FlxSprite = new FlxSprite(-1400, -725);
+	tiles.loadGraphic(Paths.image('tiles'));
+	tiles.setGraphicSize(Std.int(tiles.width * 0.625));
+	tiles.antialiasing = true;
+	tiles.scrollFactor.set(0.9, 0.9);
+	tiles.active = false;
+	PlayState.instance.add(tiles);
+
+	var haze:FlxSprite = new FlxSprite(-1400, -725);
+	haze.loadGraphic(Paths.image('haze'));
+	haze.setGraphicSize(Std.int(haze.width * 0.625));
+	haze.antialiasing = true;
+	haze.scrollFactor.set(0.9, 0.9);
+	haze.active = false;
+	PlayState.instance.add(haze);
+
+	girlTits = new FlxSprite(600, 576);
+	girlTits.frames = Paths.getSparrowAtlas('FUCKKKKK');
+	girlTits.animation.addByPrefix('idle', 'Lmao', 24, false);
+	girlTits.updateHitbox();
+	girlTits.antialiasing = true;
+	PlayState.instance.add(girlTits);
+}
+
+function onBeat(beat:Int) {
+	girlTits.animation.play('idle');
+}
+
+function onCreatePost() {
+	PlayState.instance.flipCharacters();
+
+	PlayState.boyfriend.cameraPosition[0] = -470;
+	PlayState.boyfriend.cameraPosition[1] = -230;
+	PlayState.boyfriend.x -= 270;
+	PlayState.boyfriend.y += 250;
+
+	PlayState.dad.cameraPosition[0] = -100;
+	PlayState.dad.cameraPosition[1] = 25;
+	PlayState.dad.scale.set(0.8, 0.8);
+	for (i in PlayState.dad.animOffsets.keys())
+		PlayState.dad.animOffsets[i] = [PlayState.dad.animOffsets[i][0] * PlayState.dad.scale.x, PlayState.dad.animOffsets[i][1] * PlayState.dad.scale.y];
+}

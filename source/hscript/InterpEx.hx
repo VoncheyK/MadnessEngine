@@ -63,7 +63,7 @@ class InterpEx extends Interp {
                 }
             }
         
-
+            //hscript improved already has this
             if (_proxy.classInfo.imports != null && _proxy.classInfo.imports.exists(cl)) {
                 var importedClass = _proxy.classInfo.imports.get(cl).join(".");
                 if (_scriptClassDescriptors.exists(importedClass)) {

@@ -47,10 +47,9 @@ class Paths
 	//psych engine code
 	static public function modFolders(key:String) {
 		for(mod in Modsupport.modz){
-			var fileToCheck:String = mods('$mod/$key');
+			final fileToCheck:String = mods('$mod/$key');
 			if(FileSystem.exists(fileToCheck))
 				return fileToCheck;
-
 		}
 		return 'mods/$key';
 	}
@@ -66,36 +65,39 @@ class Paths
 	}
 
 	inline public static function getPreloadPath(file:String)
-	{
 		return 'assets/$file';
-	}
 
 	inline static public function mods(modLib:String)
-	{
 		return 'mods/$modLib';
-	}
 	
 	inline static public function modtxt(key:String)
-	{
 		return modFolders('data/$key.txt');
-	}
 
-	inline static public function modImage(key:String) {
+	inline static public function modImage(key:String)
 		return modFolders('images/$key.png');
-	}
 
-	inline public static function modSound(key:String) {
+	inline public static function modSound(key:String) 
 		return modFolders('sounds/$key.$SOUND_EXT');
+
+	inline public static function modStageLoader(mod:String, stage:String):String{
+		var stagePath = 'mods/$mod/stages/';
+		if (FileSystem.exists(stagePath))
+		{
+			stagePath = 'mods/$mod/stages/${stage}Init.hscript';
+			if (FileSystem.exists(stagePath))
+				return stagePath;
+			else if (FileSystem.exists('mods/$mod/stages/${stage}Details.json'))
+				return 'mods/$mod/stages/${stage}Details.json';
+			else return null;
+		}
+		else return null;
 	}
 
-	inline static public function getFromMods(modLib:String, dir:String, file:String){
+	inline static public function getFromMods(modLib:String, dir:String, file:String)
 		return Paths.mods(modLib)+'/$dir/'+file; //dumbass me (ziad/zoardedz) made a typo here and it was making it look like modname,/DIR/filename nad the dir wouldnt change it would just be dir bec i forgor $ sign
-	}
 
 	inline static public function file(file:String, type:AssetType = TEXT, ?library:String)
-	{
 		return getPath(file, type, library);
-	}
 	
 	inline public static function getWeek(key:String, ?library:String){
 		return getPath('$key.json', TEXT, library);
@@ -192,31 +194,21 @@ class Paths
 	{
 		var imageLoaded:FlxGraphic = FlxGraphic.fromBitmapData(openfl.display.BitmapData.fromFile(modImage(key)));
 		var xmlExists:Bool = false;
-		if(FileSystem.exists(modsXml(key))) {
+		if(FileSystem.exists(modsXml(key)))
 			xmlExists = true;
-		}
+		
 		if (xmlExists)
 			return FlxAtlasFrames.fromSparrow((imageLoaded != null ? imageLoaded : image(key, library)), (xmlExists ? File.getContent(modsXml(key)) : file('images/$key.xml', library)));
 		
 		return FlxAtlasFrames.fromSparrow(image(key, library), file('images/$key.xml', library));
 	}
 
-	inline static public function modSparrowAtlas(key:String, modName:String)
-	{
-		return FlxAtlasFrames.fromSparrow('mods:assets/mods/$modName/images/$key.png', 'mods:assets/mods/$modName/images/$key.xml');
-	}
-
 	inline static public function getSparrowAtlasW7(key:String, ?library:String)
-	{
-			return FlxAtlasFrames.fromSparrow(image(key, library), getPath('images/$key.xml', TEXT, library));
-	}
+		return FlxAtlasFrames.fromSparrow(image(key, library), getPath('images/$key.xml', TEXT, library));
 
 	inline static public function getPackerAtlas(key:String, ?library:String)
-	{
 		return FlxAtlasFrames.fromSpriteSheetPacker(image(key, library), file('images/$key.txt', library));
-	}
 	
-	inline static public function getZip(key:String, library:String){
+	inline static public function getZip(key:String, library:String)
 		return 'assets/$library/$key.zip';
-	}
 }

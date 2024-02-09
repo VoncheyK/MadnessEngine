@@ -1,0 +1,89 @@
+{
+	"animations": [
+		{
+			"loop": false,
+			"offsets": [
+				0,
+				79
+			],
+			"anim": "singUP",
+			"fps": 24,
+			"name": "Sing Up",
+			"indices": []
+		},
+		{
+			"loop": true,
+			"offsets": [
+				0,
+				0
+			],
+			"anim": "idle",
+			"fps": 24,
+			"name": "Idle",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-57,
+				-139
+			],
+			"anim": "singDOWN",
+			"fps": 24,
+			"name": "Sing Down",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				106,
+				50
+			],
+			"anim": "singLEFT",
+			"fps": 24,
+			"name": "Sing Left",
+			"indices": []
+		},
+		{
+			"loop": false,
+			"offsets": [
+				-172,
+				-31
+			],
+			"anim": "singRIGHT",
+			"fps": 24,
+			"name": "Sing Right",
+			"indices": []
+		},
+		{
+			"loop": true,
+			"offsets": [
+				-2,
+				0
+			],
+			"anim": "Hank",
+			"fps": 24,
+			"name": "Hank",
+			"indices": []
+		}
+	],
+	"no_antialiasing": false,
+	"image": "characters/EXTRICKY",
+	"position": [
+		0,
+		350
+	],
+	"healthicon": "",
+	"flip_x": false,
+	"healthbar_colors": [
+		255,
+		25,
+		0
+	],
+	"camera_position": [
+		-125,
+		0
+	],
+	"sing_duration": 4,
+	"scale": 1
+}

@@ -15,6 +15,7 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import PlayerSettings;
+import haxe.ds.Either;
 
 class PauseSubState extends MusicBeatSubstate
 {
@@ -29,6 +30,8 @@ class PauseSubState extends MusicBeatSubstate
 
 	var songPos:Float;
 
+	var songName:String;
+
 	public function new(x:Float, y:Float, sp:Float)
 	{
 		super();
@@ -37,6 +40,8 @@ class PauseSubState extends MusicBeatSubstate
 			menuItems = ['Resume', 'Restart Song', 'Toggle Botplay', 'Exit to menu'];
 		}
 		this.songPos = sp;
+
+		songName = PlayState.SONG.song;
 
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 		pauseMusic.volume = 0;
@@ -50,7 +55,7 @@ class PauseSubState extends MusicBeatSubstate
 		add(bg);
 
 		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
-		levelInfo.text += PlayState.SONG.song;
+		levelInfo.text += songName;
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
 		levelInfo.updateHitbox();
@@ -142,10 +147,10 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.health = 1;
 					PlayState.instance.customHUDClass.resetShit();
 					
-					var stat = sys.FileSystem.stat(Paths.json(PlayState.SONG.song.toLowerCase()));
+					var stat = sys.FileSystem.stat(Paths.json(songName.toLowerCase()));
 
 					if (stat.mtime.toString() != PlayState.stats.mtime.toString())
-						PlayState.SONG = Song.loadFromJson(Highscore.formatSong(Paths.formatToSongPath(PlayState.SONG.song).toLowerCase(), PlayState.storyDifficulty), PlayState.SONG.song.toLowerCase());
+						PlayState.SONG = Song.loadFromJson(Highscore.formatSong(Paths.formatToSongPath(songName).toLowerCase(), PlayState.storyDifficulty), songName.toLowerCase());
 
 					stat = null;
 
